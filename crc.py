@@ -42,24 +42,26 @@ class crc16:
         self.crc = INITIAL_MODBUS
 
     def addByte(self, byte):
-        """Given a new Byte and previous CRC, Calc a new CRC-16"""
+        """Calculate a new CRC-16 with the additional byte"""
+
         crc = self.crc
         crc = (crc >> 8) ^ table[(crc ^ byte) & 0xFF]
         self.crc = crc & 0xFFFF
 
     def getResult(self):
+        """Return the current CRC Result"""
+
         return self.crc
 
 
 if __name__ == '__main__':
     buffer = range(64)
-	
+
+    crc = crc16()
+
     for each in buffer:
-        print hex(each)
-    
-    result = 0xffff
-    for each in buffer:
-        result = calcByte(each, result)
-    
+        crc.addByte(each)
+
+    result = crc.getResult()
     print result
     print hex(result)
