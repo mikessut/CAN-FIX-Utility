@@ -43,14 +43,12 @@ class crc16:
 
     def addByte(self, byte):
         """Calculate a new CRC-16 with the additional byte"""
-
         crc = self.crc
         crc = (crc >> 8) ^ table[(crc ^ byte) & 0xFF]
         self.crc = crc & 0xFFFF
 
     def getResult(self):
         """Return the current CRC Result"""
-
         return self.crc
 
 

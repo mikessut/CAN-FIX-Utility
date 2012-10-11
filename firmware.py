@@ -6,9 +6,8 @@ import string
 import time
 import argparse
 
-class Channels:
+class Channels():
     """A Class to keep up with free CANFIX Channels"""
-
     def __init__(self):
         self.channel = [0]*16
 
@@ -24,9 +23,9 @@ class Channels:
 
     def TestFrame(self, frame):
         FirstChannel = 1760
-        id = int(frame[1:4],16)
-        if id >= FirstChannel and id < FirstChannel+32:
-            c = (id - FirstChannel)/2
+
+        if frame.id >= FirstChannel and frame.id < FirstChannel+32:
+            c = (frame.id - FirstChannel)/2
             self.channel[c] = 1
 
 
@@ -39,6 +38,7 @@ def sendCommand(str):
         elif result == "\x07":
             return False
         return
+
 
 
 def config():
@@ -98,4 +98,5 @@ def main():
 
     ser.close
 
-main()
+if __name__ == '__main__':
+    main()
