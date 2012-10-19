@@ -122,7 +122,14 @@ class EasyDevice(Device):
 
     def recvFrame(self):
         result = self._readResponse()
-        return result
+        if result[0] != 't':
+            raise BusReadError("Unknown response from USB2-F-7x01")
+        frame = {}
+        frame['id'] = int(result[1:4], 16)
+        frame['data'] = []
+        for n in range(int(result[4], 16)):
+            frame['data'].append(int(result[5+n*2:7+n*2], 16))
+        return frame
 
 
 class Connection():
@@ -155,11 +162,10 @@ class Connection():
 
 if __name__ == '__main__':
     can = Connection("/dev/ttyUSB0")
-    frame = {}
     can.connect()
     can.init()
     can.open()
-    
+
     frames=[{'id':0x701, 'data':[0, 1, 3, 0x0F, 0x00]},
             {'id':0x701, 'data':[0, 1, 3, 0x0F, 0x01]},
             {'id':0x701, 'data':[0, 1, 3, 0x0F, 0x02]},
@@ -167,7 +173,15 @@ if __name__ == '__main__':
             {'id':0x701, 'data':[0, 1, 3, 0x0F, 0x04]},
             {'id':0x701, 'data':[0, 1, 3, 0x0F, 0x05]},
             {'id':0x701, 'data':[0xFF, 7, 1, 0xF7, 0x00]},
-            {'id':0x6E0, 'data':[1, 0, 0, 0]},
+            {'id':0x6E0, 'data':[1, 0xf, 0, 64]},
+            {'id':0x6E0, 'data':[0, 0, 0, 0, 0, 0, 0, 0]},
+            {'id':0x6E0, 'data':[0, 0, 0, 0, 0, 0, 0, 0]},
+            {'id':0x6E0, 'data':[0, 0, 0, 0, 0, 0, 0, 0]},
+            {'id':0x6E0, 'data':[0, 0, 0, 0, 0, 0, 0, 0]},
+            {'id':0x6E0, 'data':[0, 0, 0, 0, 0, 0, 0, 0]},
+            {'id':0x6E0, 'data':[0, 0, 0, 0, 0, 0, 0, 0]},
+            {'id':0x6E0, 'data':[0, 0, 0, 0, 0, 0, 0, 0]},
+            {'id':0x6E0, 'data':[0, 0, 0, 0, 0, 0, 0, 0]},
             {'id':0x6E0, 'data':[2, 0, 0, 0]},
             {'id':0x6E0, 'data':[3, 0, 0, 0]},
             {'id':0x6E0, 'data':[4]},
