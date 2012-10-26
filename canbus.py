@@ -102,6 +102,18 @@ class EasyDevice(Device):
         except BusReadError:
             raise BusInitError("Unable to Close CAN Port")
 
+    def error(self):
+        print "Closing CAN Port"
+        self.ser.write("F\r")
+        try:
+            result = self._readResponse()
+        except DeviceTimeout:
+            raise BusInitError("Timeout waiting for USB2-F-7x01")
+        except BusReadError:
+            raise BusInitError("Unable to Close CAN Port")
+        return int(result, 16)
+
+
     def sendFrame(self, frame):
         if frame['id'] < 0 or frame['id'] > 2047:
             raise ValueError("Frame ID out of range")
@@ -112,16 +124,23 @@ class EasyDevice(Device):
             xmit = xmit + '%02X' % (each)
         xmit = xmit + '\r'
         self.ser.write(xmit)
-        try:
-            result = self._readResponse()
-        except DeviceTimeout:
-            raise BusWriteError("Timeout waiting for USB2-F-7x01")
-        if result != 'z\r':
-            raise BusWriteError("Bad response from USB2-F-7x01")
+        while True:
+            try:
+                result = self._readResponse()
+            except DeviceTimeout:
+                raise BusWriteError("Timeout waiting for USB2-F-7x01")
+            if result[0] == 't':
+                continue
+            elif result != 'z\r':
+                print "result =", result
+                raise BusWriteError("Bad response from USB2-F-7x01")
+            else:
+                break
 
 
     def recvFrame(self):
         result = self._readResponse()
+        print result, 
         if result[0] != 't':
             raise BusReadError("Unknown response from USB2-F-7x01")
         frame = {}
@@ -129,12 +148,13 @@ class EasyDevice(Device):
         frame['data'] = []
         for n in range(int(result[4], 16)):
             frame['data'].append(int(result[5+n*2:7+n*2], 16))
+        print frame
         return frame
 
 
 class Connection():
     """Class that represents a connection to a CAN device"""
-    def __init__(self, portname = "", bitrate = 125, timeout = 0.5):
+    def __init__(self, portname = "", bitrate = 125, timeout = 0.25):
         self.portname = portname
         self.timeout = timeout
         self.devices = []
@@ -156,6 +176,7 @@ class Connection():
         self.init = self.devices[0].init
         self.open = self.devices[0].open
         self.close = self.devices[0].close
+        self.error = self.devices[0].error
         self.sendFrame = self.devices[0].sendFrame
         self.recvFrame = self.devices[0].recvFrame
 
