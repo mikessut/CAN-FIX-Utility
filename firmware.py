@@ -46,9 +46,9 @@ class Firmware():
         self.__checksum = cs.getResult()
         self.lock = threading.Lock()
         self.__progress = 0.0
-        self.__blocks = self.__size / 64 + 1
+        self.__blocks = self.__size / 128 + 1
         self.__currentblock = 0
-        self.__blocksize = 64
+        self.__blocksize = 128
         self.kill = False
 
     # Download support functions
@@ -102,7 +102,7 @@ class Firmware():
     def __fillBuffer(self, ch, address, data):
         sframe = {}
         sframe["id"] =1760 + ch
-        sframe["data"] = [0x01, address & 0xFF, (address & 0xFF00) >> 8, 64]
+        sframe["data"] = [0x01, address & 0xFF, (address & 0xFF00) >> 8, 128]
         self.__canbus.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
@@ -193,7 +193,7 @@ class Firmware():
         for n in range(self.__blocks * self.__blocksize):
             data.append(self.ih[n])
         for block in range(self.__blocks):
-            address = block * 64
+            address = block * 128
             print "Buffer Fill at %d" % (address)
             self.lock.acquire()
             self.__currentblock = block
