@@ -1,12 +1,30 @@
 #!/usr/bin/python
 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  Copyright (c) 2012 Phil Birkelbach
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+
 import serial
 from serial.tools.list_ports import comports
 import time
 
 # This module is to abstract the interface between the code and the
 # CANBus communication devices.  Right now it only works with the
-# EasySync USB2-F-7xxx devcies.  The idea is to create classes for
+# EasySync USB2-F-7xxx devices.  The idea is to create classes for
 # each type of device that we want to use and have a common interface
 # for each.  While connecting we'd figure out what kind of device that
 # we have and then set pointers to the right device classes so the rest
@@ -46,7 +64,7 @@ class Device():
 
 class EasyDevice(Device):
     """Class that represents an EasySync USB2-F-7x01 USB to CANBus device"""
-    def _readResponse(self):
+    def __readResponse(self):
         str = ""
 
         while 1:
@@ -66,7 +84,7 @@ class EasyDevice(Device):
         print "Reseting USB2-F-7x01"
         self.ser.write("R\r")
         try:
-            result = self._readResponse()
+            result = self.__readResponse()
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for USB2-F-7x01")
         except BusReadError:
@@ -76,7 +94,7 @@ class EasyDevice(Device):
         print "Setting Bit Rate"
         self.ser.write(bitrates[self.bitrate])
         try:
-            result = self._readResponse()
+            result = self.__readResponse()
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for USB2-F-7x01")
         except BusReadError:
@@ -86,7 +104,7 @@ class EasyDevice(Device):
         print "Opening CAN Port"
         self.ser.write("O\r")
         try:
-            result = self._readResponse()
+            result = self.__readResponse()
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for USB2-F-7x01")
         except BusReadError:
@@ -96,7 +114,7 @@ class EasyDevice(Device):
         print "Closing CAN Port"
         self.ser.write("C\r")
         try:
-            result = self._readResponse()
+            result = self.__readResponse()
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for USB2-F-7x01")
         except BusReadError:
@@ -113,7 +131,7 @@ class EasyDevice(Device):
             raise BusInitError("Unable to Close CAN Port")
         return int(result, 16)
 
-
+                          __readResponse
     def sendFrame(self, frame):
         if frame['id'] < 0 or frame['id'] > 2047:
             raise ValueError("Frame ID out of range")
@@ -121,7 +139,7 @@ class EasyDevice(Device):
         xmit = xmit + '%03X' % (frame['id'])
         xmit = xmit + str(len(frame['data']))
         for each in frame['data']:
-            xmit = xmit + '%02X' % (each)
+            xmit = xmi__readResponse(each)
         xmit = xmit + '\r'
         self.ser.write(xmit)
         while True:
@@ -134,7 +152,7 @@ class EasyDevice(Device):
             elif result != 'z\r':
                 print "result =", result
                 raise BusWriteError("Bad response from USB2-F-7x01")
-            else:
+            else:                                                2
                 break
 
 
