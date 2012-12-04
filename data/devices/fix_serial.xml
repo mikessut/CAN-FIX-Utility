@@ -1,0 +1,25 @@
+<device>
+    <name>CAN-FIX to FIX Serial Converter</name>
+    <deviceid>0x60</deviceid>
+    <model>0x001</model>
+    <firmware_update>
+        <update_code>0x00F701</update_code>
+        <driver>AT328</driver>
+    </firmware_update>
+    <parameters>
+        <parameter id='0x182'/>
+        <parameter id='0x183'/>
+        <parameter id='0x184'/>
+        <parameter id='0x185'/>
+        <parameter id='0x186'/>        
+    </parameters>
+    <configuration>
+        <parameter address='0x01' name='Baud Rate'>
+            <type>select</type>
+            <item name='9600' value='0x00'/>
+            <item name='19200' value='0x01'/>
+            <item name='57600' value='0x02'/>            
+            <item name='115200' value='0x03'/>
+        </parameter>
+    </configuration>
+</device>
