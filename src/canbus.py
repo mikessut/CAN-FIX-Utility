@@ -124,14 +124,13 @@ class EasyDevice(Device):
         print "Closing CAN Port"
         self.ser.write("F\r")
         try:
-            result = self._readResponse()
+            result = self.__readResponse()
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for USB2-F-7x01")
         except BusReadError:
             raise BusInitError("Unable to Close CAN Port")
         return int(result, 16)
 
-                          __readResponse
     def sendFrame(self, frame):
         if frame['id'] < 0 or frame['id'] > 2047:
             raise ValueError("Frame ID out of range")
@@ -139,12 +138,12 @@ class EasyDevice(Device):
         xmit = xmit + '%03X' % (frame['id'])
         xmit = xmit + str(len(frame['data']))
         for each in frame['data']:
-            xmit = xmi__readResponse(each)
+            xmit = xmit + '%02X' % each
         xmit = xmit + '\r'
         self.ser.write(xmit)
         while True:
             try:
-                result = self._readResponse()
+                result = self.__readResponse()
             except DeviceTimeout:
                 raise BusWriteError("Timeout waiting for USB2-F-7x01")
             if result[0] == 't':
@@ -152,12 +151,12 @@ class EasyDevice(Device):
             elif result != 'z\r':
                 print "result =", result
                 raise BusWriteError("Bad response from USB2-F-7x01")
-            else:                                                2
+            else:
                 break
 
 
     def recvFrame(self):
-        result = self._readResponse()
+        result = self.__readResponse()
         print result, 
         if result[0] != 't':
             raise BusReadError("Unknown response from USB2-F-7x01")
