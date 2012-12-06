@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabData">
        <attribute name="title">
@@ -85,24 +85,26 @@
    </property>
    <widget class="QMenu" name="menuComm">
     <property name="title">
-     <string>Comm</string>
+     <string>&amp;Comm</string>
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
-    <addaction name="actionNew"/>
-    <addaction name="actionOpen"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_As"/>
-    <addaction name="separator"/>
     <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionLoad_Firmware"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuComm"/>
+   <addaction name="menu_Tools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionConnect">
@@ -144,6 +146,17 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Meta+Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionLoad_Firmware">
+   <property name="text">
+    <string>Load &amp;Firmware</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+F</string>
    </property>
   </action>
  </widget>
@@ -188,12 +201,28 @@
    <slot>dataEdit(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>521</x>
-     <y>153</y>
+     <x>103</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
      <x>667</x>
      <y>27</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoad_Firmware</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadFirmware()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>263</y>
     </hint>
    </hints>
   </connection>
@@ -202,5 +231,6 @@
   <slot>connect()</slot>
   <slot>deviceEdit(QModelIndex)</slot>
   <slot>dataEdit(QModelIndex)</slot>
+  <slot>loadFirmware()</slot>
  </slots>
 </ui>

@@ -1,4 +1,4 @@
-UIFILES = main_ui.py connect_ui.py
+UIFILES = main_ui.py connect_ui.py firmware_ui.py
 
 all: $(UIFILES)
 
