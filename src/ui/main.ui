@@ -47,6 +47,29 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabTraffic">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <attribute name="title">
+        <string>Traffic</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QTextBrowser" name="textTraffic"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabPFD">
+       <attribute name="title">
+        <string>PFD</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QGraphicsView" name="gviewPFD"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>

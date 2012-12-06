@@ -1,4 +1,4 @@
-CaAN-FIX is a CANBus based communication protocol designed for the exchange
-of flight data between aircraft systems.  This project contains various 
-utilities that can be used to configure, troubleshoot and update devices
-that implement this protocol.
+CAN-FIX is a CANBus based communication protocol designed for the exchange of
+flight data between aircraft systems.  This project contains various utilities
+that can be used to monitor, configure, troubleshoot and update devices that
+implement this protocol.
