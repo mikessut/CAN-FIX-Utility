@@ -43,6 +43,11 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
+        
+    def btnClick(self, btn):
+        x = btn.text()
+        if x == "Apply":
+            self.labelStatus.setText("GO GO Now!!")
 
 class modelData(QAbstractTableModel):
     def __init__(self):
@@ -125,7 +130,7 @@ class modelDevices(QAbstractTableModel):
 
 class mainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
-        QWidget.__init__(self)
+        QMainWindow.__init__(self)
         self.setupUi(self)
         self.data = modelData()
         self.tableData.setModel(self.data)
@@ -164,7 +169,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
     def loadFirmware(self):
         connectDia = dialogFirmware()
         x = connectDia.exec_()
-       
                         
     def deviceEdit(self, index):
         self.devices.edit(index)

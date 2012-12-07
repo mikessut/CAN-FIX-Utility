@@ -95,7 +95,7 @@
    <item>
     <widget class="QProgressBar" name="progressBar">
      <property name="value">
-      <number>24</number>
+      <number>0</number>
      </property>
     </widget>
    </item>
@@ -109,5 +109,41 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>dialogFirmware</receiver>
+   <slot>btnClick(QAbstractButton*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>137</x>
+     <y>178</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>-17</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>dialogFirmware</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>315</x>
+     <y>182</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>220</x>
+     <y>-2</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>btnClick(QAbstractButton*)</slot>
+ </slots>
 </ui>

@@ -11,15 +11,25 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CAN-FIX Configuration Utility</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
+      <widget class="QWidget" name="tabNetwork">
+       <attribute name="title">
+        <string>Network</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QTreeView" name="viewNetwork"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tabData">
        <attribute name="title">
         <string>Data</string>
@@ -34,16 +44,6 @@
            <enum>QAbstractItemView::SelectRows</enum>
           </property>
          </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabNetwork">
-       <attribute name="title">
-        <string>Network</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QTreeView" name="viewNetwork"/>
         </item>
        </layout>
       </widget>

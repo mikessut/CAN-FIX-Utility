@@ -17,6 +17,19 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
+      <widget class="QLabel" name="labelDevice">
+       <property name="text">
+        <string>CAN &amp;Device</string>
+       </property>
+       <property name="buddy">
+        <cstring>comboDevice</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboDevice"/>
+     </item>
+     <item>
       <widget class="QLabel" name="labelPort">
        <property name="text">
         <string>&amp;Port</string>
@@ -28,19 +41,6 @@
      </item>
      <item>
       <widget class="QComboBox" name="comboPort"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelDevice">
-       <property name="text">
-        <string>&amp;Device</string>
-       </property>
-       <property name="buddy">
-        <cstring>comboDevice</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboDevice"/>
      </item>
      <item>
       <widget class="QGroupBox" name="groupBitrate">

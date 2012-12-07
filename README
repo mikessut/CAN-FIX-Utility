@@ -2,3 +2,24 @@ CAN-FIX is a CANBus based communication protocol designed for the exchange of
 flight data between aircraft systems.  This project contains various utilities
 that can be used to monitor, configure, troubleshoot and update devices that
 implement this protocol.
+
+Right now the dependencies for this project are...
+
+Python 2.x
+
+I have not tried it with older (or newer versions) but it'll probably work
+with 2.6.
+
+pySerial
+
+For serial port communication to CAN Bus communication adapters.
+
+IntelHex
+
+This library loads Intel Hex format files.  It's for the firmware loading
+functions
+
+PyQt4
+
+At some point I may make this work as a command line only type program if
+PyQt is not available but for now it's a requirement.
