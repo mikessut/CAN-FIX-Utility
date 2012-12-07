@@ -17,23 +17,8 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import argparse
+def run():
+    print "Here we go"
 
-Have_PyQt = True
-try:
-    from PyQt4.QtGui import *
-except:
-    Have_PyQt = False
-
-parser = argparse.ArgumentParser(description='CAN-FIX Configuration Utility Program')
-parser.add_argument('--interactive', '-i', action='store_true', help='Run in interactive mode')
-
-args = parser.parse_args()
-
-if Have_PyQt==False or args.interactive == True:
-    import mainCommand
-    mainCommand.run()
-else:
-    import mainWindow
-    mainWindow.run()
-    
+if __name__ == "__main__":
+    run()
