@@ -17,8 +17,8 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import com_devices.easy
-import com_devices.simulate
+import adapters.easy
+import adapters.simulate
 import serial
 from serial.tools.list_ports import comports
 
@@ -27,9 +27,10 @@ class Connection():
     def __init__(self, portname = "", bitrate = 125, timeout = 0.25):
         self.portname = portname
         self.timeout = timeout
+        #Here we append all the different Adapter classes to our list
         self.devices = []
-        self.devices.append(EasyDevice(bitrate))
-        self.devices.append(SimualteDevice(bitrate))
+        self.devices.append(adapters.easy.EasyAdapter(bitrate))
+        self.devices.append(adapters.simulate.SimulateAdapter(bitrate))
 
     def connect(self, index):
         #This code tries to find a USB/CAN device on one of the comm ports.
@@ -45,19 +46,21 @@ class Connection():
             raise BusInitError("No CAN device found")
 
         self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
-        self.devices[0].setport(self. ser)
-        self.initialize = self.devices[0].initialize
-        self.open = self.devices[0].open
-        self.close = self.devices[0].close
-        self.error = self.devices[0].error
-        self.sendFrame = self.devices[0].sendFrame
-        self.recvFrame = self.devices[0].recvFrame
+        self.devices[1].setport(self. ser)
+        self.initialize = self.devices[1].initialize
+        self.open = self.devices[1].open
+        self.close = self.devices[1].close
+        self.error = self.devices[1].error
+        self.sendFrame = self.devices[1].sendFrame
+        self.recvFrame = self.devices[1].recvFrame
 
 
 if __name__ == '__main__':
     can = Connection("/dev/ttyUSB0")
+    for each in can.devices:
+        print each.name
     can.connect()
-    can.init()
+    can.initialize()
     can.open()
 
     frames=[{'id':0x701, 'data':[0, 1, 3, 0x0F, 0x00]},

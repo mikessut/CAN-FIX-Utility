@@ -18,7 +18,7 @@
 import adapter
 import serial
 
-class EasyAdapter(Adapter):
+class EasyAdapter(adapter.Adapter):
     """Class that represents an EasySync USB2-F-7x01 USB to CANBus device"""
     def __init__(self, bitrate=125):
         self.name = "EasySync USB2-F-7x01"

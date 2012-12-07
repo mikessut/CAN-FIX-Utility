@@ -17,7 +17,7 @@ For serial port communication to CAN Bus communication adapters.
 IntelHex
 
 This library loads Intel Hex format files.  It's for the firmware loading
-functions
+functions.  It can be downloaded from https://launchpad.net/intelhex/
 
 PyQt4
 
