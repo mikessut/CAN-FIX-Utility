@@ -148,7 +148,7 @@
     <string>Exit</string>
    </property>
    <property name="shortcut">
-    <string>Meta+Ctrl+Q</string>
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionLoad_Firmware">
@@ -226,11 +226,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionDisconnect</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>disconnect()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>connect()</slot>
   <slot>deviceEdit(QModelIndex)</slot>
   <slot>dataEdit(QModelIndex)</slot>
   <slot>loadFirmware()</slot>
+  <slot>disconnect()</slot>
  </slots>
 </ui>

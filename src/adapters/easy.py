@@ -15,17 +15,16 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import adapter
 import serial
+from serial.tools.list_ports import comports
 
-class EasyAdapter(adapter.Adapter):
+class Adapter():
     """Class that represents an EasySync USB2-F-7x01 USB to CANBus device"""
-    def __init__(self, bitrate=125):
+    def __init__(self):
         self.name = "EasySync USB2-F-7x01"
-        self.bitrate = bitrate
-    
-    def setport(self, ser):
-        self.ser = ser
+        self.shortname = "easy"
+        self.type = "serial"
+        self.ser = None
         
     def __readResponse(self):
         str = ""
@@ -41,9 +40,16 @@ class EasyAdapter(adapter.Adapter):
                 if x == "\x07": # Bell is error
                     raise BusReadError("USB2-F-7x01 Returned Bell")
 
-    def init(self):
+    def connect(self, bitrate, portname=None, timeout=0.25):
         bitrates = {10:"S0\r", 20:"S1\r", 50:"S2\r", 100:"S3\r", 
                     125:"S4\r", 250:"S5\r", 500:"S6\r", 800:"S7\r", 1000:"S8\r"}
+        if portname:
+            self.portname = portname
+        else:
+            self.portname = comports[0][0]
+        self.timeout = timeout
+        self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
+                
         print "Reseting USB2-F-7x01"
         self.ser.write("R\r")
         try:

@@ -11,36 +11,68 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>CANBus Connect</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <widget class="QLabel" name="labelDevice">
+      <widget class="QLabel" name="labelAdapter">
        <property name="text">
-        <string>CAN &amp;Device</string>
+        <string>CAN A&amp;dapter</string>
        </property>
        <property name="buddy">
-        <cstring>comboDevice</cstring>
+        <cstring>comboAdapter</cstring>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboDevice"/>
+      <widget class="QComboBox" name="comboAdapter"/>
      </item>
      <item>
-      <widget class="QLabel" name="labelPort">
-       <property name="text">
-        <string>&amp;Port</string>
+      <widget class="QStackedWidget" name="stackConfig">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
        </property>
-       <property name="buddy">
-        <cstring>comboPort</cstring>
+       <property name="currentIndex">
+        <number>0</number>
        </property>
+       <widget class="QWidget" name="pageSerialPort">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QLabel" name="labelPort">
+           <property name="text">
+            <string>&amp;Port</string>
+           </property>
+           <property name="buddy">
+            <cstring>comboPort</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboPort"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="pageNetwork">
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QLabel" name="labelAddress">
+           <property name="text">
+            <string>&amp;Address</string>
+           </property>
+           <property name="buddy">
+            <cstring>editAddress</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="editAddress"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="pageNone"/>
       </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboPort"/>
      </item>
      <item>
       <widget class="QGroupBox" name="groupBitrate">
@@ -143,5 +175,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>comboAdapter</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>ConnectDialog</receiver>
+   <slot>adapterChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>36</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>141</x>
+     <y>-15</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>adapterChange(int)</slot>
+ </slots>
 </ui>

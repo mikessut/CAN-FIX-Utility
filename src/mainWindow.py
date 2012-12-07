@@ -25,6 +25,7 @@ import protocol
 from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
 from ui.firmware_ui import Ui_dialogFirmware
+import adapters
 
 con = None
 
@@ -37,6 +38,17 @@ class connectDialog(QDialog, Ui_ConnectDialog):
         ports = con.getPortList()
         for each in ports:
             self.comboPort.addItem(each)
+        for each in adapters.adapters:
+            self.comboAdapter.addItem(each.name)
+            
+    def adapterChange(self, x):
+        if adapters.adapters[x].type == "serial":
+            self.stackConfig.setCurrentIndex(0)
+        elif adapters.adapters[x].type == "network":
+            self.stackConfig.setCurrentIndex(1)
+        else:
+            self.stackConfig.setCurrentIndex(2)
+        
             
 class dialogFirmware(QDialog, Ui_dialogFirmware):
     def __init__(self):
@@ -141,7 +153,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         connectDia = connectDialog()
         x = connectDia.exec_()
         if x:
-            port = str(connectDia.listPort.currentItem().text())
+            port = str(connectDia.comboAdapter.currentItem().text())
             self.statusbar.showMessage("Connecting to %s" % port)
             val = con.connect(port)
             if val:
@@ -151,6 +163,9 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 self.statusbar.showMessage("Failed to connect to %s" % port)
         else:
             print "Canceled"
+    
+    def disconnect(self):
+        print "Disconnect..."
     
     def loadFirmware(self):
         connectDia = dialogFirmware()

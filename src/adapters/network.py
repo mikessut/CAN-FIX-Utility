@@ -18,9 +18,9 @@
 class Adapter():
     """Class that represents an EasySync USB2-F-7x01 USB to CANBus device"""
     def __init__(self):
-        self.name = "CAN Device Simulator"
-        self.shortname = "simulate"
-        self.type = "None"
+        self.name = "Dumb Network Driver"
+        self.shortname = "network"
+        self.type = "network"
     
     def connect(self):
         print "Connecting to simulation adapter"
