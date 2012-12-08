@@ -54,12 +54,18 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
-        
+        self.comboDevice.addItem("CAN-FIX Serial Converter")
+        self.comboDevice.addItem("Dummy Network Device")
+    
     def btnClick(self, btn):
         x = btn.text()
         if x == "Apply":
             self.labelStatus.setText("GO GO Now!!")
-
+    
+    def btnFileClick(self):
+        filename = filename = QFileDialog.getOpenFileName(self, 'Open File', '.')
+        self.editFile.setText(filename)
+        
 class modelData(QAbstractTableModel):
     def __init__(self):
         QAbstractTableModel.__init__(self)
