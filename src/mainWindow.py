@@ -17,6 +17,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import config
 import sys
 import connection
 from PyQt4.QtCore import *
@@ -69,7 +70,7 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
 class modelData(QAbstractTableModel):
     def __init__(self):
         QAbstractTableModel.__init__(self)
-        self.cf = protocol.CanFix("../data/canfix.xml")
+        self.cf = protocol.CanFix(config.DataPath + "canfix.xml")
         self.parlist = []
         for i in self.cf.parameters:
             self.parlist.append(self.cf.parameters[i])

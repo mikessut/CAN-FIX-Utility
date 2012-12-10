@@ -17,6 +17,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import config
 import xml.dom.minidom
 
 def _getText(node, element):
@@ -108,7 +109,7 @@ class CanFix:
             
 
 if __name__ == "__main__":
-    canfix = CanFix("canfix.xml")
+    canfix = CanFix(config.DataPath + "canfix.xml")
     print "Groups:"
     for each in canfix.groups:
         print " %s %d-%d" % (each["name"], each["startid"], each["endid"])

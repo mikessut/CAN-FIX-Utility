@@ -1,5 +1,5 @@
-<device name = 'FIX Serial Converter' id='0x60' model = '0x001'>
-    <firmware_update code = '0xF701' driver = 'AT328'/>
+<device name = 'Dummy Device' id = '0xFF' model ='0x001'>
+    <firmware_update code = '0x0000' driver = 'DUMMY'/>
     <parameters>
         <parameter id='0x182'/>
         <parameter id='0x183'/>
@@ -8,7 +8,8 @@
         <parameter id='0x186'/>        
     </parameters>
     <configuration>
-        <attribute key='0x0001' name='Baud Rate' type='select'>
+        <attribute key='0x0001' name='Baud Rate'>
+            <type>select</type>
             <item name='9600' value='0x00'/>
             <item name='19200' value='0x01'/>
             <item name='57600' value='0x02'/>            
