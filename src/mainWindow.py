@@ -18,6 +18,7 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import config
+import devices
 import sys
 import connection
 from PyQt4.QtCore import *
@@ -25,7 +26,7 @@ from PyQt4.QtGui import *
 import protocol
 from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
-from ui.firmware_ui import Ui_dialogFirmware
+import fwDialog
 import adapters
 
 con = None
@@ -51,21 +52,7 @@ class connectDialog(QDialog, Ui_ConnectDialog):
             self.stackConfig.setCurrentIndex(2)
         
             
-class dialogFirmware(QDialog, Ui_dialogFirmware):
-    def __init__(self):
-        QDialog.__init__(self)
-        self.setupUi(self)
-        self.comboDevice.addItem("CAN-FIX Serial Converter")
-        self.comboDevice.addItem("Dummy Network Device")
-    
-    def btnClick(self, btn):
-        x = btn.text()
-        if x == "Apply":
-            self.labelStatus.setText("GO GO Now!!")
-    
-    def btnFileClick(self):
-        filename = filename = QFileDialog.getOpenFileName(self, 'Open File', '.')
-        self.editFile.setText(filename)
+
         
 class modelData(QAbstractTableModel):
     def __init__(self):
@@ -175,7 +162,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         print "Disconnect..."
     
     def loadFirmware(self):
-        connectDia = dialogFirmware()
+        connectDia = fwDialog.dialogFirmware()
         x = connectDia.exec_()
                         
     def deviceEdit(self, index):
