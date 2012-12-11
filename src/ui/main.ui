@@ -109,7 +109,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionConnect">
    <property name="text">
-    <string>Connect</string>
+    <string>Connect...</string>
    </property>
    <property name="shortcut">
     <string>Meta+C</string>
