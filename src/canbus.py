@@ -18,41 +18,34 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import adapters
-import serial
-from serial.tools.list_ports import comports
+import serial.tools.list_ports
+
+def getPortList():
+    """Return a list of available ports"""
+    portList = serial.tools.list_ports.comports()
+    list = []
+    for each in portList:
+        list.append(each[0])
+        return list
 
 class Connection():
     """Class that represents a connection to a CAN device"""
-    def __init__(self, portname = "", bitrate = 125, timeout = 0.25):
-        self.portname = portname
-        self.timeout = timeout
-        #Here we append all the different Adapter classes to our list
-        self.devices = []
-        self.devices.append(adapters.easy.EasyAdapter(bitrate))
-        self.devices.append(adapters.simulate.SimulateAdapter(bitrate))
+    def __init__(self, bitrate = 125, timeout = 0.25):
+        pass
 
-    def connect(self, index):
-        #This code tries to find a USB/CAN device on one of the comm ports.
-        #TODO: This should call some function from each devcie on each portname
-        #      to try and find the a device on the port.
-        if self.portname == "":
-            for each in comports():
-                if string.find(each[1], "USB2-F-7x01") >= 0:
-                    self.portname = each[0]
-                    print "Found CAN device on Port", self.portname
-
-        if self.portname == "":
-            raise BusInitError("No CAN device found")
-
-        self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
-        self.devices[1].setport(self. ser)
-        self.initialize = self.devices[1].initialize
-        self.open = self.devices[1].open
-        self.close = self.devices[1].close
-        self.error = self.devices[1].error
-        self.sendFrame = self.devices[1].sendFrame
-        self.recvFrame = self.devices[1].recvFrame
-
+    def connect(self, index, config):
+        print config
+    
+    def disconnect(self):
+        pass
+    
+    def sendFrame(self, frame):
+        pass
+    
+    def recvFrame(self):
+        pass
+    
+   
 
 if __name__ == '__main__':
     can = Connection("/dev/ttyUSB0")

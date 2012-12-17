@@ -46,6 +46,8 @@ class DeviceTimeout(Exception):
     """Device Timeout Exception"""
     pass
 
+# Import and add each Adapter class from the files.  There may be a way
+# to do this in a loop but for now this will work.
 import easy
 import simulate
 import network
@@ -55,3 +57,22 @@ adapters.append(easy.Adapter())
 adapters.append(simulate.Adapter())
 adapters.append(network.Adapter())
 
+currentIndex = None
+
+def connect(index):
+    global adapters
+    global currentIndex
+    
+    if currentIndex != None:
+        adapters[currentIndex].disconnect()
+    
+    adpaters[index].connect()
+    currentIndex = index
+    
+def disconnect():
+    global adapters
+    global currentIndex
+    
+    if currentIndex != None:
+        adpaters[currentIndex].disconnect()
+        currentIndex = None

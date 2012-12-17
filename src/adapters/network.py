@@ -16,7 +16,7 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 class Adapter():
-    """Class that represents an EasySync USB2-F-7x01 USB to CANBus device"""
+    """Class that represents a generic TCP/IP to CAN Bus Adapter"""
     def __init__(self):
         self.name = "Dumb Network Driver"
         self.shortname = "network"

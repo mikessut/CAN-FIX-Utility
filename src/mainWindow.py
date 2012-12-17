@@ -20,7 +20,7 @@
 import config
 import devices
 import sys
-import connection
+import canbus
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import protocol
@@ -29,15 +29,12 @@ from ui.connect_ui import Ui_ConnectDialog
 import fwDialog
 import adapters
 
-con = None
 
 class connectDialog(QDialog, Ui_ConnectDialog):
     def __init__(self):
-        global con
         QDialog.__init__(self)
         self.setupUi(self)
-        con = connection.Connection()
-        ports = con.getPortList()
+        ports = canbus.getPortList()
         for each in ports:
             self.comboPort.addItem(each)
         for each in adapters.adapters:
@@ -103,11 +100,13 @@ class modelData(QAbstractTableModel):
         print "Edit Data Row %d" % index.row()
 
 
-class modelDevices(QAbstractTableModel):
-    def __init__(self):
-        QAbstractTableModel.__init__(self)
+class modelNetwork(QAbstractItemModel):
+    def __init__(self, parent=None):
+        super(modelNetwork, self).__init__(parent)
+        self.parents=[]
+        self.rootItem = "Hello"
         self.rows = 100
-        self.cols = 10
+        self.cols = 1
         
     def data(self, index, role = Qt.DisplayRole):
         if not index.isValid(): 
@@ -116,10 +115,10 @@ class modelDevices(QAbstractTableModel):
             return QVariant() 
         return QVariant((index.row()+1)*100 + index.column()+1)
     
-    def rowCount(self, parent = QModelIndex()):
+    def rowCount(self, parent):
         return self.rows
     
-    def columnCount(self, parent = QModelIndex()):
+    def columnCount(self, parent):
         return self.cols
     
     def headerData(self, col, orientation, role):
@@ -129,9 +128,19 @@ class modelDevices(QAbstractTableModel):
             return QVariant("Row")
         return QVariant()
     
-    def edit(self, index):
-        print "Edit Device Row %d" % index.row()
+    def index(self, row, column, parent):
+        if row < 0 or column < 0 or \
+           row >= self.rowCount(parent) or column >= self.columnCount(parent):
+            return QModelIndex()
+        if not parent.isValid():
+            parentItem = self.rootItem
+        childItem = parentItem.child(row)
+        if childItem:
+            return self.createIndex(row, colum, childItem)
+        else:
+            return QModelIndex
 
+        
 
 class mainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -139,22 +148,35 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.data = modelData()
         self.tableData.setModel(self.data)
-        self.devices = modelDevices()
-        self.viewNetwork.setModel(self.devices)
+        self.network = QStandardItemModel()
+        parentItem = self.network.invisibleRootItem()
+        for i in range(10):
+            item = QStandardItem("Node " + str(i))
+            parentItem.appendRow(item)
+            for each in range(3):
+                child = QStandardItem("Parameter " + str(each))
+                item.appendRow(child)
+            #parentItem = item
+        #self.network = modelNetwork()
+        self.viewNetwork.setModel(self.network)
         
     def connect(self):
         print "Connect..."
         connectDia = connectDialog()
         x = connectDia.exec_()
         if x:
-            port = str(connectDia.comboAdapter.currentItem().text())
-            self.statusbar.showMessage("Connecting to %s" % port)
-            val = con.connect(port)
+            config = {}
+            index = connectDia.comboAdapter.currentIndex()
+            config['port'] = str(connectDia.comboPort.currentText())
+            config['address'] = str(connectDia.editAddress.text())
+            self.statusbar.showMessage("Connecting to %s" % adapters.adapters[index].name)
+            self.con = canbus.Connection()
+            val = self.con.connect(index, config)
             if val:
                 self.statusbar.showMessage("Connected to %s at %d baud.  Version %s" % 
                                           (val["Port"], val["Baudrate"], val["Version"]))
             else:
-                self.statusbar.showMessage("Failed to connect to %s" % port)
+                self.statusbar.showMessage("Failed to connect to %s" % config['port'])
         else:
             print "Canceled"
     
@@ -165,11 +187,11 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         connectDia = fwDialog.dialogFirmware()
         x = connectDia.exec_()
                         
-    def deviceEdit(self, index):
-        self.devices.edit(index)
-    
     def dataEdit(self, index):
         self.data.edit(index)
+    
+    def networkClicked(self, index):
+        print index.parent().data().toString() + " " + index.data().toString()
 
 def run():
     app = QApplication(sys.argv)

@@ -19,7 +19,7 @@ import serial
 from serial.tools.list_ports import comports
 
 class Adapter():
-    """Class that represents an EasySync USB2-F-7x01 USB to CANBus device"""
+    """Class that represents an EasySync USB2-F-7x01 USB to CANBus adapter"""
     def __init__(self):
         self.name = "EasySync USB2-F-7x01"
         self.shortname = "easy"
