@@ -45,7 +45,7 @@ import serial
 import serial.tools.list_ports
 import threading
 import Queue
-import os
+import time
     
 def getSerialPortList():
     """Return a list of serial ports"""
@@ -57,18 +57,36 @@ def getSerialPortList():
 
 class SendThread(threading.Thread):
     def __init__(self):
+        threading.Thread.__init__(self)
         self.getout = False
     
     def run(self):
         while(True):
-            os.sleep(1)
+            time.sleep(1)
             if(self.getout):
                 break
-            print "Okay"
+            print "Send Thread"
+        print "End of the Send Thread"
     
     def quit(self):
         self.getout = True
-   
+
+class RecvThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.getout = False
+    
+    def run(self):
+        while(True):
+            time.sleep(1)
+            if(self.getout):
+                break
+            print "Receive Thread"
+        print "End of the Receive thread"
+        
+    def quit(self):
+        self.getout = True
+        
 # Import and add each Adapter class from the files.  There may be a way
 # to do this in a loop but for now this will work.
 import easy
@@ -84,12 +102,15 @@ adapterIndex = None
 sendQueue = Queue.Queue()
 recvQueueList = []
 listLock = threading.Lock()
-sendThread = SendThread()
+sendThread = None
+recvThread = None
             
 
 def connect(index = None, config = None):
     global adapters
     global adapterIndex
+    global sendThread
+    global recvThread
     
     print "canbus.connect() has been called"
     if adapterIndex != None:
@@ -104,16 +125,27 @@ def connect(index = None, config = None):
             #Raise an exception that we have to have information
             pass
         else:
+            sendThread = SendThread()
+            recvThread = RecvThread()
             sendThread.start()
-            adpaters[index].connect()
+            recvThread.start()
+            #adapters[index].connect()
             adapterIndex = index
     
 def disconnect(queueIndex):
     global adapters
     global adapterIndex
+    global sendThread
+    global recvThread
     
     if adapterIndex != None:
-        adpaters[adapterIndex].disconnect()
+        sendThread.quit()
+        sendThread.join()
+        recvThread.quit()
+        recvThread.join()
+        sendThread = None
+        recvThread = None
+        #adapters[adapterIndex].disconnect()
         adapterIndex = None
 
 def sendFrame(frame):

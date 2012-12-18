@@ -179,6 +179,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             print "Canceled"
     
     def disconnect(self):
+        canbus.disconnect(1)
         print "Disconnect..."
     
     def loadFirmware(self):
@@ -191,9 +192,14 @@ class mainWindow(QMainWindow, Ui_MainWindow):
     def networkClicked(self, index):
         print index.parent().data().toString() + " " + index.data().toString()
 
+def getout():
+    print "Calling Getout"
+    canbus.disconnect(0)
+
 def run():
     app = QApplication(sys.argv)
     myapp = mainWindow()
+    app.aboutToQuit.connect(getout)
     myapp.show()
     sys.exit(app.exec_())
 
