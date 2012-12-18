@@ -21,7 +21,7 @@ import config
 import protocol
 import devices
 import sys
-import connection
+#import connection
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from ui.firmware_ui import Ui_dialogFirmware

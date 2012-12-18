@@ -27,23 +27,22 @@ import protocol
 from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
 import fwDialog
-import adapters
 
 
 class connectDialog(QDialog, Ui_ConnectDialog):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
-        ports = canbus.getPortList()
+        ports = canbus.getSerialPortList()
         for each in ports:
             self.comboPort.addItem(each)
-        for each in adapters.adapters:
+        for each in canbus.adapters:
             self.comboAdapter.addItem(each.name)
             
     def adapterChange(self, x):
-        if adapters.adapters[x].type == "serial":
+        if canbus.adapters[x].type == "serial":
             self.stackConfig.setCurrentIndex(0)
-        elif adapters.adapters[x].type == "network":
+        elif canbus.adapters[x].type == "network":
             self.stackConfig.setCurrentIndex(1)
         else:
             self.stackConfig.setCurrentIndex(2)
@@ -169,9 +168,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             index = connectDia.comboAdapter.currentIndex()
             config['port'] = str(connectDia.comboPort.currentText())
             config['address'] = str(connectDia.editAddress.text())
-            self.statusbar.showMessage("Connecting to %s" % adapters.adapters[index].name)
-            self.con = canbus.Connection()
-            val = self.con.connect(index, config)
+            self.statusbar.showMessage("Connecting to %s" % canbus.adapters[index].name)
+            canbus.connect(index, config)
             if val:
                 self.statusbar.showMessage("Connected to %s at %d baud.  Version %s" % 
                                           (val["Port"], val["Baudrate"], val["Version"]))
