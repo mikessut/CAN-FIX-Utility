@@ -34,11 +34,15 @@ class commThread(QThread):
         self.getout = False
     
         while True:
-            frame = canbus.recvFrame(0)
-            # TODO: Do something with the frame.
-            print frame
-            if self.getout:
-                break
+            try:
+                frame = canbus.recvFrame(0)
+                # TODO: Do something with the frame.
+                print frame
+            except canbus.exceptions.DeviceTimeout:
+                pass
+            finally:
+                if self.getout:
+                    break
             
     def quit(self):
         self.getout = True

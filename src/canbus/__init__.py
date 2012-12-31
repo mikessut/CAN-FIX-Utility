@@ -81,8 +81,6 @@ class RecvThread(threading.Thread):
                         n+=1
             except DeviceTimeout:
                 pass
-            #except:
-            #    break
             finally:
                 if(self.getout):
                     break
@@ -160,7 +158,7 @@ def recvFrame(index, timeout = 0.25):
         raise BusInitError("Queue is not active")
     
     try:
-        frame = recvQueueList[index].get(timeout)
+        frame = recvQueueList[index].get(timeout = timeout)
         return frame
     except Queue.Empty:
         raise DeviceTimeout()
