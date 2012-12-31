@@ -14,11 +14,11 @@
    <string>CAN-FIX Configuration Utility</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabNetwork">
        <attribute name="title">
@@ -54,9 +54,47 @@
        <attribute name="title">
         <string>Traffic</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QPlainTextEdit" name="textTraffic"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonStart">
+            <property name="text">
+             <string>Start</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonStop">
+            <property name="text">
+             <string>Stop</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonClear">
+            <property name="text">
+             <string>Clear</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -258,6 +296,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>buttonClear</sender>
+   <signal>clicked()</signal>
+   <receiver>textTraffic</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>635</x>
+     <y>479</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>547</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonStart</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>trafficStart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>525</x>
+     <y>484</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>484</x>
+     <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonStop</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>trafficStop()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>576</x>
+     <y>485</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>564</x>
+     <y>22</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>connect()</slot>
@@ -265,5 +351,7 @@
   <slot>dataEdit(QModelIndex)</slot>
   <slot>loadFirmware()</slot>
   <slot>disconnect()</slot>
+  <slot>trafficStart()</slot>
+  <slot>trafficStop()</slot>
  </slots>
 </ui>

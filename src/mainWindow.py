@@ -188,7 +188,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         #self.network = modelNetwork()
         self.viewNetwork.setModel(self.network)
         self.commThread = CommThread()
-        self.commThread.newFrameString.connect(self.textTraffic.appendPlainText)
+        
         
     def connect(self):
         print "Connect..."
@@ -225,6 +225,12 @@ class mainWindow(QMainWindow, Ui_MainWindow):
     
     def networkClicked(self, index):
         print index.parent().data().toString() + " " + index.data().toString()
+        
+    def trafficStart(self):
+        self.commThread.newFrameString.connect(self.textTraffic.appendPlainText)
+    
+    def trafficStop(self):
+        self.commThread.newFrameString.disconnect(self.textTraffic.appendPlainText)
 
 def getout():
     global mWindow
