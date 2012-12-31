@@ -14,33 +14,11 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-
 # This module is to abstract the interface between the code and the
 # CANBus communication adapters.
 
-class BusError(Exception):
-    """Base class for exceptions in this module"""
-    pass
 
-class BusInitError(BusError):
-    """CAN Bus Initialization Error"""
-    def __init__(self, msg):
-        self.msg = msg
-
-class BusReadError(BusError):
-    """CAN Bus Read Error"""
-    def __init__(self, msg):
-        self.msg = msg
-
-class BusWriteError(BusError):
-    """CAN Bus Write Error"""
-    def __init__(self, msg):
-        self.msg = msg
-
-class DeviceTimeout(Exception):
-    """Device Timeout Exception"""
-    pass
-
+from exceptions import *
 import serial
 import serial.tools.list_ports
 import threading
@@ -55,6 +33,15 @@ def getSerialPortList():
         list.append(each[0])
         return list    
 
+
+        
+# Import and add each Adapter class from the files.  There may be a way
+# to do this in a loop but for now this will work.
+import easy
+import simulate
+import network
+
+
 class SendThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -62,10 +49,17 @@ class SendThread(threading.Thread):
     
     def run(self):
         while(True):
-            time.sleep(1)
-            if(self.getout):
+            try:
+                frame = sendQueue.get(timeout = 0.5)
+                adapters[adapterIndex].sendFrame(frame)
+            except Queue.Empty:
+                pass
+            except:
                 break
-            print "Send Thread"
+            finally:
+                if(self.getout):
+                    break
+                print "Send Thread", adapterIndex
         print "End of the Send Thread"
     
     def quit(self):
@@ -78,33 +72,25 @@ class RecvThread(threading.Thread):
     
     def run(self):
         while(True):
-            time.sleep(1)
-            if(self.getout):
-                break
-            print "Receive Thread"
+            try:
+                frame = adapters[adapterIndex].recvFrame()
+                n = 0
+                for each in recvQueueActive:
+                    if each:
+                        recvQueueList[n].put(frame)
+                        n+=1
+            except DeviceTimeout:
+                pass
+            #except:
+            #    break
+            finally:
+                if(self.getout):
+                    break
+                print "Receive Thread", adapterIndex
         print "End of the Receive thread"
         
     def quit(self):
         self.getout = True
-        
-# Import and add each Adapter class from the files.  There may be a way
-# to do this in a loop but for now this will work.
-import easy
-import simulate
-import network
-
-adapters = []
-adapters.append(easy.Adapter())
-adapters.append(simulate.Adapter())
-adapters.append(network.Adapter())
-
-adapterIndex = None
-sendQueue = Queue.Queue()
-recvQueueList = []
-listLock = threading.Lock()
-sendThread = None
-recvThread = None
-            
 
 def connect(index = None, config = None):
     global adapters
@@ -115,7 +101,7 @@ def connect(index = None, config = None):
     print "canbus.connect() has been called"
     if adapterIndex != None:
         if index == None:
-            #return a new Queue
+            #return a new Receive Queue
             pass
         else:
             #Raise an exception that we already have a connection
@@ -127,45 +113,105 @@ def connect(index = None, config = None):
         else:
             sendThread = SendThread()
             recvThread = RecvThread()
+            adapters[index].connect()
+            adapterIndex = index
             sendThread.start()
             recvThread.start()
-            #adapters[index].connect()
-            adapterIndex = index
+    return True
     
-def disconnect(queueIndex):
+def disconnect():
     global adapters
     global adapterIndex
     global sendThread
     global recvThread
     
-    if adapterIndex != None:
+    if sendThread:
         sendThread.quit()
         sendThread.join()
+    if recvThread:
         recvThread.quit()
         recvThread.join()
-        sendThread = None
-        recvThread = None
-        #adapters[adapterIndex].disconnect()
-        adapterIndex = None
+    sendThread = None
+    recvThread = None
+    adapterIndex = None
 
+    # I know there is a more pythonic way to do this but this is what I know.
+    for each in range(len(recvQueueActive)):
+        recvQueueActive[each] = False
+    
+    if adapterIndex != None:
+        #remove the queueIndex from the recv queue.
+        #if queueIndex is zero then kill them all. ??
+        #if last queueIndex then kill
+        #adapters[adapterIndex].disconnect()
+        pass
+        
 def sendFrame(frame):
     if adapterIndex == None:
-        raise BussInitError("No Connection to CAN-Bus")
+        raise BusInitError("No Connection to CAN-Bus")
     sendQueue.put(frame)
 
-def recvFrame(index, frame, timeout = 0.25):
+def recvFrame(index, timeout = 0.25):
     if adapterIndex == None:
-        raise BussInitError("No Connection to CAN-Bus")
+        raise BusInitError("No Connection to CAN-Bus")
+    if index < 0 or index > len(recvQueueList):
+        raise IndexError("No Such Receive Queue")
+    if recvQueueActive[index] == False:
+        raise BusInitError("Queue is not active")
     
-    adpaters[adapterIndex].sendFrame(frame) 
+    try:
+        frame = recvQueueList[index].get(timeout)
+        return frame
+    except Queue.Empty:
+        raise DeviceTimeout()
+    
+def enableRecvQueue(index):
+    global listLock
+    global recvQueueList
+    global recvQueueActive
+    
+    with listLock:
+        if index < 0 or index > len(recvQueueActive):
+            raise IndexError("No Such Receive Queue")
+        else:
+            recvQueueActive[index] = True
+            
+def disableRecvQueue(index):
+    global listLock
+    global recvQueueList
+    global recvQueueActive
+    
+    with listLock:
+        if index < 0 or index > recvQueueActive.len():
+            raise IndexError("No Such Receive Queue")
+        else:
+            recvQueueActive[index] = False
+            
 
 def addRecvQueue():
     """Adds a new Queue to the recvQueueList"""
     global listLock
     global recvQueueList
+    global recvQueueActive
     
     with listLock:
-        newQueue = Queue()
+        newQueue = Queue.Queue()
         recvQueueList.append(newQueue)
-        return newQueue
+        recvQueueActive.append(False)
+
+adapters = []
+adapters.append(easy.Adapter())
+adapters.append(simulate.Adapter())
+adapters.append(network.Adapter())
+
+adapterIndex = None
+sendQueue = Queue.Queue()
+recvQueueList = []
+recvQueueActive = []
+listLock = threading.Lock()
+sendThread = None
+recvThread = None
+
+for each in range(3):
+    addRecvQueue()
     

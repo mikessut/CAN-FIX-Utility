@@ -28,6 +28,21 @@ from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
 import fwDialog
 
+class commThread(QThread):
+    def run(self):
+        canbus.enableRecvQueue(0)
+        self.getout = False
+    
+        while True:
+            frame = canbus.recvFrame(0)
+            # TODO: Do something with the frame.
+            print frame
+            if self.getout:
+                break
+            
+    def quit(self):
+        self.getout = True
+        
 
 class connectDialog(QDialog, Ui_ConnectDialog):
     def __init__(self):
@@ -158,6 +173,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             #parentItem = item
         #self.network = modelNetwork()
         self.viewNetwork.setModel(self.network)
+        self.CommThread = commThread()
         
     def connect(self):
         print "Connect..."
@@ -169,17 +185,20 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             config['port'] = str(connectDia.comboPort.currentText())
             config['address'] = str(connectDia.editAddress.text())
             self.statusbar.showMessage("Connecting to %s" % canbus.adapters[index].name)
-            canbus.connect(index, config)
+            val = canbus.connect(index, config)
             if val:
-                self.statusbar.showMessage("Connected to %s at %d baud.  Version %s" % 
-                                          (val["Port"], val["Baudrate"], val["Version"]))
+                self.CommThread.start()
+                self.statusbar.showMessage("Connected to %s" % 
+                                          (canbus.adapters[index].name))
             else:
                 self.statusbar.showMessage("Failed to connect to %s" % config['port'])
         else:
             print "Canceled"
     
     def disconnect(self):
-        canbus.disconnect(1)
+        self.CommThread.quit() 
+        self.CommThread.wait()
+        canbus.disconnect()
         print "Disconnect..."
     
     def loadFirmware(self):
@@ -193,14 +212,18 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         print index.parent().data().toString() + " " + index.data().toString()
 
 def getout():
+    global mWindow
+    
     print "Calling Getout"
-    canbus.disconnect(0)
+    mainWindow.disconnect(mWindow)
+    #canbus.disconnect()
 
 def run():
+    global mWindow
     app = QApplication(sys.argv)
-    myapp = mainWindow()
+    mWindow = mainWindow()
     app.aboutToQuit.connect(getout)
-    myapp.show()
+    mWindow.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
