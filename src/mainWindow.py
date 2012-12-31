@@ -28,16 +28,27 @@ from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
 import fwDialog
 
-class commThread(QThread):
+class CommThread(QThread):
+    """Thread to handle the communication for the UI"""
+    # We emit two signals.  One with the raw frame dict...
+    newFrame = pyqtSignal(dict)
+    # .. The other with a formatted string.
+    newFrameString = pyqtSignal('QString')
+    
     def run(self):
         canbus.enableRecvQueue(0)
         self.getout = False
-    
+        
         while True:
             try:
                 frame = canbus.recvFrame(0)
-                # TODO: Do something with the frame.
-                print frame
+                s = "%03X:" % (frame["id"])
+                for each in frame["data"]:
+                    s = s + "%02X" % (each)
+                #emit the signals
+                self.newFrame.emit(frame)
+                self.newFrameString.emit(s)
+                #print frame, s
             except canbus.exceptions.DeviceTimeout:
                 pass
             finally:
@@ -66,8 +77,6 @@ class connectDialog(QDialog, Ui_ConnectDialog):
         else:
             self.stackConfig.setCurrentIndex(2)
         
-            
-
         
 class modelData(QAbstractTableModel):
     def __init__(self):
@@ -167,6 +176,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.data = modelData()
         self.tableData.setModel(self.data)
         self.network = QStandardItemModel()
+        self.textTraffic.setReadOnly(True)
         parentItem = self.network.invisibleRootItem()
         for i in range(10):
             item = QStandardItem("Node " + str(i))
@@ -177,7 +187,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             #parentItem = item
         #self.network = modelNetwork()
         self.viewNetwork.setModel(self.network)
-        self.CommThread = commThread()
+        self.commThread = CommThread()
+        self.commThread.newFrameString.connect(self.textTraffic.appendPlainText)
         
     def connect(self):
         print "Connect..."
@@ -191,7 +202,7 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             self.statusbar.showMessage("Connecting to %s" % canbus.adapters[index].name)
             val = canbus.connect(index, config)
             if val:
-                self.CommThread.start()
+                self.commThread.start()
                 self.statusbar.showMessage("Connected to %s" % 
                                           (canbus.adapters[index].name))
             else:
@@ -200,8 +211,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             print "Canceled"
     
     def disconnect(self):
-        self.CommThread.quit() 
-        self.CommThread.wait()
+        self.commThread.quit() 
+        self.commThread.wait()
         canbus.disconnect()
         print "Disconnect..."
     
