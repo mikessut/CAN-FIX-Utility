@@ -17,6 +17,7 @@
 
 from exceptions import *
 import serial
+import time
 from serial.tools.list_ports import comports
 
 class Adapter():
@@ -41,14 +42,23 @@ class Adapter():
                 if x == "\x07": # Bell is error
                     raise BusReadError("USB2-F-7x01 Returned Bell")
 
-    def connect(self, bitrate, portname=None, timeout=0.25):
+    def connect(self, config):
+        try:
+            self.bitrate = config['bitrate']
+        except KeyError:
+            self.bitrate = 125
         bitrates = {10:"S0\r", 20:"S1\r", 50:"S2\r", 100:"S3\r", 
                     125:"S4\r", 250:"S5\r", 500:"S6\r", 800:"S7\r", 1000:"S8\r"}
-        if portname:
-            self.portname = portname
-        else:
+        try:
+            self.portname = config['port']
+        except KeyError:
             self.portname = comports[0][0]
-        self.timeout = timeout
+        
+        try:
+            self.timeout = config['timeout']
+        except KeyError:
+            self.timeout = 0.25
+            
         self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
                 
         print "Reseting USB2-F-7x01"
@@ -70,7 +80,7 @@ class Adapter():
         except BusReadError:
             raise BusInitError("Unable to set CAN Bit rate")
 
-    def open(self):
+#    def open(self):
         print "Opening CAN Port"
         self.ser.write("O\r")
         try:

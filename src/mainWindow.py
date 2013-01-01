@@ -199,6 +199,15 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             index = connectDia.comboAdapter.currentIndex()
             config['port'] = str(connectDia.comboPort.currentText())
             config['address'] = str(connectDia.editAddress.text())
+            if connectDia.radio250.isChecked():
+                bitrate = 250
+            elif connectDia.radio500.isChecked():
+                bitrate = 500
+            elif connectDia.radio1000.isChecked():
+                bitrate = 1000
+            else:
+                bitrate = 125
+            config['bitrate'] = bitrate
             self.statusbar.showMessage("Connecting to %s" % canbus.adapters[index].name)
             val = canbus.connect(index, config)
             if val:
@@ -237,7 +246,6 @@ def getout():
     
     print "Calling Getout"
     mainWindow.disconnect(mWindow)
-    #canbus.disconnect()
 
 def run():
     global mWindow

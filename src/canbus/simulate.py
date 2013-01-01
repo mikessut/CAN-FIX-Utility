@@ -30,7 +30,7 @@ class Adapter():
         random.seed()
         self.airspeed = 1000
     
-    def connect(self):
+    def connect(self, config):
         print "Connecting to simulation adapter"
 
     def open(self):

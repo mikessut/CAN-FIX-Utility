@@ -21,19 +21,39 @@
 from exceptions import *
 import serial
 import serial.tools.list_ports
+import platform
+import glob
 import threading
 import Queue
 import time
     
+#def getSerialPortList():
+#    """Return a list of serial ports"""
+#    portList = serial.tools.list_ports.comports()
+#    list = []
+#    for each in portList:
+#        list.append(each[0])
+#        return list    
+
 def getSerialPortList():
-    """Return a list of serial ports"""
-    portList = serial.tools.list_ports.comports()
-    list = []
-    for each in portList:
-        list.append(each[0])
-        return list    
-
-
+    system_name = platform.system()
+    if system_name == "Windows":
+        # Scan for available ports.
+        available = []
+        for i in range(256):
+            try:
+                s = serial.Serial(i)
+                available.append(i)
+                s.close()
+            except serial.SerialException:
+                pass
+        return available
+    elif system_name == "Darwin":
+        # Mac
+        return glob.glob('/dev/tty*') + glob.glob('/dev/cu*')
+    else:
+        # Assume Linux or something else
+        return glob.glob('/dev/ttyS*') + glob.glob('/dev/ttyUSB*')
         
 # Import and add each Adapter class from the files.  There may be a way
 # to do this in a loop but for now this will work.
@@ -111,7 +131,7 @@ def connect(index = None, config = None):
         else:
             sendThread = SendThread()
             recvThread = RecvThread()
-            adapters[index].connect()
+            adapters[index].connect(config)
             adapterIndex = index
             sendThread.start()
             recvThread.start()

@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabNetwork">
        <attribute name="title">
@@ -44,6 +44,16 @@
            <enum>QAbstractItemView::SelectRows</enum>
           </property>
          </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabPFD">
+       <attribute name="title">
+        <string>PFD</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QGraphicsView" name="gviewPFD"/>
         </item>
        </layout>
       </widget>
@@ -95,16 +105,6 @@
            </widget>
           </item>
          </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabPFD">
-       <attribute name="title">
-        <string>PFD</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QGraphicsView" name="gviewPFD"/>
         </item>
        </layout>
       </widget>
