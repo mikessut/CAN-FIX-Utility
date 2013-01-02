@@ -18,104 +18,138 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import config
-import xml.dom.minidom
+import xml.etree.ElementTree as ET
+import copy
 
-def _getText(node, element):
-    """Retrieve the text from 'element' in DOM node"""
-    elementNodes = node.getElementsByTagName(element)
-    if elementNodes:
-        s = ""
-        for each in elementNodes[0].childNodes:
-            if each.nodeType == each.TEXT_NODE:
-                s = s + str(each.data)
-        return s.rstrip()
-    else:
+
+def __getText(element, text):
+    try:
+        return element.find(text).text
+    except AttributeError:
         return None
 
-
-def _getFloat(s):
+def __getFloat(s):
     """Take string 's,' remove any commas and return a float"""
     if s:
         return float(s.replace(",",""))
     else:
         return None
 
-        
-def _getAuxData(node):
-    """Retrieve the 'aux' data from the element 'node'
-       Returns a list of the remarks or an empty list if there are none"""
-    auxNodes = node.getElementsByTagName("aux")
-    if auxNodes:
-        auxList = ["" for each in range(15)]
-        for each in auxNodes:
-            s = ""
-            index = int(each.getAttribute("id"))-1
-            for child in each.childNodes:
-                if child.nodeType == child.TEXT_NODE:
-                    s = s + str(child.data)
-                    
-            auxList[index] = s
-        return auxList
-    else:
-        return []
+
+class Parameter():
+    def __init__(self, name):
+        self.name = name
+        self.units = None
+        self.type = None
+        self.multiplier = 1.0
+        self.offset = None
+        self.min = None
+        self.max = None
+        self.index = None
+        self.format = None
+        self.auxdata = {}
+        self.remarks = []
     
-def _getRemarks(node):
-    """Retrieve the 'remarks' elements from 'node'
-       Returns a list of the remarks or an empty list if there are none"""
-    remNodes = node.getElementsByTagName("remarks")
-    remList = []
-    if remNodes:
-        for each in remNodes:
-            s = ""
-            for child in each.childNodes:
-                if child.nodeType == child.TEXT_NODE:
-                    s = s + str(child.data)
-            remList.append(s)
-    return remList
+    def write(self):
+        s = "(0x%03X, %d) %s\n" % (self.id, self.id, self.name)
+        if self.type:
+            s = s + "  Data Type: %s\n" % self.type
+        if self.units:
+            if self.multiplier == 1.0:
+                s = s + "  Units:     %s\n" % self.units
+            else:
+                s = s + "  Units:     %s x %s\n" % (self.units, str(self.multiplier))
+        if self.offset:
+            s = s + "  Offset:    %s\n" % str(self.offset)
+        if self.min:
+            s = s + "  Min:       %s\n" % str(self.min)
+        if self.max:
+            s = s + "  Max:       %s\n" % str(self.max)
+        if self.format:
+            s = s + "  Format:    %s\n" % self.format
+        if self.index:
+            s = s + "  Index:     %s\n" % self.index
+        if self.auxdata:
+            s = s + "  Auxilliary Data:\n"
+            for each in self.auxdata:
+                s = s + "   0x%02X - %s\n" % (each, self.auxdata[each])
+        if self.remarks:
+            s = s + "  Remarks:\n"
+            for each in self.remarks:
+                s = s + "    " + each + "\n"
+        return s
+    
+    
+tree = ET.parse(config.DataPath + "canfix.xml")
+root = tree.getroot()            
+if root.tag != "protocol":
+    raise ValueError("Root Tag is not protocol'")
 
-class CanFix:
-    """Represent the CANFix protocol parameters.  It reads the xml file
-       given as 'filename' and populates a list of groups and a dictionary
-       of parameters.  The key to the parameters dictionary is the id as an integer"""
-    def __init__(self, filename):
-        self.groups = []
-        self.parameters = {}
-        
-        doc = xml.dom.minidom.parse(filename)
-        
-        groupNodes = doc.getElementsByTagName("group")
-        for each in groupNodes:
-            self.groups.append({"name":_getText(each, "name"),
-                                "startid":int(_getText(each, "startid")),
-                                "endid":int(_getText(each,"endid"))})
-        
-        parameterNodes = doc.getElementsByTagName("parameter")
-        for each in parameterNodes:
-            id = int(_getText(each, "id"))
-            self.parameters[id] = {"id":id,
-                                   "name":_getText(each, "name"),
-                                   "type":_getText(each, "type"),
-                                   "units":_getText(each, "units"),
-                                   "format":_getText(each, "format"),
-                                   "count":int(_getText(each, "count")),
-                                   "index":_getText(each, "index")}
-            self.parameters[id]["multiplier"] = _getFloat(_getText(each, "multiplier"))
-            self.parameters[id]["offset"] = _getFloat(_getText(each, "offset"))
-            self.parameters[id]["min"] = _getFloat(_getText(each, "min"))
-            self.parameters[id]["max"] = _getFloat(_getText(each, "max"))
-            
-            self.parameters[id]["auxdata"] = _getAuxData(each)
-            self.parameters[id]["remarks"] = _getRemarks(each)
-            
+child = root.find("name")
+if child.text != "CANFIX":
+    raise ValueError("Not a CANFIX Protocol File")
 
+child = root.find("version")
+version = child.text
+
+groups = []
+parameters = {}
+
+def __add_group(element):
+    child = element.find("name")
+    x = {}
+    x['name'] = element.find("name").text
+    x['startid'] = int(element.find("startid").text)
+    x['endid'] = int(element.find("endid").text)
+    groups.append(x)
+
+def __add_parameter(element):
+    pid = int(element.find("id").text)
+    count = int(element.find("count").text)
+    
+    p = Parameter(element.find("name").text)
+    p.units = __getText(element, "units")
+    p.format = __getText(element, "format")
+    p.type = __getText(element, "type")
+    p.multiplier = __getFloat(__getText(element, "multiplier"))
+    p.offset = __getFloat(__getText(element, "offset"))
+    p.min = __getFloat(__getText(element, "min"))
+    p.max = __getFloat(__getText(element, "max"))
+    p.index = __getText(element, "index")
+    
+    l = element.findall('aux')
+    for each in l:
+        p.auxdata[int(each.attrib['id'])] = each.text
+    l = element.findall('remarks')
+    
+    for each in l:
+        p.remarks.append(each.text)
+
+    if count > 1:
+        for n in range(count):
+            np = copy.copy(p)
+            np.name = p.name + " #" + str(n+1)
+            np.id = pid + n
+            parameters[pid+n] = np
+    else:
+        p.id = pid
+        parameters[pid] = p
+    
+for child in root:
+    if child.tag == "group":
+        __add_group(child)
+    elif child.tag == "parameter":
+        __add_parameter(child)
+
+            
 if __name__ == "__main__":
-    canfix = CanFix(config.DataPath + "canfix.xml")
+    print "CANFIX Protocol Version " + version
     print "Groups:"
-    for each in canfix.groups:
-        print " %s %d-%d" % (each["name"], each["startid"], each["endid"])
+    for each in groups:
+        print "  %s %d-%d" % (each["name"], each["startid"], each["endid"])
     
     print "Parameters:"
-    for each in canfix.parameters:
-        print str(each) + " - " + canfix.parameters[each]["name"]
-        print "  ", canfix.parameters[each]["remarks"]
+    for each in parameters:
+        print parameters[each].write()
+
     

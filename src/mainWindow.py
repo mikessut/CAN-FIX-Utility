@@ -81,11 +81,11 @@ class connectDialog(QDialog, Ui_ConnectDialog):
 class modelData(QAbstractTableModel):
     def __init__(self):
         QAbstractTableModel.__init__(self)
-        self.cf = protocol.CanFix(config.DataPath + "canfix.xml")
+        #self.cf = protocol.CanFix(config.DataPath + "canfix.xml")
         self.parlist = []
-        for i in self.cf.parameters:
-            self.parlist.append(self.cf.parameters[i])
-        self.parlist.sort(lambda a,b:cmp(a["id"], b["id"]))
+        for i in protocol.parameters:
+            self.parlist.append(protocol.parameters[i])
+        self.parlist.sort(lambda a,b:cmp(a.id, b.id))
         self.cols = 3
         
     def data(self, index, role = Qt.DisplayRole):
@@ -96,11 +96,11 @@ class modelData(QAbstractTableModel):
         y = index.row()
         x = index.column()
         if x == 0:
-           Q = self.parlist[y]["name"]
+           Q = self.parlist[y].name
         elif x == 1:
-           Q = self.parlist[y]["units"]
+           Q = self.parlist[y].units
         elif x == 2:
-           Q = self.parlist[y]["multiplier"]
+           Q = self.parlist[y].multiplier
         else:
            Q = None
         return QVariant(Q)
@@ -120,7 +120,7 @@ class modelData(QAbstractTableModel):
             else:
                 return QVariant("")
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
-            return QVariant(self.parlist[col]["id"])
+            return QVariant(self.parlist[col].id)
         return QVariant()
     
     def edit(self, index):
@@ -199,15 +199,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             index = connectDia.comboAdapter.currentIndex()
             config['port'] = str(connectDia.comboPort.currentText())
             config['address'] = str(connectDia.editAddress.text())
-            if connectDia.radio250.isChecked():
-                bitrate = 250
-            elif connectDia.radio500.isChecked():
-                bitrate = 500
-            elif connectDia.radio1000.isChecked():
-                bitrate = 1000
-            else:
-                bitrate = 125
-            config['bitrate'] = bitrate
             self.statusbar.showMessage("Connecting to %s" % canbus.adapters[index].name)
             val = canbus.connect(index, config)
             if val:
