@@ -36,8 +36,6 @@ class Device:
         self.parameters = []
         self.configuration = []
                     
-devices = []
-
 def __getFirmWare(element, device):
     root = element.find("firmware_update")
     if root != None:
@@ -52,12 +50,18 @@ def __getFirmWare(element, device):
 
 
 def __getParameters(element, device):
-    pass
+    root = element.find("parameters")
+    for child in root:
+        if child.tag == 'parameter':
+            device.parameters.append(child.attrib['id'])
 
 def __getConfiguration(element, device):
     pass
 
+devices = []
+
 dirlist = os.listdir(config.DataPath + "devices")
+
 for each in dirlist:
     if each[-4:] == ".xml":
         tree = ET.parse(config.DataPath + "devices/" + each)
@@ -78,17 +82,11 @@ for each in dirlist:
             __getConfiguration(root, newdevice)
             devices.append(newdevice)
             
-"""        child = root.find("firmware_update")
-        if child != None:
-            for each in child:
-                print each.tag, each.attrib
-        child = root.find("parameters")
-        for each in child:
-            print each.tag, each.attrib
-"""
+
 if __name__ == "__main__":
     for each in devices:
         print each.name, each.DeviceId, each.modelNumber
         print "  FW Code =", each.fwUpdateCode
         print "  FW Driver = ", each.fwDriver
+        print "  Parmeters = ", each.parameters
             

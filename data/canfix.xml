@@ -1,6 +1,6 @@
 <protocol>
 <name>CANFIX</name>
-<version>0.3</version>
+<version>0.4</version>
 <group>
   <name>High Priority Node Alarms</name>
   <startid>1</startid>
@@ -83,6 +83,138 @@
 </group>
 <parameter>
   <id>256</id>
+  <count>2</count>
+  <name>Flap Control Switches</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+  <remarks>b0 = Up</remarks>
+  <remarks>b1 = Down</remarks>
+  <remarks>b2 - b7 Can be used for predefined notches</remarks>
+</parameter>
+<parameter>
+  <id>258</id>
+  <count>2</count>
+  <name>Trim Switches</name>
+  <type>WORD</type>
+  <format>Discrete Bits</format>
+  <remarks>b0 = Pitch Up</remarks>
+  <remarks>b1 = Pitch Down</remarks>
+  <remarks>b2 = Pitch Center</remarks>
+  <remarks>b3 = Roll Left</remarks>
+  <remarks>b4 = Roll Right</remarks>
+  <remarks>b5 = Roll Center</remarks>
+  <remarks>b6 = Yaw Left</remarks>
+  <remarks>b7 = Yaw Right</remarks>
+  <remarks>b8 = Yaw Center</remarks>
+  <remarks>b9 = Collective Up</remarks>
+  <remarks>b10 = Collective Dn</remarks>
+  <remarks>b11 = AT Pedals Left</remarks>
+  <remarks>b12 = AT Pedals Right</remarks>
+  <remarks>b13 = AT Pedals Center</remarks>
+</parameter>
+<parameter>
+  <id>260</id>
+  <count>2</count>
+  <name>Electrical Bus Control Switches</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+</parameter>
+<parameter>
+  <id>262</id>
+  <count>2</count>
+  <name>Lighting Control Switches</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+</parameter>
+<parameter>
+  <id>264</id>
+  <count>2</count>
+  <name>Fuel Pump System Switches</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+</parameter>
+<parameter>
+  <id>266</id>
+  <count>2</count>
+  <name>Fuel Valve System Switches</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+</parameter>
+<parameter>
+  <id>268</id>
+  <count>2</count>
+  <name>AutoPilot Commands</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+  <remarks>b0 = Engage</remarks>
+  <remarks>b1 = Disconnect</remarks>
+  <remarks>b2 = VS Mode</remarks>
+  <remarks>b3 = Alt Hold Mode</remarks>
+  <remarks>b4 = Alt Select Mode</remarks>
+  <remarks>b5 = Heading Increment</remarks>
+  <remarks>b6 = Heading Decrement</remarks>
+</parameter>
+<parameter>
+  <id>270</id>
+  <count>2</count>
+  <name>VHF Control Commands</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+  <remarks>b0 = PTT</remarks>
+  <remarks>b1 = Flip</remarks>
+  <remarks>b2 = Next Saved Freq</remarks>
+  <remarks>b3 = Last Saved Freq</remarks>
+</parameter>
+<parameter>
+  <id>272</id>
+  <count>2</count>
+  <name>Transponder Commands</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+  <remarks>b0 = IDENT</remarks>
+  <remarks>b1 = ALT</remarks>
+  <remarks>b2 = STBY</remarks>
+  <remarks>b2 = ALT</remarks>
+  <remarks>b3 = VFR</remarks>
+  <remarks>b5 = OFF</remarks>
+</parameter>
+<parameter>
+  <id>274</id>
+  <count>2</count>
+  <name>Starter / Magneto Commands</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+</parameter>
+<parameter>
+  <id>276</id>
+  <count>2</count>
+  <name>Landing Gear Control Position</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+  <remarks>0=Down</remarks>
+  <remarks>1=Up</remarks>
+  <remarks>b0=Nose</remarks>
+  <remarks>b1=Left</remarks>
+  <remarks>B2=Right</remarks>
+</parameter>
+<parameter>
+  <id>278</id>
+  <count>2</count>
+  <name>Keypad Input</name>
+  <type>CHAR[2]</type>
+  <format>Key, Function Key</format>
+</parameter>
+<parameter>
+  <id>280</id>
+  <count>2</count>
+  <name>Generic Switches</name>
+  <type>BYTE</type>
+  <format>Discrete Bits</format>
+  <index>As needed</index>
+  <remarks>User Defined For Multiplexing Switches</remarks>
+</parameter>
+<parameter>
+  <id>282</id>
   <count>1</count>
   <name>Pitch Control Position</name>
   <type>INT</type>
@@ -93,7 +225,7 @@
   <remarks>Greater Than 0 = Nose Up</remarks>
 </parameter>
 <parameter>
-  <id>257</id>
+  <id>283</id>
   <count>1</count>
   <name>Roll Control Position</name>
   <type>INT</type>
@@ -104,7 +236,7 @@
   <remarks>Greater Than 0 = Right</remarks>
 </parameter>
 <parameter>
-  <id>258</id>
+  <id>284</id>
   <count>1</count>
   <name>Yaw Control Position</name>
   <type>INT</type>
@@ -115,7 +247,7 @@
   <remarks>Greater Than 0 = Right</remarks>
 </parameter>
 <parameter>
-  <id>259</id>
+  <id>285</id>
   <count>1</count>
   <name>Collective Control Position</name>
   <type>INT</type>
@@ -126,7 +258,7 @@
   <remarks>Greater Than 0 = Up</remarks>
 </parameter>
 <parameter>
-  <id>260</id>
+  <id>286</id>
   <count>1</count>
   <name>Anti-Torque Pedals Position</name>
   <type>INT</type>
@@ -137,7 +269,7 @@
   <remarks>Greater Than 0 = Right</remarks>
 </parameter>
 <parameter>
-  <id>261</id>
+  <id>287</id>
   <count>1</count>
   <name>Flap Control Position</name>
   <type>INT</type>
@@ -148,7 +280,7 @@
   <remarks>Greater Than 0 = Down</remarks>
 </parameter>
 <parameter>
-  <id>262</id>
+  <id>288</id>
   <count>1</count>
   <name>Left Brake Control Position</name>
   <type>UINT</type>
@@ -158,7 +290,7 @@
   <units>%</units>
 </parameter>
 <parameter>
-  <id>263</id>
+  <id>289</id>
   <count>1</count>
   <name>Right Brake Control Position</name>
   <type>UINT</type>
@@ -168,7 +300,7 @@
   <units>%</units>
 </parameter>
 <parameter>
-  <id>264</id>
+  <id>290</id>
   <count>4</count>
   <name>Engine Throttle Control Position</name>
   <type>UINT</type>
@@ -178,7 +310,7 @@
   <units>%</units>
 </parameter>
 <parameter>
-  <id>268</id>
+  <id>294</id>
   <count>4</count>
   <name>Engine Prop Control Position</name>
   <type>UINT</type>
@@ -188,7 +320,7 @@
   <units>%</units>
 </parameter>
 <parameter>
-  <id>272</id>
+  <id>298</id>
   <count>4</count>
   <name>Engine Mixture Control Position</name>
   <type>UINT</type>
@@ -196,18 +328,6 @@
   <max>100</max>
   <multiplier>0.01</multiplier>
   <units>%</units>
-</parameter>
-<parameter>
-  <id>276</id>
-  <count>1</count>
-  <name>Landing Gear Control Position</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-  <remarks>0=Down</remarks>
-  <remarks>1=Up</remarks>
-  <remarks>b0=Nose</remarks>
-  <remarks>b1=Left</remarks>
-  <remarks>B2=Right</remarks>
 </parameter>
 <parameter>
   <id>320</id>
@@ -906,6 +1026,7 @@
   <type>UINT</type>
   <multiplier>0.01</multiplier>
   <units>gal</units>
+  <index>Aux Tanks</index>
   <aux id='1'>Min</aux>
   <aux id='2'>Max</aux>
   <aux id='4'>Low Warn</aux>
@@ -959,13 +1080,22 @@
   <id>640</id>
   <count>1</count>
   <name>Cabin Pressure</name>
-  <type></type>
+  <type>UINT</type>
+  <min>0</min>
+  <max>35</max>
+  <multiplier>0.001</multiplier>
+  <units>inHg</units>
 </parameter>
 <parameter>
   <id>641</id>
   <count>1</count>
   <name>Cabin Altitude</name>
-  <type></type>
+  <type>UINT</type>
+  <min>-1,000</min>
+  <max>60,000</max>
+  <offset>-1000</offset>
+  <multiplier>10</multiplier>
+  <units>ft</units>
 </parameter>
 <parameter>
   <id>768</id>
@@ -1036,123 +1166,6 @@
   <max>100</max>
   <multiplier>0.01</multiplier>
   <units>%</units>
-</parameter>
-<parameter>
-  <id>775</id>
-  <count>1</count>
-  <name>Reserved</name>
-  <type></type>
-</parameter>
-<parameter>
-  <id>776</id>
-  <count>2</count>
-  <name>Trim Switches</name>
-  <type>WORD</type>
-  <format>Discrete Bits</format>
-  <remarks>b0 = Pitch Up</remarks>
-  <remarks>b1 = Pitch Down</remarks>
-  <remarks>b2 = Pitch Center</remarks>
-  <remarks>b3 = Roll Left</remarks>
-  <remarks>b4 = Roll Right</remarks>
-  <remarks>b5 = Roll Center</remarks>
-  <remarks>b6 = Yaw Left</remarks>
-  <remarks>b7 = Yaw Right</remarks>
-  <remarks>b8 = Yaw Center</remarks>
-  <remarks>b9 = Collective Up</remarks>
-  <remarks>b10 = Collective Dn</remarks>
-  <remarks>b11 = AT Pedals Left</remarks>
-  <remarks>b12 = AT Pedals Right</remarks>
-  <remarks>b13 = AT Pedals Center</remarks>
-</parameter>
-<parameter>
-  <id>778</id>
-  <count>2</count>
-  <name>Flap Control Switches</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-  <remarks>b0 = Up</remarks>
-  <remarks>b1 = Down</remarks>
-  <remarks>b2 - b7 Can be used for predefined notches</remarks>
-</parameter>
-<parameter>
-  <id>780</id>
-  <count>1</count>
-  <name>Lighting Control Switches</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-</parameter>
-<parameter>
-  <id>781</id>
-  <count>1</count>
-  <name>Electrical Bus Control Switches</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-</parameter>
-<parameter>
-  <id>782</id>
-  <count>1</count>
-  <name>Fuel Pump System Switches</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-</parameter>
-<parameter>
-  <id>783</id>
-  <count>1</count>
-  <name>Fuel Valve System Switches</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-</parameter>
-<parameter>
-  <id>784</id>
-  <count>4</count>
-  <name>VHF Control Commands</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-  <remarks>b0 = PTT</remarks>
-  <remarks>b1 = Flip</remarks>
-  <remarks>b2 = Next Saved Freq</remarks>
-  <remarks>b3 = Last Saved Freq</remarks>
-</parameter>
-<parameter>
-  <id>788</id>
-  <count>1</count>
-  <name>Transponder Commands</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-  <remarks>b0 = IDENT</remarks>
-  <remarks>b1 = ALT</remarks>
-  <remarks>b2 = STBY</remarks>
-  <remarks>b2 = ALT</remarks>
-  <remarks>b3 = VFR</remarks>
-  <remarks>b5 = OFF</remarks>
-</parameter>
-<parameter>
-  <id>789</id>
-  <count>1</count>
-  <name>AutoPilot Commands</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-  <remarks>b0 = Engage</remarks>
-  <remarks>b1 = Disconnect</remarks>
-  <remarks>b2 = VS Mode</remarks>
-  <remarks>b3 = Alt Hold Mode</remarks>
-  <remarks>b4 = Alt Select Mode</remarks>
-  <remarks>b5 = Heading Increment</remarks>
-  <remarks>b6 = Heading Decrement</remarks>
-</parameter>
-<parameter>
-  <id>790</id>
-  <count>4</count>
-  <name>Starter / Magneto Commands</name>
-  <type>BYTE</type>
-  <format>Discrete Bits</format>
-</parameter>
-<parameter>
-  <id>794</id>
-  <count>2</count>
-  <name>Keypad Input</name>
-  <type>CHAR[2]</type>
-  <format>Key, Function Key</format>
 </parameter>
 <parameter>
   <id>896</id>

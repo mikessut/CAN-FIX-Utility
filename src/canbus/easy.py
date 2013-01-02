@@ -79,8 +79,12 @@ class Adapter():
             raise BusInitError("Timeout waiting for USB2-F-7x01")
         except BusReadError:
             raise BusInitError("Unable to set CAN Bit rate")
+        self.open()
+    
+    def disconnect(self):
+        self.close()
 
-#    def open(self):
+    def open(self):
         print "Opening CAN Port"
         self.ser.write("O\r")
         try:
