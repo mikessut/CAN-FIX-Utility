@@ -53,7 +53,17 @@ def getSerialPortList():
         return glob.glob('/dev/tty*') + glob.glob('/dev/cu*')
     else:
         # Assume Linux or something else
-        return glob.glob('/dev/ttyS*') + glob.glob('/dev/ttyUSB*')
+        l = []
+        x = glob.glob('/dev/ttyUSB*') + glob.glob('/dev/ttyS*')
+        for i in x:
+            try:
+                s = serial.Serial(i)
+                l.append(i)
+                s.close()
+            except serial.SerialException:
+                pass
+        return l
+                
         
 # Import and add each Adapter class from the files.  There may be a way
 # to do this in a loop but for now this will work.
@@ -74,8 +84,9 @@ class SendThread(threading.Thread):
                 adapters[adapterIndex].sendFrame(frame)
             except Queue.Empty:
                 pass
-            except:
-                break
+            except BusError:
+                # TODO: Should handle some of these
+                pass
             finally:
                 if(self.getout):
                     break
@@ -100,6 +111,9 @@ class RecvThread(threading.Thread):
                         recvQueueList[n].put(frame)
                         n+=1
             except DeviceTimeout:
+                pass
+            except BusError:
+                # TODO: Should probably handle some of these.
                 pass
             finally:
                 if(self.getout):
@@ -143,26 +157,25 @@ def disconnect():
     global sendThread
     global recvThread
     
-    if sendThread:
-        sendThread.quit()
-        sendThread.join()
-    if recvThread:
-        recvThread.quit()
-        recvThread.join()
-    sendThread = None
-    recvThread = None
-    adapterIndex = None
-
-    # I know there is a more pythonic way to do this but this is what I know.
-    for each in range(len(recvQueueActive)):
-        recvQueueActive[each] = False
-    
     if adapterIndex != None:
-        #remove the queueIndex from the recv queue.
-        #if queueIndex is zero then kill them all. ??
-        #if last queueIndex then kill
-        #adapters[adapterIndex].disconnect()
-        pass
+        try:
+            adapters[adapterIndex].disconnect()
+        finally:
+            if sendThread:
+                sendThread.quit()
+                sendThread.join()
+            if recvThread:
+                recvThread.quit()
+                recvThread.join()
+            sendThread = None
+            recvThread = None
+            adapterIndex = None
+
+            # I know there is a more pythonic way to do this but this is what I know.
+            for each in range(len(recvQueueActive)):
+                recvQueueActive[each] = False
+    
+
         
 def sendFrame(frame):
     if adapterIndex == None:
