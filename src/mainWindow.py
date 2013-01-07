@@ -117,6 +117,8 @@ class modelData(QAbstractTableModel):
                 return QVariant("Name")
             elif col == 1: 
                 return QVariant("Units")
+            elif col == 2:
+                return QVariant("Multiplier")
             else:
                 return QVariant("")
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
@@ -214,7 +216,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         self.commThread.quit() 
         self.commThread.wait()
         canbus.disconnect()
-        print "Disconnect..."
     
     def loadFirmware(self):
         connectDia = fwDialog.dialogFirmware()
@@ -235,7 +236,6 @@ class mainWindow(QMainWindow, Ui_MainWindow):
 def getout():
     global mWindow
     
-    print "Calling Getout"
     mainWindow.disconnect(mWindow)
 
 def run():
