@@ -20,6 +20,7 @@ import Queue
 import random
 import time
 import struct
+import canbus
 
 class Node():
     def __init__(self, name = None):
@@ -40,20 +41,18 @@ class Node():
         
     def doFrame(self, frame):
         """Function that handles incoming frames for the node"""
-        if frame['id'] > 0x700 and frame['data'][0] == self.node:
+        if frame.id > 0x700 and frame.data[0] == self.node:
             # We start a response frame in case we need it
-            f = {}
-            f['id'] = self.node + 0x700
-            f['data'] = [frame['id'] - 0x700, frame['data'][1]]
-            cmd = frame['data'][1]
+            f = canbus.Frame(self.node + 0x700, [frame.id - 0x700, frame.data[1]])
+            cmd = frame.data[1]
             if cmd == 0: #Node identification
                 # TODO: Fix the model number part
-                f['data'].extend([0x01, self.deviceType % 255, 1, 0 , 0, 0])
+                f.data.extend([0x01, self.deviceType % 255, 1, 0 , 0, 0])
             elif cmd == 1: # Bitrate Set Command
                 return None
             elif cmd == 2: # Node Set Command
-                self.nodeID = frame['data'][2]
-                f['data'].append(0x00)
+                self.nodeID = frame.data[2]
+                f.data.append(0x00)
             #TODO: Fix these so they work??
             elif cmd == 3: # Disable Parameter
                 return None
@@ -62,10 +61,10 @@ class Node():
             elif cmd == 5: # Node Report
                 return None
             elif cmd == 7: # Firmware Update
-                FCode = frame['data'][3]<<8 | frame['data'][2]
+                FCode = frame.data[3]<<8 | frame.data[2]
                 if FCode == self.FWCode:
-                    FWChannel = frame['data'][4]
-                    f['data'].append(0x00)
+                    FWChannel = frame.data[4]
+                    f.data.append(0x00)
             print f # FOR TESTING ONLY
             return f
         
@@ -103,13 +102,13 @@ engine['i'] = 0
 def __func_engine(node):
     global engine
     t = time.time()
-    frame = {}
+    frame = canbus.Frame()
     if t > engine['lasttime'] + 1:
         if engine['n'] == 0:
             o = (int(time.time()*100) % 10) - 5
             x = struct.pack('<H', (engine['cht']+o)*10)
-            frame['id'] = 0x500 #Cylinder Head Temperature
-            frame['data'] = [node, engine['i'], 0, ord(x[0]), ord(x[1])]
+            frame.id = 0x500 #Cylinder Head Temperature
+            frame.data = [node, engine['i'], 0, ord(x[0]), ord(x[1])]
             engine['i'] += 1
             if engine['i'] == 4:
                 engine['i'] = 0
@@ -117,6 +116,7 @@ def __func_engine(node):
         else:
             engine['n'] = 0
             engine['lasttime'] = t
+            return None
         return frame
             
     
@@ -130,29 +130,30 @@ airdata['n'] = 0
 def __func_airdata(node):
     global airdata
     t = time.time()
-    frame = {}
+    frame = canbus.Frame()
     if t > airdata['lasttime'] + 1:
         if airdata['n'] == 0:
             o = (int(time.time()*100) % 4) - 2
             x = struct.pack('<H', (airdata['airspeed']+o)*10)
-            frame['id'] = 0x183 #Indicated Airspeed
-            frame['data'] = [node, 0, 0, ord(x[0]), ord(x[1])]
+            frame.id = 0x183 #Indicated Airspeed
+            frame.data = [node, 0, 0, ord(x[0]), ord(x[1])]
             airdata['n'] += 1
         elif airdata['n'] == 1:
             o = (int(time.time()*100) % 20) - 10
             x = struct.pack('<H', (airdata['altitude']+o+1000)/10 )
-            frame['id'] = 0x184 #Indicated Altitude
-            frame['data'] = [node, 0, 0, ord(x[0]), ord(x[1])]
+            frame.id = 0x184 #Indicated Altitude
+            frame.data = [node, 0, 0, ord(x[0]), ord(x[1])]
             airdata['n'] += 1
         elif airdata['n'] == 2:
             o = (int(time.time()*100) % 100) - 50
             x = struct.pack('<H', airdata['oat'] * 100 + o)
-            frame['id'] = 0x407 #OAT
-            frame['data'] = [node, 0, 0, ord(x[0]), ord(x[1])]
+            frame.id = 0x407 #OAT
+            frame.data = [node, 0, 0, ord(x[0]), ord(x[1])]
             airdata['n'] += 1
         else:
             airdata['n'] = 0
             airdata['lasttime'] = t
+            return None
         return frame
     
 def configNodes():
@@ -196,7 +197,7 @@ class Adapter():
         print "Closing CAN Port"
 
     def sendFrame(self, frame):
-        if frame['id'] < 0 or frame['id'] > 2047:
+        if frame.id < 0 or frame.id > 2047:
             raise ValueError("Frame ID out of range")
         else:
             for each in self.nodes:

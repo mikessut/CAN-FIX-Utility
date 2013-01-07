@@ -63,7 +63,34 @@ def getSerialPortList():
             except serial.SerialException:
                 pass
         return l
-                
+
+class Frame(object):
+    """Class represents a CANBus frame"""
+    def __init__(self, id=0, data=[]):
+        self.id = id
+        self.data = data
+
+        #self.d = {}
+        #self.d['id'] = id
+        #self.d['data'] = data
+    
+    #def __setattr__(self, name, value):
+        #if name == 'id':
+            #if value < 0 or value >= 2048:
+                #raise ValueError("Frame ID is out of range")
+            #self.d['id'] = value
+        #elif name == 'data':
+            #if type(self.d['data']) != types.ListType:
+                #raise ValueError("Frame Data must be a list")
+            #self.d['data'] = value
+        #else:
+            #raise IndexError("Unknown Member %s" % name)
+
+    #def __getattr__(self, name):
+        #if name == 'id':
+            #return self.d['id']
+        
+
         
 # Import and add each Adapter class from the files.  There may be a way
 # to do this in a loop but for now this will work.

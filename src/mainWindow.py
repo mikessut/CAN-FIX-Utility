@@ -28,10 +28,11 @@ from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
 import fwDialog
 
+
 class CommThread(QThread):
     """Thread to handle the communication for the UI"""
-    # We emit two signals.  One with the raw frame dict...
-    newFrame = pyqtSignal(dict)
+    # We emit two signals.  One with the raw frame ...
+    newFrame = pyqtSignal(canbus.Frame)
     # .. The other with a formatted string.
     newFrameString = pyqtSignal('QString')
     
@@ -42,13 +43,12 @@ class CommThread(QThread):
         while True:
             try:
                 frame = canbus.recvFrame(0)
-                s = "%03X:" % (frame["id"])
-                for each in frame["data"]:
+                s = "%03X:" % (frame.id)
+                for each in frame.data:
                     s = s + "%02X" % (each)
                 #emit the signals
-                self.newFrame.emit(frame)
+                #self.newFrame.emit(frame)
                 self.newFrameString.emit(s)
-                #print frame, s
             except canbus.exceptions.DeviceTimeout:
                 pass
             finally:
