@@ -25,6 +25,7 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from ui.firmware_ui import Ui_dialogFirmware
+import firmware
 
 
 class dialogFirmware(QDialog, Ui_dialogFirmware):

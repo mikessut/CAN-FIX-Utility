@@ -22,7 +22,7 @@ import argparse
 Have_PyQt = True
 try:
     from PyQt4.QtGui import *
-except:
+except ImportError:
     Have_PyQt = False
 
 parser = argparse.ArgumentParser(description='CAN-FIX Configuration Utility Program')

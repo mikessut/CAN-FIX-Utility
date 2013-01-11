@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
-#  Copyright (c) 2012 Phil Birkelbach
+#  Copyright (c) 2013 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,3 +16,30 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+class DUMMY_Driver(object):
+    def __init__(self, filename):
+        self.__ih = IntelHex(filename)
+        
+        cs = crc.crc16()
+        for each in range(self.__ih.minaddr(), self.__ih.maxaddr()+1):
+            cs.addByte(self.__ih[each])
+        self.__size = self.__ih.maxaddr()+1
+        self.__checksum = cs.getResult()
+
+    def statusCallback(self, status):
+        self.__statusCallback = status
+    
+    def progressCallback(self, progress):
+        self.__progressCallback = progress
+
+    def sendStatus(self, status):
+        if self.__statusCallback:
+            self.__statusCallback(status)
+    
+    def sendProgress(self, progress):
+        if self.__progressCallback:
+            self.__progressCallback(progress)
+
+    def download():
+        pass

@@ -225,7 +225,7 @@ def disableRecvQueue(index):
             recvQueueActive[index] = False
             
 
-def addRecvQueue():
+def __addRecvQueue():
     """Adds a new Queue to the recvQueueList"""
     global listLock
     global recvQueueList
@@ -236,6 +236,12 @@ def addRecvQueue():
         recvQueueList.append(newQueue)
         recvQueueActive.append(False)
 
+def isConnected():
+    if sendThread.isrunning() and recvThread.isrunning():
+        return True
+    else:
+        return False
+        
 adapters = []
 adapters.append(easy.Adapter())
 adapters.append(simulate.Adapter())
@@ -248,7 +254,8 @@ recvQueueActive = []
 listLock = threading.Lock()
 sendThread = None
 recvThread = None
+srcNode = 255
 
 for each in range(3):
-    addRecvQueue()
+    __addRecvQueue()
     
