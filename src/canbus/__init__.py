@@ -20,9 +20,8 @@
 
 from exceptions import *
 import serial
-import serial.tools.list_ports
-import platform
-import glob
+#import serial.tools.list_ports
+import config
 import threading
 import Queue
 import time
@@ -36,33 +35,17 @@ import time
 #        return list    
 
 def getSerialPortList():
-    system_name = platform.system()
-    if system_name == "Windows":
-        # Scan for available ports.
-        available = []
-        for i in range(256):
-            try:
-                s = serial.Serial(i)
-                available.append(i)
-                s.close()
-            except serial.SerialException:
-                pass
-        return available
-    elif system_name == "Darwin":
-        # Mac
-        return glob.glob('/dev/tty*') + glob.glob('/dev/cu*')
-    else:
-        # Assume Linux or something else
-        l = []
-        x = glob.glob('/dev/ttyUSB*') + glob.glob('/dev/ttyS*')
-        for i in x:
-            try:
-                s = serial.Serial(i)
-                l.append(i)
-                s.close()
-            except serial.SerialException:
-                pass
-        return l
+    # Scan for available ports.
+    available = []
+    for i in config.portlist:
+        try:
+            s = serial.Serial(i)
+            available.append(s.portstr)
+            #available.append(i)
+            s.close()
+        except serial.SerialException:
+            pass
+    return available
 
 class Frame(object):
     """Class represents a CANBus frame"""
