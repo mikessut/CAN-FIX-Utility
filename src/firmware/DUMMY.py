@@ -19,7 +19,8 @@
 
 class DUMMY_Driver(object):
     def __init__(self, filename):
-        self.__ih = IntelHex(filename)
+        self.__ih = IntelHex()
+        self.__ih.loadhex(filename)
         
         cs = crc.crc16()
         for each in range(self.__ih.minaddr(), self.__ih.maxaddr()+1):

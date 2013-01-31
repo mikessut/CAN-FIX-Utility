@@ -218,6 +218,13 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         canbus.disconnect()
     
     def loadFirmware(self):
+        if not self.commThread.isRunning():
+            qm = QMessageBox()
+            qm.setText("Please connect to a CANBus Network before trying to download firmware")
+            qm.setWindowTitle("Error")
+            qm.setIcon(QMessageBox.Warning)
+            qm.exec_()
+            return
         connectDia = fwDialog.dialogFirmware()
         x = connectDia.exec_()
                         

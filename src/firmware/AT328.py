@@ -23,7 +23,8 @@ import canbus
 
 class Driver(object):
     def __init__(self, filename):
-        self.__ih = IntelHex(filename)
+        self.__ih = IntelHex()
+        self.__ih.loadhex(filename)
             
         cs = crc.crc16()
         for each in range(self.__ih.minaddr(), self.__ih.maxaddr()+1):
@@ -34,7 +35,7 @@ class Driver(object):
         self.__blocksize = 128
         self.__blocks = self.__size / self.__blocksize + 1
         self.__currentblock = 0
-       
+
     def statusCallback(self, status):
         """Called to set a callback function that this object
            will use to send a status string to the caller"""
@@ -128,7 +129,7 @@ class Driver(object):
 
     def download(self, ch, node):
         for n in range(self.__blocks * self.__blocksize):
-            data.append(self.ih[n])
+            data.append(self.__ih[n])
         for block in range(self.__blocks):
             address = block * 128
             print "Buffer Fill at %d" % (address)
@@ -148,6 +149,5 @@ class Driver(object):
         self.__progress = 1.0
         print "Download Complete Checksum", hex(self.__checksum), "Size", self.__size
         self.__sendComplete(channel)
-        sendStatus("Download Complete Checksum 0x%X, Size %d" % (hex(self.__checksum), self.__size)
-
+        sendStatus("Download Complete Checksum 0x%X, Size %d" % (hex(self.__checksum), self.__size))
         

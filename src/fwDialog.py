@@ -39,8 +39,20 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
     def btnClick(self, btn):
         x = btn.text()
         if x == "Apply":
-            self.labelStatus.setText("GO GO Now!!")
-    
+            driver = devices.devices[self.comboDevice.currentIndex()].fwDriver
+            s = driver
+            s = s + " - " + str(self.editFile.text())
+            node = self.spinNode.value()
+            self.labelStatus.setText(s)
+            try:
+                self.fw = firmware.Firmware(driver, self.editFile.text())
+                self.fw.setStatusCallback(self.labelStatus.setText)
+                self.fw.download(node)
+            except Exception as e:
+                #TODO: Print error and try again
+                print "Exception " + str(e)
+            
+           
     def btnFileClick(self):
         filename = filename = QFileDialog.getOpenFileName(self, 'Open File', '.')
         self.editFile.setText(filename)

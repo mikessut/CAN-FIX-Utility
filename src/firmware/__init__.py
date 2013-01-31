@@ -25,8 +25,6 @@ import time
 import argparse
 import devices
 
-import AT328
-
 class FirmwareError(Exception):
     """Base class for exceptions in this module"""
     pass
@@ -60,10 +58,11 @@ class Firmware():
         if driver == "AT328":
             import AT328
             self.__driver = AT328.Driver(filename)
-        elif drive == "DUMMY":
+        elif driver == "DUMMY":
             import DUMMY
             self.__driver = DUMMY.Driver(filename)
-            
+        else:
+            raise FirmwareError("No such device")
         self.__kill = False
         
     # Download support functions
@@ -120,6 +119,7 @@ class Firmware():
         ch = Channels()
         data = []
         while True: # Firmware load request loop
+            print "Trying Channel"
             self.__tryChannel(ch)
             # send firmware request
             if self.__tryFirmwareReq(ch, node): break
@@ -149,13 +149,6 @@ class Firmware():
     size = property(getSize)
     checksum = property(getChecksum)
         
-class FirmwareThread(threading.Thread):
-    def __init__(self, fw):
-        self.fw = fw
-        threading.Thread.__init__(self)
-        
-    def run(self):
-        self.fw.Download(0xFF)
         
 def config():
     parser = argparse.ArgumentParser(description='CANFIX Firmware Downloader 1.0')
@@ -178,26 +171,7 @@ def config():
 
 #***** MAIN ROUTINE *****
 def main():
-    args = config()
-    can = canbus.Connection(args['portname'])
-    
-    fw = Firmware(can, args['filename'], args['node'])
-    print "Program size", fw.size
-    print "Block Count", fw.blocks
-    
-    fw.Connect()
-    fwt = FirmwareThread(fw)
-    fwt.start()
-    
-    while True:
-        print fw.progress
-        print "Current Block", fw.currentblock
-        if not fwt.isAlive(): break
-        try:
-            time.sleep(0.2)
-        except KeyboardInterrupt:
-            fw.kill = True
-            exit()
+    exit()
        
 if __name__ == '__main__':
     main()
