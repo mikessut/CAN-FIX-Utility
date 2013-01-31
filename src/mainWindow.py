@@ -207,15 +207,22 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 self.commThread.start()
                 self.statusbar.showMessage("Connected to %s" % 
                                           (canbus.adapters[index].name))
+                self.actionConnect.setDisabled(True)
+                self.actionDisconnect.setEnabled(True)
+                return True
             else:
                 self.statusbar.showMessage("Failed to connect to %s" % config['port'])
+                return False
         else:
             print "Canceled"
+            return False
     
     def disconnect(self):
         self.commThread.quit() 
         self.commThread.wait()
         canbus.disconnect()
+        self.actionConnect.setEnabled(True)
+        self.actionDisconnect.setDisabled(True)
     
     def loadFirmware(self):
         if not self.commThread.isRunning():
@@ -224,7 +231,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             qm.setWindowTitle("Error")
             qm.setIcon(QMessageBox.Warning)
             qm.exec_()
-            return
+            if not self.connect(): # Try to connect
+                return
         connectDia = fwDialog.dialogFirmware()
         x = connectDia.exec_()
                         
