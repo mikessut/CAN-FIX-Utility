@@ -233,8 +233,8 @@ class mainWindow(QMainWindow, Ui_MainWindow):
             qm.exec_()
             if not self.connect(): # Try to connect
                 return
-        connectDia = fwDialog.dialogFirmware()
-        x = connectDia.exec_()
+        diaFirmware = fwDialog.dialogFirmware()
+        x = diaFirmware.exec_()
                         
     def dataEdit(self, index):
         self.data.edit(index)
@@ -256,6 +256,8 @@ def getout():
 def run():
     global mWindow
     app = QApplication(sys.argv)
+    app.setOrganizationName("PetraSoft")
+    app.setApplicationName("CAN-FIX Utility")
     mWindow = mainWindow()
     app.aboutToQuit.connect(getout)
     mWindow.show()

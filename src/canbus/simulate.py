@@ -41,9 +41,9 @@ class Node():
         
     def doFrame(self, frame):
         """Function that handles incoming frames for the node"""
-        if frame.id > 0x700 and frame.data[0] == self.node:
+        if frame.id > 0x700 and frame.data[0] == self.nodeID:
             # We start a response frame in case we need it
-            f = canbus.Frame(self.node + 0x700, [frame.id - 0x700, frame.data[1]])
+            f = canbus.Frame(self.nodeID + 0x700, [frame.id - 0x700, frame.data[1]])
             cmd = frame.data[1]
             if cmd == 0: #Node identification
                 # TODO: Fix the model number part

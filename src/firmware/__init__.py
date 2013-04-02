@@ -64,6 +64,11 @@ class Firmware():
         else:
             raise FirmwareError("No such device")
         self.__kill = False
+        canbus.enableRecvQueue(2)
+    
+    def kill(self):
+        self.__kill = True
+        canbus.disableRecvQueue(2)
         
     # Download support functions
     def __tryChannel(self, ch):
@@ -73,7 +78,7 @@ class Firmware():
         ch.ClearAll()
         while True: # Channel wait loop
             try:
-                rframe = canbus.recvFrame()
+                rframe = canbus.recvFrame(2)
             except canbus.DeviceTimeout:
                 pass
             else:
@@ -86,13 +91,13 @@ class Firmware():
            if the response is correct and if so returns True returns
            False on timeout"""
         channel = ch.GetFreeChannel()
-        sframe = canbus.frame(1792 + canbus.srcnode, node, 7, 1, 0xF7, channel)
+        sframe = canbus.Frame(1792 + canbus.srcNode, [node, 7, 1, 0xF7, channel])
         canbus.sendFrame(sframe)
         endtime = time.time() + 0.5
         ch.ClearAll()
         while True: # Channel wait loop
             try:
-                rframe = canbus.recvFrame()
+                rframe = canbus.recvFrame(2)
             except canbus.DeviceTimeout:
                 pass
             else:
@@ -118,16 +123,23 @@ class Firmware():
     def download(self, node):
         ch = Channels()
         data = []
+        attempt = 0
         while True: # Firmware load request loop
+            if self.__kill: 
+                print "Gotta be killed"
+                exit(-1)
             print "Trying Channel"
+            self.__driver.statusCallback("Trying Channel " + str(attempt))
+            attempt += 1
             self.__tryChannel(ch)
             # send firmware request
             if self.__tryFirmwareReq(ch, node): break
-            if self.kill: exit(-1)
+            
         # Here we are in the Firmware load mode of the node    
         # Get our firmware bytes into a normal list
         channel = ch.GetFreeChannel()
             
+"""
     def getProgress(self):
         return self.__progress
     
@@ -148,7 +160,7 @@ class Firmware():
     blocks = property(getBlocks)
     size = property(getSize)
     checksum = property(getChecksum)
-        
+"""        
         
 def config():
     parser = argparse.ArgumentParser(description='CANFIX Firmware Downloader 1.0')

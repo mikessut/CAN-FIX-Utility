@@ -33,7 +33,7 @@ DataPath = os.path.dirname(os.path.dirname(__file__)) + "/data/"
 # The following is the configured communications (serial) ports
 # These are the defaults for most systems.  Others can simply be
 # added as strings to the portlist[] list.  These device names
-# shoudl be suitable for use in the pySerial serial.port() property
+# should be suitable for use in the pySerial serial.port() property
 # This can list every possible port on the machine.  The canbus
 # module will test each one to see if it really is a serial port.
 portlist = []

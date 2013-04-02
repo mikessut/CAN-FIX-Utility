@@ -56,8 +56,9 @@ class Frame(object):
         
 # Import and add each Adapter class from the files.  There may be a way
 # to do this in a loop but for now this will work.
-import easy
 import simulate
+import canfixusb
+import easy
 import network
 
 
@@ -202,7 +203,7 @@ def disableRecvQueue(index):
     global recvQueueActive
     
     with listLock:
-        if index < 0 or index > recvQueueActive.len():
+        if index < 0 or index > len(recvQueueActive):
             raise IndexError("No Such Receive Queue")
         else:
             recvQueueActive[index] = False
@@ -226,8 +227,9 @@ def isConnected():
         return False
         
 adapters = []
-adapters.append(easy.Adapter())
 adapters.append(simulate.Adapter())
+adapters.append(canfixusb.Adapter())
+adapters.append(easy.Adapter())
 adapters.append(network.Adapter())
 
 adapterIndex = None
