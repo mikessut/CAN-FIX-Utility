@@ -20,9 +20,12 @@
 from intelhex import IntelHex
 import crc
 import canbus
+from fwBase import FirmwareBase
+import time
 
-class Driver(object):
+class Driver(FirmwareBase):
     def __init__(self, filename):
+        FirmwareBase.__init__(self)
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)
         
@@ -32,19 +35,13 @@ class Driver(object):
         self.__size = self.__ih.maxaddr()+1
         self.__checksum = cs.getResult()
 
-    def statusCallback(self, status):
-        self.__statusCallback = status
-    
-    def progressCallback(self, progress):
-        self.__progressCallback = progress
-
-    def sendStatus(self, status):
-        if self.__statusCallback:
-            self.__statusCallback(status)
-    
-    def sendProgress(self, progress):
-        if self.__progressCallback:
-            self.__progressCallback(progress)
-
-    def download():
-        pass
+    def download(self, node):
+        progress = 0.0
+        self.statusCallback("Starting Download to Node " + str(node))
+        while True:
+            if self.kill==True: return
+            time.sleep(1)
+            self.progressCallback(progress)
+            progress = progress + 0.1
+            if progress > 1: break
+        self.statusCallback("Download Finished")

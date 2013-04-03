@@ -66,7 +66,7 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
             #    print "Exception " + str(e)
             #    raise e
         if x == "Cancel":
-            self.fw.kill()
+            self.fw.stop()
             
            
     def btnFileClick(self):

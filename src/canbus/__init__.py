@@ -26,13 +26,6 @@ import threading
 import Queue
 import time
     
-#def getSerialPortList():
-#    """Return a list of serial ports"""
-#    portList = serial.tools.list_ports.comports()
-#    list = []
-#    for each in portList:
-#        list.append(each[0])
-#        return list    
 
 def getSerialPortList():
     # Scan for available ports.
@@ -46,6 +39,7 @@ def getSerialPortList():
         except serial.SerialException:
             pass
     return available
+
 
 class Frame(object):
     """Class represents a CANBus frame"""

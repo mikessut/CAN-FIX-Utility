@@ -20,9 +20,12 @@
 from intelhex import IntelHex
 import crc
 import canbus
+from fwBase import FirmwareBase
 
-class Driver(object):
+
+class Driver(FirmwareBase):
     def __init__(self, filename):
+        FirmwareBase.__init__(self)
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)
             
