@@ -55,6 +55,10 @@ import canfixusb
 import easy
 import network
 
+class Port:
+    def __init__(self):
+        pass
+    
 
 class SendThread(threading.Thread):
     def __init__(self):
@@ -219,7 +223,8 @@ def isConnected():
         return True
     else:
         return False
-        
+
+     
 adapters = []
 adapters.append(simulate.Adapter())
 adapters.append(canfixusb.Adapter())
@@ -237,4 +242,4 @@ srcNode = 255
 
 for each in range(3):
     __addRecvQueue()
-    
+

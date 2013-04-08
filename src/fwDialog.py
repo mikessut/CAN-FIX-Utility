@@ -28,13 +28,26 @@ from ui.firmware_ui import Ui_dialogFirmware
 import firmware
 
 class FirmwareThread(QThread):
+    progress = pyqtSignal("float")
+    status = pyqtSignal(QString)
+    
     def __init__(self, fw, node):
         QThread.__init__(self)
         self.fw = fw
         self.node = node
+        self.fw.setStatusCallback(self.setStatus)
+        self.fw.setProgressCallback(self.setProgress)
+    
+    def setStatus(self, status):
+        self.status.emit(status)
+        
+    def setProgress(self, progress):
+        self.progress.emit(progress * 100.0)
         
     def run(self):
         self.fw.download(self.node)
+        self.progress.emit(100.0)
+        self.status.emit("Finished")
 
 
 class dialogFirmware(QDialog, Ui_dialogFirmware):
@@ -58,17 +71,22 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
             self.settings.setValue("firmware/driver", driver)
             #try:
             self.fw = firmware.Firmware(driver, self.editFile.text())
-            self.fw.setStatusCallback(self.labelStatus.setText)
+            
+             
             self.fwThread = FirmwareThread(self.fw, node)
+            self.fwThread.status.connect(self.labelStatus.setText)
+            self.fwThread.progress.connect(self.progressBar.setValue)
+           
             self.fwThread.start()
-            #self.fw.download(node)
-            #except Exception as e:
-            #    print "Exception " + str(e)
-            #    raise e
         if x == "Cancel":
             self.fw.stop()
             
-           
+    def setProgress(self, x):
+        self.progressBar.setValue(x*100.0)
+        
+    def fwComplete(self):
+        self.labelStatus.setText("We Done")
+        
     def btnFileClick(self):
         filename = filename = QFileDialog.getOpenFileName(self, 'Open File', '.')
         self.editFile.setText(filename)

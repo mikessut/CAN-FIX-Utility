@@ -40,8 +40,10 @@ class Driver(FirmwareBase):
         self.statusCallback("Starting Download to Node " + str(node))
         while True:
             if self.kill==True: return
-            time.sleep(1)
+            time.sleep(0.1)
             self.progressCallback(progress)
-            progress = progress + 0.1
+            progress = progress + 0.01
             if progress > 1: break
+        self.progressCallback(1.0)
         self.statusCallback("Download Finished")
+        self.completeCallback()

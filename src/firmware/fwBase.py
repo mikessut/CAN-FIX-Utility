@@ -16,7 +16,10 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 # This function is a placeholder for callbacks that have not been set
-def DoNothing(x):
+
+import canbus
+
+def DoNothing():
     pass
 
 class FirmwareBase:
@@ -27,6 +30,7 @@ class FirmwareBase:
         # are not used by the caller.
         self.progressCallback = DoNothing
         self.statusCallback = DoNothing
+        self.completeCallback = DoNothing
         
     
     def setProgressCallback(self, progress):
@@ -41,6 +45,11 @@ class FirmwareBase:
         else:
             raise TypeError("Argument passed is not a function")
         
+    def setCompleteCallback(self, complete):
+        if callable(complete):
+            self.completeCallback = complete
+        else:
+            raise TypeError("Argument passed is not a function")
         
     def stop(self):
         self.__kill = True
