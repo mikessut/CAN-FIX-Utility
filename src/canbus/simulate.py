@@ -22,6 +22,8 @@ import time
 import struct
 import canbus
 
+import inspect # For TESTING Only
+
 class Node():
     def __init__(self, name = None):
         self.name = name
@@ -62,10 +64,9 @@ class Node():
                 return None
             elif cmd == 7: # Firmware Update
                 FCode = frame.data[3]<<8 | frame.data[2]
-                if FCode == self.FWCode:
+                if FCode == self.FWVCode:
                     FWChannel = frame.data[4]
                     f.data.append(0x00)
-            print f # FOR TESTING ONLY
             return f
         
         return None

@@ -193,6 +193,7 @@ def enableRecvQueue(index):
         if index < 0 or index > len(recvQueueActive):
             raise IndexError("No Such Receive Queue")
         else:
+            print "Enabling Receive Queue # " + str(index)
             recvQueueActive[index] = True
             
 def disableRecvQueue(index):
@@ -204,6 +205,7 @@ def disableRecvQueue(index):
         if index < 0 or index > len(recvQueueActive):
             raise IndexError("No Such Receive Queue")
         else:
+            print "Disabling Receive Queue # " + str(index)
             recvQueueActive[index] = False
             
 

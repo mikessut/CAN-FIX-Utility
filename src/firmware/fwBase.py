@@ -18,42 +18,66 @@
 # This function is a placeholder for callbacks that have not been set
 
 import canbus
+import time
+import firmware
 
-def DoNothing():
-    pass
+canbusQueue = 2 #this is the queue that we'll use for firmware updates.
+
+class Channels():
+    """A Class to keep up with free CANFIX Channels"""
+    def __init__(self):
+        self.channel = [0]*16
+
+    def GetFreeChannel(self):
+        for each in range(16):
+            if self.channel[each] == 0:
+                return each
+        return -1
+
+    def ClearAll(self):
+        for each in range(16):
+            self.channel[each] = 0
+
+    def TestFrame(self, frame):
+        FirstChannel = 1760
+
+        if frame.id >= FirstChannel and frame.id < FirstChannel+32:
+            c = (frame.id - FirstChannel)/2
+            self.channel[c] = 1
+
 
 class FirmwareBase:
+    """Base Class for all firmware download drivers"""
     def __init__(self):
         # .kill when set to True should stop downloads
         self.kill = False
-        # Set the callback functions to DoNothing to avoid times when they
-        # are not used by the caller.
-        self.progressCallback = DoNothing
-        self.statusCallback = DoNothing
-        self.completeCallback = DoNothing
         
-    
     def setProgressCallback(self, progress):
         if callable(progress):
-            self.progressCallback = progress
+            self.__progressCallback = progress
         else:
             raise TypeError("Argument passed is not a function")
         
     def setStatusCallback(self, status):
         if callable(status):
-            self.statusCallback = status
+            self.__statusCallback = status
         else:
             raise TypeError("Argument passed is not a function")
         
-    def setCompleteCallback(self, complete):
-        if callable(complete):
-            self.completeCallback = complete
-        else:
-            raise TypeError("Argument passed is not a function")
+    def sendStatus(self, status):
+        """Function used by this object to test that the callback
+            has been set and if so call it"""
+        if self.__statusCallback:
+            self.__statusCallback(status)
         
+    def sendProgress(self, progress):
+        """Function used by this object to test that the callback
+           has been set and if so call it"""
+        if self.__progressCallback:
+            self.__progressCallback(progress)
+            
     def stop(self):
-        self.__kill = True
-        canbus.disableRecvQueue(2)
+        self.kill = True
         
     # Download support functions
     def __tryChannel(self, ch):
@@ -63,11 +87,11 @@ class FirmwareBase:
         ch.ClearAll()
         while True: # Channel wait loop
             try:
-                rframe = canbus.recvFrame(2)
+                rframe = canbus.recvFrame(canbusQueue)
+                ch.TestFrame(rframe)
             except canbus.DeviceTimeout:
                 pass
-            else:
-                ch.TestFrame(rframe)
+            finally:
                 now = time.time()
                 if now > endtime: break
 
@@ -81,13 +105,15 @@ class FirmwareBase:
         endtime = time.time() + 0.5
         ch.ClearAll()
         while True: # Channel wait loop
+            if self.kill: raise firmware.FirmwareError("Canceled")
             try:
-                rframe = canbus.recvFrame(2)
+                rframe = canbus.recvFrame(canbusQueue)
             except canbus.DeviceTimeout:
                 pass
             else:
                 if rframe.id == (1792 + node) and \
                    rframe.data[0] == self.__srcnode: break
+            finally:
                 now = time.time()
                 if now > endtime: return False
         return True
@@ -96,18 +122,17 @@ class FirmwareBase:
         ch = Channels()
         data = []
         attempt = 0
+        canbus.enableRecvQueue(canbusQueue)
         while True: # Firmware load request loop
-            if self.__kill: 
-                print "Gotta be killed"
-                exit(-1)
-            print "Trying Channel"
-            self.__driver.statusCallback("Trying Channel " + str(attempt))
+            if self.kill: raise firmware.FirmwareError("Canceled")
+            self.sendStatus("Trying Channel " + str(attempt))
             attempt += 1
             self.__tryChannel(ch)
             # send firmware request
             if self.__tryFirmwareReq(ch, node): break
-            
         # Here we are in the Firmware load mode of the node    
         # Get our firmware bytes into a normal list
         channel = ch.GetFreeChannel()
   
+    def end_download(self):
+        canbus.disableRecvQueue(canbusQueue)

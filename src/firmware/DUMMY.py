@@ -17,6 +17,8 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+# This is a fake firmware driver that is just used for testing
+
 from intelhex import IntelHex
 import crc
 import canbus
@@ -37,13 +39,12 @@ class Driver(FirmwareBase):
 
     def download(self, node):
         progress = 0.0
-        self.statusCallback("Starting Download to Node " + str(node))
+        self.sendStatus("Starting Download to Node " + str(node))
         while True:
             if self.kill==True: return
             time.sleep(0.1)
-            self.progressCallback(progress)
+            self.sendProgress(progress)
             progress = progress + 0.01
             if progress > 1: break
-        self.progressCallback(1.0)
-        self.statusCallback("Download Finished")
-        self.completeCallback()
+        self.sendProgress(1.0)
+        self.sendStatus("Download Finished")

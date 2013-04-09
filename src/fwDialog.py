@@ -76,14 +76,12 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
             self.fwThread = FirmwareThread(self.fw, node)
             self.fwThread.status.connect(self.labelStatus.setText)
             self.fwThread.progress.connect(self.progressBar.setValue)
-           
+            self.fwThread.finished.connect(self.fwComplete)
+            
             self.fwThread.start()
         if x == "Cancel":
             self.fw.stop()
-            
-    def setProgress(self, x):
-        self.progressBar.setValue(x*100.0)
-        
+                    
     def fwComplete(self):
         self.labelStatus.setText("We Done")
         

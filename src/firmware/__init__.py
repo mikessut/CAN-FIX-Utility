@@ -17,55 +17,14 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from intelhex import IntelHex
-import crc
 import canbus
 import string
-import time
 import argparse
-import devices
 
 class FirmwareError(Exception):
     """Base class for exceptions in this module"""
     pass
 
-class Channels():
-    """A Class to keep up with free CANFIX Channels"""
-    def __init__(self):
-        self.channel = [0]*16
-
-    def GetFreeChannel(self):
-        for each in range(16):
-            if self.channel[each] == 0:
-                return each
-        return -1
-
-    def ClearAll(self):
-        for each in range(16):
-            self.channel[each] = 0
-
-    def TestFrame(self, frame):
-        FirstChannel = 1760
-
-        if frame.id >= FirstChannel and frame.id < FirstChannel+32:
-            c = (frame.id - FirstChannel)/2
-            self.channel[c] = 1
-
-
-#class Firmware():
-    #"""A Class that represents the firmware logic."""
-    #def __init__(self, driver, filename):
-        ## Here we import and assign the right download driver object
-        #if driver == "AT328":
-            #import AT328
-            #self.__driver = AT328.Driver(filename)
-        #elif driver == "DUMMY":
-            #import DUMMY
-            #self.__driver = DUMMY.Driver(filename)
-        #else:
-            #raise FirmwareError("No such device")
-        #self.__kill = False
-        #canbus.enableRecvQueue(2)
 
 def Firmware(driver, filename):
     if driver == "AT328":

@@ -39,29 +39,7 @@ class Driver(FirmwareBase):
         self.__blocks = self.__size / self.__blocksize + 1
         self.__currentblock = 0
 
-    def statusCallback(self, status):
-        """Called to set a callback function that this object
-           will use to send a status string to the caller"""
-        self.__statusCallback = status
-    
-    def progressCallback(self, progress):
-        """CAlled to set a callback function that this object
-           will use to send the progress to the caller.  The
-           progress is a floating point numnber between 0.0 and 1.0"""
-        self.__progressCallback = progress
 
-    def sendStatus(self, status):
-        """Function used by this object to test that the callback
-           has been set and if so call it"""
-        if self.__statusCallback:
-            self.__statusCallback(status)
-    
-    def sendProgress(self, progress):
-        """Function used by this object to test that the callback
-           has been set and if so call it"""
-        if self.__progressCallback:
-            self.__progressCallback(progress)
-        
     def __fillBuffer(ch, address, data):
         sframe = canbus.Frame(1760 + ch, [0x01, address & 0xFF, (address & 0xFF00) >> 8, 128])
         canbus.sendFrame(sframe)
@@ -130,7 +108,8 @@ class Driver(FirmwareBase):
                 now = time.time()
                 if now > endtime: return False
 
-    def download(self, ch, node):
+    def download(self, node):
+        FirmwareBase.start_download(self, node)
         for n in range(self.__blocks * self.__blocksize):
             data.append(self.__ih[n])
         for block in range(self.__blocks):
@@ -153,4 +132,4 @@ class Driver(FirmwareBase):
         print "Download Complete Checksum", hex(self.__checksum), "Size", self.__size
         self.__sendComplete(channel)
         sendStatus("Download Complete Checksum 0x%X, Size %d" % (hex(self.__checksum), self.__size))
-        
+        FirmwareBase.end_download()

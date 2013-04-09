@@ -138,6 +138,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>editFile</tabstop>
+  <tabstop>btnFile</tabstop>
+  <tabstop>spinNode</tabstop>
+  <tabstop>comboDevice</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
