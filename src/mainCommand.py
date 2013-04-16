@@ -18,11 +18,36 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import canbus
+import devices
 
-def run():
-    print "Here we go"
-    for each in canbus.adapters:
-        print each.name
+def run(args):
+    print args
+    
+    if args.list_devices == True:
+        print
+        print "Device Name [Device ID]"
+        print "-----------------------"
+        for each in devices.devices:
+            print each.name, '[' + hex(each.DeviceId) + ']'
+    if args.listen == True:
+        config = {}
+        config['bitrate']=args.bitrate
+        config['port']=args.serial_port
+        config['ipaddress']=args.ip_address
+        canbus.connect(None, config, args.adapter)
+        canbus.enableRecvQueue(0)
+        count = 0
+        while True:
+            try:
+                frame = canbus.recvFrame(0)
+                print str(frame)
+                count+=1
+                if args.frame_count != 0:
+                    if count > args.frame_count: break
+            except canbus.exceptions.DeviceTimeout:
+                pass
+            
+        canbus.disconnect()
 
 if __name__ == "__main__":
-    run()
+    run(None)

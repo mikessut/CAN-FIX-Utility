@@ -167,6 +167,7 @@ def configNodes():
         nodelist.append(node)
     nodelist[0].setFunction(__func_airdata)
     nodelist[1].setFunction(__func_engine)
+    #nodelist[0].FMVCode = 
     return nodelist
     
     

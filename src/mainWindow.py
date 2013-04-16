@@ -47,7 +47,7 @@ class CommThread(QThread):
                 for each in frame.data:
                     s = s + "%02X" % (each)
                 #emit the signals
-                #self.newFrame.emit(frame)
+                self.newFrame.emit(frame)
                 self.newFrameString.emit(s)
             except canbus.exceptions.DeviceTimeout:
                 pass
@@ -172,7 +172,7 @@ class modelNetwork(QAbstractItemModel):
         
 
 class mainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, args):
         QMainWindow.__init__(self)
         self.setupUi(self)
         self.data = modelData()
@@ -253,7 +253,7 @@ def getout():
     
     mainWindow.disconnect(mWindow)
 
-def run():
+def run(args):
     global mWindow
     app = QApplication(sys.argv)
     app.setOrganizationName("PetraSoft")

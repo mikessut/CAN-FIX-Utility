@@ -46,7 +46,11 @@ class Frame(object):
     def __init__(self, id=0, data=[]):
         self.id = id
         self.data = data
-
+    def __str__(self):
+        s = str(self.id) + ':'
+        for each in self.data:
+            s = s + str(each)
+        return s
         
 # Import and add each Adapter class from the files.  There may be a way
 # to do this in a loop but for now this will work.
@@ -112,7 +116,7 @@ class RecvThread(threading.Thread):
     def quit(self):
         self.getout = True
 
-def connect(index = None, config = None):
+def connect(index = None, config = None, adapter = None):
     global adapters
     global adapterIndex
     global sendThread
@@ -128,15 +132,22 @@ def connect(index = None, config = None):
             pass
     else:
         if index == None:
-            #Raise an exception that we have to have information
-            pass
-        else:
-            sendThread = SendThread()
-            recvThread = RecvThread()
-            adapters[index].connect(config)
-            adapterIndex = index
-            sendThread.start()
-            recvThread.start()
+            if adapter != None:
+                n = 0
+                for each in adapters:
+                    if adapters[n].shortname == adapter:
+                        index = n
+                        break
+            else:
+                raise BusInitError("Not enough information to make connection")
+                pass
+       
+        sendThread = SendThread()
+        recvThread = RecvThread()
+        adapters[index].connect(config)
+        adapterIndex = index
+        sendThread.start()
+        recvThread.start()
     return True
     
 def disconnect():
