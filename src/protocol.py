@@ -21,7 +21,56 @@ import config
 import xml.etree.ElementTree as ET
 import copy
 
+class NodeAlarm():
+    """Represents a Node Alarm"""
+    def __init__(self, frame):
+        self.node = frame.id
+        self.alarm = frame.data[0] + frame.data[1]*256
+        self.data = frame.data[2:]
 
+class Parameter():
+    """Represents a normal parameter update frame"""
+    def __init__(self, frame):
+        p = parameters[frame.id]
+        self.name = p.name
+        self.units = p.units
+        self.min = p.min
+        self.max = p.max
+        self.format = p.format
+
+class TwoWayMsg():
+    """Represents 2 Way communication channel data"""
+    def __init__(self, frame):
+        self.channel = (frame.id - 1760) /2
+        self.data = frame.data
+        if frame.id % 2 == 0:
+            self.type = "Request"
+        else:
+            self.type = "Response"
+
+class NodeSpecific():
+    """Represents a Node Specific Message"""
+    def __init(self, frame):
+        self.sendNode = frame.id -1792
+        self.destNode = frame.data[0]
+        self.controlCode = frame.data[1]
+        self.data = frame.data[2:]
+        
+def parseFrame(frame):
+    """Determine what type of frame is given and return an object
+       that represents what that frame is"""
+    if frame.id < 256:
+        return NodeAlarm(frame)
+    elif frame.id < 1760:
+        return Parameter(frame)
+    elif frame.id < 1792:
+        return TwoWayMsg(frame)
+    elif frame.id < 2048:
+        return NodeSpecific(frame)
+    else:
+        return None
+
+        
 def __getText(element, text):
     try:
         return element.find(text).text
@@ -36,7 +85,7 @@ def __getFloat(s):
         return None
 
 
-class Parameter():
+class ParameterDef():
     def __init__(self, name):
         self.name = name
         self.units = None
@@ -107,7 +156,7 @@ def __add_parameter(element):
     pid = int(element.find("id").text)
     count = int(element.find("count").text)
     
-    p = Parameter(element.find("name").text)
+    p = ParameterDef(element.find("name").text)
     p.units = __getText(element, "units")
     p.format = __getText(element, "format")
     p.type = __getText(element, "type")
@@ -141,6 +190,10 @@ for child in root:
     elif child.tag == "parameter":
         __add_parameter(child)
 
+def getGroup(id):
+    for each in groups:
+        if id >= each['startid'] and id <= each['endid']:
+            return each
             
 if __name__ == "__main__":
     print "CANFIX Protocol Version " + version

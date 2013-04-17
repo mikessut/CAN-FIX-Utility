@@ -19,35 +19,51 @@
 
 import canbus
 import devices
+import protocol
+
+def list_devices():
+    print
+    print "Device Name [Device ID]"
+    print "-----------------------"
+    for each in devices.devices:
+        print each.name, '[' + hex(each.DeviceId) + ']'
+
+def listen(frame_count, config, adapter):
+    canbus.connect(None, config, adapter)
+    canbus.enableRecvQueue(0)
+    count = 0
+    while True:
+        try:
+            frame = canbus.recvFrame(0)
+            #print str(frame) + protocol.parameters[frame.id].name
+            x = protocol.parseFrame(frame)
+            if isinstance(x, protocol.Parameter):
+                print x.name + ' ' + x.units
+            count+=1
+            if frame_count != 0:
+                if count > frame_count: break
+        except canbus.exceptions.DeviceTimeout:
+            pass
+        except KeyboardInterrupt:
+            break
+    canbus.disconnect()
+    
 
 def run(args):
-    print args
-    
-    if args.list_devices == True:
-        print
-        print "Device Name [Device ID]"
-        print "-----------------------"
-        for each in devices.devices:
-            print each.name, '[' + hex(each.DeviceId) + ']'
-    if args.listen == True:
-        config = {}
-        config['bitrate']=args.bitrate
-        config['port']=args.serial_port
-        config['ipaddress']=args.ip_address
-        canbus.connect(None, config, args.adapter)
-        canbus.enableRecvQueue(0)
-        count = 0
-        while True:
-            try:
-                frame = canbus.recvFrame(0)
-                print str(frame)
-                count+=1
-                if args.frame_count != 0:
-                    if count > args.frame_count: break
-            except canbus.exceptions.DeviceTimeout:
-                pass
-            
+    try:
+        print args
+        
+        if args.list_devices == True:
+            list_devices()
+        if args.listen == True:
+            config = {}
+            config['bitrate']=args.bitrate
+            config['port']=args.serial_port
+            config['ipaddress']=args.ip_address
+            listen(args.frame_count, config, args.adapter)
+    except:
         canbus.disconnect()
-
+        raise
+        
 if __name__ == "__main__":
     run(None)
