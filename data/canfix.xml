@@ -223,7 +223,7 @@
   <name>Encoder Input</name>
   <type>INT</type>
   <format>Steps Moved</format>
-  <remarks>0 = CW</remarks>
+  <remarks>Less than 0 = CCW, Greater than 0 = CW</remarks>
 </parameter>
 <parameter>
   <id>284</id>
@@ -231,7 +231,7 @@
   <name>Generic Switches</name>
   <type>BYTE[5]</type>
   <format>Discrete Bits</format>
-  <index>As needed</index>
+  <index>Unit</index>
   <remarks>User Defined For Multiplexing Switches</remarks>
 </parameter>
 <parameter>
@@ -359,7 +359,7 @@
   <max>100</max>
   <multiplier>0.01</multiplier>
   <units>%</units>
-  <index>As needed</index>
+  <index>Unit</index>
   <remarks>User Defined</remarks>
 </parameter>
 <parameter>
@@ -1231,7 +1231,7 @@
   <type>UINT</type>
   <multiplier>0.01</multiplier>
   <units>gal</units>
-  <index>Aux Tanks</index>
+  <index>Aux Tank</index>
   <aux id='1'>Min</aux>
   <aux id='2'>Max</aux>
   <aux id='4'>Low Warn</aux>
@@ -1594,7 +1594,7 @@
   <max>100</max>
   <multiplier>0.01</multiplier>
   <units>%</units>
-  <index>As needed</index>
+  <index>Unit</index>
   <remarks>User Defined</remarks>
   <aux id='1'>Min</aux>
   <aux id='2'>Max</aux>
