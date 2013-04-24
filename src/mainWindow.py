@@ -258,7 +258,7 @@ def run(args):
     app = QApplication(sys.argv)
     app.setOrganizationName("PetraSoft")
     app.setApplicationName("CAN-FIX Utility")
-    mWindow = mainWindow()
+    mWindow = mainWindow(args)
     app.aboutToQuit.connect(getout)
     mWindow.show()
     sys.exit(app.exec_())

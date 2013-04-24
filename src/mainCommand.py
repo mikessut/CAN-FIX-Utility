@@ -37,8 +37,9 @@ def listen(frame_count, config, adapter):
             frame = canbus.recvFrame(0)
             #print str(frame) + protocol.parameters[frame.id].name
             x = protocol.parseFrame(frame)
-            if isinstance(x, protocol.Parameter):
-                print x.name + ' ' + x.units
+            print '-'
+            print str(frame)
+            protocol.test_print(x)
             count+=1
             if frame_count != 0:
                 if count > frame_count: break
