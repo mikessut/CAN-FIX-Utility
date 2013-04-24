@@ -47,9 +47,10 @@ class Frame(object):
         self.id = id
         self.data = data
     def __str__(self):
-        s = str(self.id) + ':'
+        s = hex(self.id)[2:] + ':'
         for each in self.data:
-            s = s + str(each)
+            if each < 10: s = s + '0'
+            s = s + hex(each)[2:]  + ' '
         return s
         
 # Import and add each Adapter class from the files.  There may be a way
@@ -59,10 +60,6 @@ import canfixusb
 import easy
 import network
 
-class Port:
-    def __init__(self):
-        pass
-    
 
 class SendThread(threading.Thread):
     def __init__(self):
