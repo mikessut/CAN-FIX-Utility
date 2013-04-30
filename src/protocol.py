@@ -28,6 +28,10 @@ class NodeAlarm():
         self.node = frame.id
         self.alarm = frame.data[0] + frame.data[1]*256
         self.data = frame.data[2:]
+    
+    def __str__(self):
+        s = "[" + str(self.node) + "] Node Alarm " + str(self.alarm) + " Data " + str(self.data)
+        return s
 
 class Parameter():
     """Represents a normal parameter update frame"""
@@ -88,7 +92,33 @@ class Parameter():
         else:
             x = getValue(self.type, self.data, self.multiplier)
         return x
-
+    
+    def __str__(self):
+        s = '[' + str(p.node) + '] ' + p.name
+        if p.meta: s = s + ' ' + p.meta
+        if p.indexName:
+            s = s + ' ' + p.indexName + ' ' + str(p.index+1)
+        s = s + ': '
+        if p.value != None:
+            if isinstance(p.value, list):
+                if p.type == "BYTE" or p.type == "WORD":
+                    n = 0 #loop counter
+                    for each in reversed(p.value):
+                        if each == True:
+                            s = s+'1'
+                        else:
+                            s = s+'0'
+                        n += 1
+                        if n % 4 == 0: #add a space every four bits
+                            s = s+' '
+                else:
+                    for each in p.value:
+                        s = s + str(each) + ','
+                s = s.strip(', ')
+            else:
+               s = s + str(p.value)
+        return s
+        
 class TwoWayMsg():
     """Represents 2 Way communication channel data"""
     def __init__(self, frame):
@@ -99,13 +129,34 @@ class TwoWayMsg():
         else:
             self.type = "Response"
 
+    def __str__(self):
+        s = self.type + " on channel " + str(self.channel) + ': ' + str(self.data)
+        return s
+
 class NodeSpecific():
     """Represents a Node Specific Message"""
-    def __init(self, frame):
+    codes = ["Node Identification", "Bit Rate Set", "Node ID Set", "Disable Parameter",
+             "Enable Parameter", "Node Report", "Node Status", "Update Firmware",
+             "Connection Request", "Node Configuration Set", "Node Configuration Query"]
+    def __init__(self, frame):
         self.sendNode = frame.id -1792
         self.destNode = frame.data[0]
         self.controlCode = frame.data[1]
         self.data = frame.data[2:]
+    
+    def __str__(self):
+        s = '[' + str(self.sendNode) + ']'
+        s = s + "->[" + str(self.destNode) + '] '
+        try:
+            s = s + self.codes[self.controlCode]
+        except IndexError:
+            if self.controlCode < 128:
+                s = s + "Reserved NSM "
+            else:
+                s = s + "User Defined NSM "
+            s = s + str(self.controlCode)
+        s = s + ": " + str(self.data)
+        return s
 
 def getTypeSize(datatype):
     table = {"BYTE":1, "WORD":2, "SHORT":1, "USHORT":1, "UINT":2,
@@ -152,7 +203,6 @@ def getValue(datatype, data, multiplier):
         # If we get a KeyError on the dict then it's a CHAR
         if "CHAR" in datatype:
             return str(data)
-        print "Ain't gotta " + datatype
         return None
         
 def parseFrame(frame):
@@ -294,17 +344,6 @@ def getGroup(id):
     for each in groups:
         if id >= each['startid'] and id <= each['endid']:
             return each
-
-def test_print(p):
-    if isinstance(p, Parameter):
-        s = '[' + str(p.node) + '] ' + p.name
-        if p.meta: s = s + ' ' + p.meta
-        if p.value != None: s = s + ' = ' + str(p.value)
-        print s
-        print ' ' + p.type
-        if p.indexName:
-            print ' ' + p.indexName + ' ' + str(p.index+1),
-        #print p.data
             
 if __name__ == "__main__":
     import argparse
@@ -326,6 +365,7 @@ if __name__ == "__main__":
     if args.test:
         import canbus
         frames = []
+        frames.append(canbus.Frame(0x023, [0x01, 0x02, 1,2,3,4,5]))
         frames.append(canbus.Frame(0x183, [2, 0, 0, 44, 5]))
         frames.append(canbus.Frame(0x183, [2, 0, 0x10, 0, 0]))
         frames.append(canbus.Frame(0x183, [2, 0, 0x20, 0xD0, 0x7]))
@@ -337,8 +377,10 @@ if __name__ == "__main__":
         frames.append(canbus.Frame(0x587, [1, 0, 0, ord('7'), ord('2'), ord('7'), ord('W'), ord('B')]))
         frames.append(canbus.Frame(0x4DC, [4, 0, 0, 1, 2, 0, 0]))
         frames.append(canbus.Frame(0x581, [5, 0, 0, 0xdd, 0x07, 4, 26]))
+        frames.append(canbus.Frame(1795, [5, 3, 1, 2, 3]))
+        frames.append(canbus.Frame(1773, [1, 2, 3, 4, 5]))
         for f in frames:
             p = parseFrame(f)
             print '-'
             print str(f)
-            test_print(p)
+            print str(p)
