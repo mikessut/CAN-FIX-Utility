@@ -45,6 +45,8 @@ class Parameter():
         self.max = p.max
         self.format = p.format
         self.multiplier = p.multiplier
+        if self.multiplier == None:
+            self.multiplier = 1
         self.indexName = p.index
         self.node = frame.data[0]
         self.index = frame.data[1]
@@ -69,7 +71,22 @@ class Parameter():
         self.value = self.unpack()
     
     def unpack(self):
-        x = getValue(self.type, self.data, self.multiplier)
+        if self.type == "UINT, USHORT[2]": #Unusual case of the date
+            x = []
+            x.append(getValue("UINT", self.data[0:2],1))
+            x.append(getValue("USHORT", self.data[2:3], 1))
+            x.append(getValue("USHORT", self.data[3:4], 1))
+        elif '[' in self.type:
+            y = self.type.strip(']').split('[')
+            if y[0] == 'CHAR':
+                x = getValue(self.type, self.data, self.multiplier)
+            else:
+                x = []
+                size = getTypeSize(y[0])
+                for n in range(int(y[1])):
+                    x.append(getValue(y[0], self.data[size*n:size*n+size], self.multiplier))
+        else:
+            x = getValue(self.type, self.data, self.multiplier)
         return x
 
 class TwoWayMsg():
@@ -89,6 +106,13 @@ class NodeSpecific():
         self.destNode = frame.data[0]
         self.controlCode = frame.data[1]
         self.data = frame.data[2:]
+
+def getTypeSize(datatype):
+    table = {"BYTE":1, "WORD":2, "SHORT":1, "USHORT":1, "UINT":2,
+             "INT":2, "DINT":4, "UDINT":4, "FLOAT":4, "CHAR":1}
+    return table[datatype]
+
+
 
 # This function takes the bytearray that is in data and converts it into a value.
 # The table is a dictionary that contains the CAN-FIX datatype string as the
@@ -311,6 +335,8 @@ if __name__ == "__main__":
         frames.append(canbus.Frame(0x102, [3, 0, 0, 0x55, 0xAA]))
         frames.append(canbus.Frame(0x10E, [3, 0, 0, 0x02]))
         frames.append(canbus.Frame(0x587, [1, 0, 0, ord('7'), ord('2'), ord('7'), ord('W'), ord('B')]))
+        frames.append(canbus.Frame(0x4DC, [4, 0, 0, 1, 2, 0, 0]))
+        frames.append(canbus.Frame(0x581, [5, 0, 0, 0xdd, 0x07, 4, 26]))
         for f in frames:
             p = parseFrame(f)
             print '-'
