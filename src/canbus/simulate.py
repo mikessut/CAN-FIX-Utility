@@ -141,9 +141,9 @@ def __func_airdata(node):
             airdata['n'] += 1
         elif airdata['n'] == 1:
             o = (int(time.time()*100) % 20) - 10
-            x = struct.pack('<H', (airdata['altitude']+o+1000)/10 )
+            x = struct.pack('<l', (airdata['altitude']+o) )
             frame.id = 0x184 #Indicated Altitude
-            frame.data = [node, 0, 0, ord(x[0]), ord(x[1])]
+            frame.data = [node, 0, 0, ord(x[0]), ord(x[1]), ord(x[2]), ord(x[3])]
             airdata['n'] += 1
         elif airdata['n'] == 2:
             o = (int(time.time()*100) % 100) - 50
