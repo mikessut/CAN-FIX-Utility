@@ -94,16 +94,16 @@ class Parameter():
         return x
     
     def __str__(self):
-        s = '[' + str(p.node) + '] ' + p.name
-        if p.meta: s = s + ' ' + p.meta
-        if p.indexName:
-            s = s + ' ' + p.indexName + ' ' + str(p.index+1)
+        s = '[' + str(self.node) + '] ' + self.name
+        if self.meta: s = s + ' ' + self.meta
+        if self.indexName:
+            s = s + ' ' + self.indexName + ' ' + str(self.index+1)
         s = s + ': '
-        if p.value != None:
-            if isinstance(p.value, list):
-                if p.type == "BYTE" or p.type == "WORD":
+        if self.value != None:
+            if isinstance(self.value, list):
+                if self.type == "BYTE" or self.type == "WORD":
                     n = 0 #loop counter
-                    for each in reversed(p.value):
+                    for each in reversed(self.value):
                         if each == True:
                             s = s+'1'
                         else:
@@ -112,11 +112,13 @@ class Parameter():
                         if n % 4 == 0: #add a space every four bits
                             s = s+' '
                 else:
-                    for each in p.value:
+                    for each in self.value:
                         s = s + str(each) + ','
                 s = s.strip(', ')
             else:
-               s = s + str(p.value)
+               s = s + str(self.value)
+            if self.units != None:
+                s = s + ' ' + self.units
         return s
         
 class TwoWayMsg():
@@ -235,6 +237,8 @@ def __getFloat(s):
 
 
 class ParameterDef():
+    """Defines an individual CANFIX parameter.  The database would
+    essentially be a list of these objects"""
     def __init__(self, name):
         self.name = name
         self.units = None
