@@ -235,7 +235,14 @@ class mainWindow(QMainWindow, Ui_MainWindow):
                 return
         diaFirmware = fwDialog.dialogFirmware()
         x = diaFirmware.exec_()
-                        
+    
+    def trafficFrame(self, frame):
+        if self.checkRaw.isChecked():
+            self.textTraffic.appendPlainText(str(frame))
+        else:
+            p = protocol.parseFrame(frame)
+            self.textTraffic.appendPlainText(str(p))
+    
     def dataEdit(self, index):
         self.data.edit(index)
     
@@ -243,10 +250,12 @@ class mainWindow(QMainWindow, Ui_MainWindow):
         print index.parent().data().toString() + " " + index.data().toString()
         
     def trafficStart(self):
-        self.commThread.newFrameString.connect(self.textTraffic.appendPlainText)
-    
+        #self.commThread.newFrameString.connect(self.textTraffic.appendPlainText)
+        self.commThread.newFrame.connect(self.trafficFrame)
+
     def trafficStop(self):
-        self.commThread.newFrameString.disconnect(self.textTraffic.appendPlainText)
+        #self.commThread.newFrameString.disconnect(self.textTraffic.appendPlainText)
+        self.commThread.newFrame.disconnect(self.trafficFrame)
 
 def getout():
     global mWindow
