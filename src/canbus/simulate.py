@@ -125,7 +125,7 @@ airdata = {}
 airdata['lasttime'] = 0.0
 airdata['airspeed'] = 165
 airdata['altitude'] = 8500
-airdata['oat'] = 10
+airdata['oat'] = 10.5
 airdata['n'] = 0
 
 def __func_airdata(node):
@@ -134,19 +134,19 @@ def __func_airdata(node):
     frame = canbus.Frame()
     if t > airdata['lasttime'] + 1:
         if airdata['n'] == 0:
-            o = (int(time.time()*100) % 4) - 2
-            x = struct.pack('<H', (airdata['airspeed']+o)*10)
+            o = (int(time.time()*1000.0) % 40) - 20
+            x = struct.pack('<H', (airdata['airspeed']*10 + o))
             frame.id = 0x183 #Indicated Airspeed
             frame.data = [node, 0, 0, ord(x[0]), ord(x[1])]
             airdata['n'] += 1
         elif airdata['n'] == 1:
-            o = (int(time.time()*100) % 20) - 10
-            x = struct.pack('<l', (airdata['altitude']+o) )
+            o = (int(time.time()*1000.0) % 20) - 10
+            x = struct.pack('<l', (airdata['altitude']+o))
             frame.id = 0x184 #Indicated Altitude
             frame.data = [node, 0, 0, ord(x[0]), ord(x[1]), ord(x[2]), ord(x[3])]
             airdata['n'] += 1
         elif airdata['n'] == 2:
-            o = (int(time.time()*100) % 100) - 50
+            o = (int(time.time()*1000.0) % 100) - 50
             x = struct.pack('<H', airdata['oat'] * 100 + o)
             frame.id = 0x407 #OAT
             frame.data = [node, 0, 0, ord(x[0]), ord(x[1])]

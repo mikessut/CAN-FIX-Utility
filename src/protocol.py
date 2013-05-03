@@ -38,28 +38,28 @@ class Parameter():
     def __init__(self, frame=None):
         if frame != None:
             self.setFrame(frame)
-            
-    def setFrame(self, frame):
-        self.__frame = frame
-        p = parameters[frame.id]
+    
+    def parameterData(self, frameID):
+        p = parameters[frameID]
         self.name = p.name
         self.units = p.units
         self.type = p.type
         self.min = p.min
         self.max = p.max
         self.format = p.format
+        self.indexName = p.index
         self.multiplier = p.multiplier
         if self.multiplier == None:
             self.multiplier = 1
-        self.indexName = p.index
+        
+    def setFrame(self, frame):
+        self.__frame = frame
+        p = parameters[frame.id]
+        self.parameterData(frame.id)
         self.node = frame.data[0]
         self.index = frame.data[1]
         self.function = frame.data[2]
         self.data = bytearray(frame.data[3:])
-        try:
-            self.meta = p.auxdata[self.function>>4]
-        except KeyError:
-            self.meta = None
         if self.function | 0x04:
             self.failure = True
         else:
@@ -73,6 +73,16 @@ class Parameter():
         else:
             self.annunciate = False
         self.value = self.unpack()
+        try:
+            self.meta = p.auxdata[self.function>>4]
+        except KeyError:
+            self.meta = None
+        
+    
+    def getFrame(self):
+        self.parameterData(__frame.id)
+        data = self.pack(value)
+        return
     
     def unpack(self):
         if self.type == "UINT, USHORT[2]": #Unusual case of the date
@@ -92,6 +102,10 @@ class Parameter():
         else:
             x = getValue(self.type, self.data, self.multiplier)
         return x
+    
+    def pack(self):
+        if self.type == "UINT, USHORT[2]": # unusual case of the date
+           pass
     
     def __str__(self):
         s = '[' + str(self.node) + '] ' + self.name
@@ -205,6 +219,21 @@ def getValue(datatype, data, multiplier):
         # If we get a KeyError on the dict then it's a CHAR
         if "CHAR" in datatype:
             return str(data)
+        return None
+        
+def setValue(datatype, value, multiplier):
+    table = {"SHORT":"<b", "USHORT":"<B", "UINT":"<H",
+             "INT":"<h", "DINT":"<l", "UDINT":"<L", "FLOAT":"<f"}
+    
+    if datatype == "BYTE":
+        return None
+    elif datatype == "WORD":
+        return None
+    try:
+        x = pack(table[datatype], value * multiplier)
+    except KeyError:
+        if "CHAR" in datatype:
+            return value
         return None
         
 def parseFrame(frame):
