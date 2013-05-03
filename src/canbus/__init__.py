@@ -20,7 +20,6 @@
 
 from exceptions import *
 import serial
-#import serial.tools.list_ports
 import config
 import threading
 import Queue
@@ -30,11 +29,11 @@ import time
 def getSerialPortList():
     # Scan for available ports.
     available = []
+    
     for i in config.portlist:
         try:
             s = serial.Serial(i)
             available.append(s.portstr)
-            #available.append(i)
             s.close()
         except serial.SerialException:
             pass
@@ -154,22 +153,22 @@ def disconnect():
     global recvThread
     
     if adapterIndex != None:
-        try:
-            adapters[adapterIndex].disconnect()
-        finally:
-            if sendThread:
-                sendThread.quit()
-                sendThread.join()
-            if recvThread:
-                recvThread.quit()
-                recvThread.join()
-            sendThread = None
-            recvThread = None
-            adapterIndex = None
+        if sendThread:
+            sendThread.quit()
+            sendThread.join()
+        if recvThread:
+            recvThread.quit()
+            recvThread.join()
+        sendThread = None
+        recvThread = None
+        
+        # I know there is a more pythonic way to do this but this is what I know.
+        for each in range(len(recvQueueActive)):
+            recvQueueActive[each] = False
 
-            # I know there is a more pythonic way to do this but this is what I know.
-            for each in range(len(recvQueueActive)):
-                recvQueueActive[each] = False
+        
+        adapters[adapterIndex].disconnect()
+        adapterIndex = None
     
 
         

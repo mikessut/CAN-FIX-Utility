@@ -18,7 +18,7 @@
 from exceptions import *
 import serial
 import time
-from serial.tools.list_ports import comports
+#from serial.tools.list_ports import comports
 
 class Adapter():
     """Class that represents an the Open Source CAN-FIX-it USB to CANBus adapter"""
@@ -29,19 +29,19 @@ class Adapter():
         self.ser = None
         
     def __readResponse(self, ch):
-        str = ""
+        s = ""
 
         while 1:
             x = self.ser.read()
             if len(x) == 0:
                 raise DeviceTimeout
             else:
-                str = str + x
-                if x == ch.tolower() + "\n": # Good Response
-                    return str
-                if x == "*": # Error
-                    x = self.ser.read()
-                    raise BusReadError("Error " + x + " Returned")
+                s = s + x
+                if x == '\n':
+                    if s[0] == ch.lower(): # Good Response
+                        return s
+                    if s[0] == "*": # Error
+                        raise BusReadError("Error " + s[1] + " Returned")
 
     def connect(self, config):
         try:
@@ -62,7 +62,7 @@ class Adapter():
         self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
                 
         print "Reseting CAN-FIX-it"
-        self.ser.write("K\n")
+        print self.ser.write("K\n")
         try:
             result = self.__readResponse("K")
         except DeviceTimeout:
@@ -73,7 +73,7 @@ class Adapter():
         print "Setting Bit Rate"
         self.ser.write(bitrates[self.bitrate])
         try:
-            result = self.__readResponse()
+            result = self.__readResponse("B")
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for adapter")
         except BusReadError:
@@ -87,7 +87,7 @@ class Adapter():
         print "Opening CAN Port"
         self.ser.write("O\n")
         try:
-            result = self.__readResponse()
+            result = self.__readResponse("O")
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for adapter")
         except BusReadError:
@@ -97,17 +97,16 @@ class Adapter():
         print "Closing CAN Port"
         self.ser.write("C\n")
         try:
-            result = self.__readResponse()
+            result = self.__readResponse("C")
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for Adapter")
         except BusReadError:
             raise BusInitError("Unable to Close CAN Port")
 
     def error(self):
-        print "Closing CAN Port"
-        self.ser.write("F\r")
+        self.ser.write("E\r")
         try:
-            result = self.__readResponse()
+            result = self.__readResponse("E")
         except DeviceTimeout:
             raise BusInitError("Timeout waiting for Adapter")
         except BusReadError:
@@ -127,7 +126,7 @@ class Adapter():
         self.ser.write(xmit)
         while True:
             try:
-                result = self.__readResponse()
+                result = self.__readResponse("W")
             except DeviceTimeout:
                 raise BusWriteError("Timeout waiting for Adapter")
             if result[0] == 'w':
@@ -140,7 +139,7 @@ class Adapter():
 
 
     def recvFrame(self):
-        result = self.__readResponse()
+        result = self.__readResponse("R")
         print result, 
         if result[0] != 'r':
             raise BusReadError("Unknown response from Adapter")
