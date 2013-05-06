@@ -166,12 +166,10 @@ def disconnect():
         for each in range(len(recvQueueActive)):
             recvQueueActive[each] = False
 
-        
         adapters[adapterIndex].disconnect()
         adapterIndex = None
-    
 
-        
+    
 def sendFrame(frame):
     if adapterIndex == None:
         raise BusInitError("No Connection to CAN-Bus")

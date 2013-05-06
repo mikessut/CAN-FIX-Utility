@@ -43,6 +43,26 @@ class Adapter():
                     if s[0] == "*": # Error
                         raise BusReadError("Error " + s[1] + " Returned")
 
+    def __sendCommand(self, command, attempts = 3):
+        n = 0 #attempt counter
+        if command[-1] != '\n':
+            command = command + '\n'
+        
+        while True:
+            self.ser.write(command)
+            try:
+                result = self.__readResponse(command[0])
+                return result
+            except DeviceTimeout:
+                if n == attempts:
+                    raise BusInitError("Timeout waiting for adapter")
+            except BusReadError:
+                if n == attempts:
+                    raise BusInitError("Unable to send Command " + command)
+                time.sleep(self.timeout)
+            n+=1
+        
+        
     def connect(self, config):
         try:
             self.bitrate = config['bitrate']
@@ -58,26 +78,13 @@ class Adapter():
             self.timeout = config['timeout']
         except KeyError:
             self.timeout = 0.25
-            
-        self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
-                
-        print "Reseting CAN-FIX-it"
-        print self.ser.write("K\n")
-        try:
-            result = self.__readResponse("K")
-        except DeviceTimeout:
-            raise BusInitError("Timeout waiting for adapter")
-        except BusReadError:
-            raise BusInitError("Unable to Reset adapter")
         
+        self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
+        
+        print "Reseting CAN-FIX-it"
+        self.__sendCommand("K")
         print "Setting Bit Rate"
-        self.ser.write(bitrates[self.bitrate])
-        try:
-            result = self.__readResponse("B")
-        except DeviceTimeout:
-            raise BusInitError("Timeout waiting for adapter")
-        except BusReadError:
-            raise BusInitError("Unable to set CAN Bit rate")
+        self.__sendCommand(bitrates[self.bitrate])
         self.open()
     
     def disconnect(self):
@@ -85,23 +92,11 @@ class Adapter():
 
     def open(self):
         print "Opening CAN Port"
-        self.ser.write("O\n")
-        try:
-            result = self.__readResponse("O")
-        except DeviceTimeout:
-            raise BusInitError("Timeout waiting for adapter")
-        except BusReadError:
-            raise BusInitError("Unable to Open CAN Port")
-
+        self.__sendCommand("O")
+        
     def close(self):
         print "Closing CAN Port"
-        self.ser.write("C\n")
-        try:
-            result = self.__readResponse("C")
-        except DeviceTimeout:
-            raise BusInitError("Timeout waiting for Adapter")
-        except BusReadError:
-            raise BusInitError("Unable to Close CAN Port")
+        self.__sendCommand("C")
 
     def error(self):
         self.ser.write("E\r")
