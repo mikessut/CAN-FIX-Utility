@@ -5,21 +5,28 @@ implement this protocol.
 
 Right now the dependencies for this project are...
 
-Python 2.x
+Python 2.7 - I have not tried it with older (or newer versions) but it'll 
+probably work with 2.6.
 
-I have not tried it with older (or newer versions) but it'll probably work
-with 2.6.
+pySerial - For serial port communication to CAN Bus communication adapters.
 
-pySerial
+PyQt4 - At some point I may make this work as a command line only type program
+if PyQt is not available but for now it's a requirement.
 
-For serial port communication to CAN Bus communication adapters.
+At this time the functionality is pretty minimal.  
 
-IntelHex
+The only adapters which are known to work are the Simulation adapter and
+the CAN-FIX-USB adapter which is the home grown Arduino based adapter that we
+made specifically for doing this kind of work. You can find details on it at...
 
-This library loads Intel Hex format files.  It's for the firmware loading
-functions.  It can be downloaded from https://launchpad.net/intelhex/
+https://github.com/birkelbach/ArduinoCAN
 
-PyQt4
+The EasySync adapter driver is close and could be made to work with minimal
+effort.  The Network adapter will probably just be a TCP based version of the
+CAN-FIX-USB driver.
 
-At some point I may make this work as a command line only type program if
-PyQt is not available but for now it's a requirement.
+The only feature that really works now, is the traffic montitoring.  To monitor
+traffic on the bus make a connection to an adapter from the Comm menu, and
+select the Traffic tab on the main screen.  The start/stop buttons start and
+stop traffic monitoring and the Raw checkbox is used to toggle between showing
+the raw CAN frame and the decoded CAN-FIX information.
