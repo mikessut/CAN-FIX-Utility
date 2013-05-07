@@ -101,6 +101,7 @@ class RecvThread(threading.Thread):
             except DeviceTimeout:
                 pass
             except BusError:
+                print "BussError"
                 # TODO: Should probably handle some of these.
                 pass
             finally:

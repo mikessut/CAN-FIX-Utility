@@ -18,6 +18,7 @@
 from exceptions import *
 import serial
 import time
+import canbus
 #from serial.tools.list_ports import comports
 
 class Adapter():
@@ -55,10 +56,10 @@ class Adapter():
                 return result
             except DeviceTimeout:
                 if n == attempts:
-                    raise BusInitError("Timeout waiting for adapter")
+                    raise BusReadError("Timeout waiting for adapter")
             except BusReadError:
                 if n == attempts:
-                    raise BusInitError("Unable to send Command " + command)
+                    raise BusReadError("Unable to send Command " + command)
                 time.sleep(self.timeout)
             n+=1
         
@@ -79,13 +80,16 @@ class Adapter():
         except KeyError:
             self.timeout = 0.25
         
-        self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
-        
-        print "Reseting CAN-FIX-it"
-        self.__sendCommand("K")
-        print "Setting Bit Rate"
-        self.__sendCommand(bitrates[self.bitrate])
-        self.open()
+        try:
+            self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
+            
+            print "Reseting CAN-FIX-it"
+            self.__sendCommand("K")
+            print "Setting Bit Rate"
+            self.__sendCommand(bitrates[self.bitrate])
+            self.open()
+        except BusReadError:
+            raise BussInitError("Unable to Initialize CAN Port")
     
     def disconnect(self):
         self.close()
@@ -112,36 +116,21 @@ class Adapter():
         if frame['id'] < 0 or frame['id'] > 2047:
             raise ValueError("Frame ID out of range")
         xmit = "W"
-        xmit = xmit + '%03X' % (frame['id'])
-        #xmit = xmit + str(len(frame['data']))
+        xmit = xmit + '%03X' % frame.id
         xmit = xmit + ':'
-        for each in frame['data']:
+        for each in frame.data:
             xmit = xmit + '%02X' % each
         xmit = xmit + '\n'
-        self.ser.write(xmit)
-        while True:
-            try:
-                result = self.__readResponse("W")
-            except DeviceTimeout:
-                raise BusWriteError("Timeout waiting for Adapter")
-            if result[0] == 'w':
-                continue
-            elif result != 'z\r':
-                print "result =", result
-                raise BusWriteError("Bad response from Adapter")
-            else:
-                break
-
+        self.__sendCommand(xmit)
 
     def recvFrame(self):
         result = self.__readResponse("R")
-        print result, 
+        
         if result[0] != 'r':
             raise BusReadError("Unknown response from Adapter")
-        frame = {}
-        frame['id'] = int(result[1:4], 16)
-        frame['data'] = []
-        for n in range(int(result[5], 16)):
-            frame['data'].append(int(result[5+n*2:7+n*2], 16))
+        data= []
+        for n in range((len(result)-5)/2):
+            data.append(int(result[5+n*2:7+n*2], 16))
+        frame = canbus.Frame(int(result[1:4], 16), data)
         print frame
         return frame
