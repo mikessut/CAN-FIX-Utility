@@ -48,9 +48,9 @@ class Frame(object):
     def __str__(self):
         s = hex(self.id)[2:] + ':'
         for each in self.data:
-            if each < 10: s = s + '0'
+            if each < 16: s = s + '0'
             s = s + hex(each)[2:]  + ' '
-        return s
+        return s.upper()
         
 # Import and add each Adapter class from the files.  There may be a way
 # to do this in a loop but for now this will work.
