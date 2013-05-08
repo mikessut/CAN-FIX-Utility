@@ -43,12 +43,12 @@ class CommThread(QThread):
         while True:
             try:
                 frame = canbus.recvFrame(0)
-                s = "%03X:" % (frame.id)
-                for each in frame.data:
-                    s = s + "%02X" % (each)
+                #s = "%03X:" % (frame.id)
+                #for each in frame.data:
+                #    s = s + "%02X" % (each)
                 #emit the signals
                 self.newFrame.emit(frame)
-                self.newFrameString.emit(s)
+                self.newFrameString.emit(str(frame))
             except canbus.exceptions.DeviceTimeout:
                 pass
             finally:
@@ -78,7 +78,7 @@ class connectDialog(QDialog, Ui_ConnectDialog):
             self.stackConfig.setCurrentIndex(2)
         
         
-class modelData(QAbstractTableModel):
+class ModelData(QAbstractTableModel):
     def __init__(self):
         QAbstractTableModel.__init__(self)
         #self.cf = protocol.CanFix(config.DataPath + "canfix.xml")
@@ -129,7 +129,7 @@ class modelData(QAbstractTableModel):
         print "Edit Data Row %d" % index.row()
 
 
-class modelNetwork(QAbstractItemModel):
+class ModelNetwork(QAbstractItemModel):
     def __init__(self, parent=None):
         super(modelNetwork, self).__init__(parent)
         self.parents=[]
@@ -171,11 +171,11 @@ class modelNetwork(QAbstractItemModel):
 
         
 
-class mainWindow(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, args):
         QMainWindow.__init__(self)
         self.setupUi(self)
-        self.data = modelData()
+        self.data = ModelData()
         self.tableData.setModel(self.data)
         self.network = QStandardItemModel()
         self.textTraffic.setReadOnly(True)
@@ -252,22 +252,27 @@ class mainWindow(QMainWindow, Ui_MainWindow):
     def trafficStart(self):
         #self.commThread.newFrameString.connect(self.textTraffic.appendPlainText)
         self.commThread.newFrame.connect(self.trafficFrame)
+        self.buttonStart.setDisabled(True)
+        self.buttonStop.setEnabled(True)
 
     def trafficStop(self):
         #self.commThread.newFrameString.disconnect(self.textTraffic.appendPlainText)
         self.commThread.newFrame.disconnect(self.trafficFrame)
+        self.buttonStop.setDisabled(True)
+        self.buttonStart.setEnabled(True)
+
 
 def getout():
     global mWindow
     
-    mainWindow.disconnect(mWindow)
+    MainWindow.disconnect(mWindow)
 
 def run(args):
     global mWindow
     app = QApplication(sys.argv)
     app.setOrganizationName("PetraSoft")
     app.setApplicationName("CAN-FIX Utility")
-    mWindow = mainWindow(args)
+    mWindow = MainWindow(args)
     app.aboutToQuit.connect(getout)
     mWindow.show()
     sys.exit(app.exec_())
