@@ -36,16 +36,16 @@ class CommThread(QThread):
     # .. The other with a formatted string.
     newFrameString = pyqtSignal('QString')
     
+    def __init__(self, can):
+        QThread.__init__(self)
+        self.can = can
+        
     def run(self):
-        canbus.enableRecvQueue(0)
         self.getout = False
         
         while True:
             try:
-                frame = canbus.recvFrame(0)
-                #s = "%03X:" % (frame.id)
-                #for each in frame.data:
-                #    s = s + "%02X" % (each)
+                frame = self.can.recvFrame()
                 #emit the signals
                 self.newFrame.emit(frame)
                 self.newFrameString.emit(str(frame))
@@ -55,7 +55,7 @@ class CommThread(QThread):
                 if self.getout:
                     break
             
-    def quit(self):
+    def stop(self):
         self.getout = True
         
 
@@ -66,13 +66,13 @@ class connectDialog(QDialog, Ui_ConnectDialog):
         ports = canbus.getSerialPortList()
         for each in ports:
             self.comboPort.addItem(each)
-        for each in canbus.adapters:
+        for each in canbus.adapterList:
             self.comboAdapter.addItem(each.name)
             
     def adapterChange(self, x):
-        if canbus.adapters[x].type == "serial":
+        if canbus.adapterList[x].type == "serial":
             self.stackConfig.setCurrentIndex(0)
-        elif canbus.adapters[x].type == "network":
+        elif canbus.adapterList[x].type == "network":
             self.stackConfig.setCurrentIndex(1)
         else:
             self.stackConfig.setCurrentIndex(2)
@@ -189,7 +189,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #parentItem = item
         #self.network = modelNetwork()
         self.viewNetwork.setModel(self.network)
-        self.commThread = CommThread()
+        self.commThread = None
         
         
     def connect(self):
@@ -197,35 +197,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         connectDia = connectDialog()
         x = connectDia.exec_()
         if x:
-            config = {}
+            config = canbus.Config()
             index = connectDia.comboAdapter.currentIndex()
-            config['port'] = str(connectDia.comboPort.currentText())
-            config['address'] = str(connectDia.editAddress.text())
-            self.statusbar.showMessage("Connecting to %s" % canbus.adapters[index].name)
-            val = canbus.connect(index, config)
-            if val:
+            self.statusbar.showMessage("Connecting to %s" % canbus.adapterList[index].name)
+            self.can = canbus.Connection(canbus.adapterList[index].shortname)
+            self.can.device = str(connectDia.comboPort.currentText())
+            self.can.ipaddress = str(connectDia.editAddress.text())
+            self.can.bitrate = 125 #TODO Change this to actually work
+            self.can.timeout = 0.25
+            self.can.connect()
+            if self.can:
+                self.commThread = CommThread(self.can)
                 self.commThread.start()
                 self.statusbar.showMessage("Connected to %s" % 
-                                          (canbus.adapters[index].name))
+                                          (self.can.adapter.name))
                 self.actionConnect.setDisabled(True)
                 self.actionDisconnect.setEnabled(True)
                 return True
             else:
-                self.statusbar.showMessage("Failed to connect to %s" % config['port'])
+                self.statusbar.showMessage("Failed to connect to %s" % config.device)
                 return False
         else:
             print "Canceled"
             return False
     
     def disconnect(self):
-        self.commThread.quit() 
-        self.commThread.wait()
-        canbus.disconnect()
+        print "Disconnect() Called"
+        if self.commThread:
+            self.commThread.stop() 
+            self.commThread.wait()
+        self.can.disconnect()
+        self.commThread = None
         self.actionConnect.setEnabled(True)
         self.actionDisconnect.setDisabled(True)
     
     def loadFirmware(self):
-        if not self.commThread.isRunning():
+        if not self.commThread or not self.commThread.isRunning():
             qm = QMessageBox()
             qm.setText("Please connect to a CANBus Network before trying to download firmware")
             qm.setWindowTitle("Error")
@@ -233,8 +240,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             qm.exec_()
             if not self.connect(): # Try to connect
                 return
+        self.commThread.stop()
         diaFirmware = fwDialog.dialogFirmware()
         x = diaFirmware.exec_()
+        self.commThread.start()
     
     def trafficFrame(self, frame):
         if self.checkRaw.isChecked():

@@ -29,8 +29,8 @@ except ImportError:
 
 parser = argparse.ArgumentParser(description='CAN-FIX Configuration Utility Program')
 parser.add_argument('--interactive', '-i', action='store_true', help='Run in interactive mode')
-l = []
-for each in canbus.adapters:
+l=[]
+for each in canbus.adapterList:
     l.append(each.shortname)
 parser.add_argument('--adapter', choices=l, help='CANBus Connection Adapter Name')
 parser.add_argument('--bitrate', default=125, type=int, help='CANBus Bitrate')

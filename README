@@ -10,10 +10,8 @@ probably work with 2.6.
 
 pySerial - For serial port communication to CAN Bus communication adapters.
 
-PyQt4 - At some point I may make this work as a command line only type program
-if PyQt is not available but for now it's a requirement.
-
-At this time the functionality is pretty minimal.  
+PyQt4 - The program will revert to an interactive command line program if
+PyQT4 is not available but the functionality is limited.
 
 The only adapters which are known to work are the Simulation adapter and
 the CAN-FIX-USB adapter which is the home grown Arduino based adapter that we
@@ -30,3 +28,5 @@ traffic on the bus make a connection to an adapter from the Comm menu, and
 select the Traffic tab on the main screen.  The start/stop buttons start and
 stop traffic monitoring and the Raw checkbox is used to toggle between showing
 the raw CAN frame and the decoded CAN-FIX information.
+
+Firmware downloading is the current priority.
