@@ -21,6 +21,27 @@ import canbus
 import devices
 import protocol
 
+can = None
+
+def connect(args):
+    global can
+    
+    if can == None:
+        print "Connect()"
+        can = canbus.Connection(args.adapter)
+        can.device = args.serial_port
+        can.ipaddress = args.ip_address
+        can.bitrate = int(args.bitrate)
+        can.timeout = 0.25
+        can.connect()
+
+def disconnect():
+    global can
+    
+    if can != None:
+        can.disconnect()
+        can = None
+
 def list_devices():
     print
     print "Device Name [Device ID]"
@@ -28,18 +49,16 @@ def list_devices():
     for each in devices.devices:
         print each.name, '[' + hex(each.DeviceId) + ']'
 
-def listen(frame_count, config, adapter):
-    canbus.connect(None, config, adapter)
-    canbus.enableRecvQueue(0)
+def listen(frame_count):
+    global can
     count = 0
     while True:
         try:
-            frame = canbus.recvFrame(0)
+            frame = can.recvFrame()
             #print str(frame) + protocol.parameters[frame.id].name
             x = protocol.parseFrame(frame)
             print '-'
             print str(frame)
-            protocol.test_print(x)
             count+=1
             if frame_count != 0:
                 if count > frame_count: break
@@ -47,24 +66,23 @@ def listen(frame_count, config, adapter):
             pass
         except KeyboardInterrupt:
             break
-    canbus.disconnect()
     
 
 def run(args):
+    global can
+    
     try:
         print args
         
         if args.list_devices == True:
             list_devices()
         if args.listen == True:
-            config = {}
-            config['bitrate']=args.bitrate
-            config['port']=args.serial_port
-            config['ipaddress']=args.ip_address
-            listen(args.frame_count, config, args.adapter)
+            connect(args)
+            listen(args.frame_count)
     except:
-        canbus.disconnect()
+        disconnect()
         raise
+    disconnect()
         
 if __name__ == "__main__":
     run(None)
