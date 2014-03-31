@@ -18,21 +18,42 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import canbus
+import config
 import devices
 import protocol
 
 can = None
+
+def get_adapter(args):
+    if args.adapter:
+        return args.adapter
+    else:
+        while(True):
+            n = 1
+            for each in canbus.adapterList:
+                print n, ") -", each.name
+                n = n+1
+            print "x ) - Cancel"
+            x = raw_input("Select Adapter: ")
+            if x == "x":
+                return
+            try:
+                return canbus.adapterList[int(x)-1].shortname
+            except:
+                pass
 
 def connect(args):
     global can
     
     if can == None:
         print "Connect()"
-        can = canbus.Connection(args.adapter)
-        can.device = args.serial_port
-        can.ipaddress = args.ip_address
+        a = get_adapter(args)
+        can = canbus.Connection(a)
+        if args.ip_address:
+            can.ipaddress = args.ip_address
+        if args.serial_port:
+            can.device = args.serial_port
         can.bitrate = int(args.bitrate)
-        can.timeout = 0.25
         can.connect()
 
 def disconnect():
@@ -43,7 +64,6 @@ def disconnect():
         can = None
 
 def list_devices():
-    print
     print "Device Name [Device ID]"
     print "-----------------------"
     for each in devices.devices:
@@ -57,7 +77,6 @@ def listen(frame_count):
             frame = can.recvFrame()
             #print str(frame) + protocol.parameters[frame.id].name
             x = protocol.parseFrame(frame)
-            print '-'
             print str(frame)
             count+=1
             if frame_count != 0:
@@ -72,8 +91,6 @@ def run(args):
     global can
     
     try:
-        print args
-        
         if args.list_devices == True:
             list_devices()
         if args.listen == True:

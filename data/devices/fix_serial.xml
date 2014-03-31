@@ -1,4 +1,4 @@
-<device name = 'FIX Serial Converter' id='0x60' model = '0x001'>
+<device name = 'FIX Serial Converter' id='0x60' model = '0x000001'>
     <firmware_update code = '0xF701' driver = 'AT328'/>
     <parameters>
         <parameter id='0x182'/>

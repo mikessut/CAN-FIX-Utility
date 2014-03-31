@@ -26,13 +26,13 @@ class FirmwareError(Exception):
     pass
 
 
-def Firmware(driver, filename):
+def Firmware(driver, filename, can):
     if driver == "AT328":
         import AT328
-        return AT328.Driver(filename)
+        return AT328.Driver(filename, can)
     elif driver == "DUMMY":
         import DUMMY
-        return DUMMY.Driver(filename)
+        return DUMMY.Driver(filename, can)
     else:
         raise FirmwareError("No such device")
 

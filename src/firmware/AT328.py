@@ -24,11 +24,12 @@ from fwBase import FirmwareBase
 
 
 class Driver(FirmwareBase):
-    def __init__(self, filename):
+    def __init__(self, filename, can):
         FirmwareBase.__init__(self)
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)
-            
+        self.can = can
+        
         cs = crc.crc16()
         for each in range(self.__ih.minaddr(), self.__ih.maxaddr()+1):
             cs.addByte(self.__ih[each])
@@ -42,11 +43,11 @@ class Driver(FirmwareBase):
 
     def __fillBuffer(ch, address, data):
         sframe = canbus.Frame(1760 + ch, [0x01, address & 0xFF, (address & 0xFF00) >> 8, 128])
-        canbus.sendFrame(sframe)
+        self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
             try:
-                rframe = canbus.recvFrame()
+                rframe = self.can.recvFrame()
             except canbus.DeviceTimeout:
                 pass
             else:
@@ -58,17 +59,17 @@ class Driver(FirmwareBase):
             #print data[address + (8*n):address + (8*n) + 8]
             sendProgress(float(address + 8*n) / float(self.size))
             sframe.data = data[address + (8*n):address + (8*n) + 8]
-            canbus.sendFrame(sframe)
+            self.can.sendFrame(sframe)
             #time.sleep(0.3)
             # TODO Need to deal with the abort from the uC somewhere
 
     def __erasePage(self, ch, address):
         sframe = canbus.Frame(1760 + ch, [0x02, address & 0xFF, (address & 0xFF00) >> 8, 64])
-        canbus.sendFrame(sframe)
+        self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
             try:
-                rframe = canbus.recvFrame()
+                rframe = self.can.recvFrame()
             except canbus.DeviceTimeout:
                 pass
             else:
@@ -79,11 +80,11 @@ class Driver(FirmwareBase):
 
     def __writePage(self, ch, address):
         sframe = canbus.Frame(1760 + ch, [0x03, address & 0xFF, (address & 0xFF00) >> 8])
-        canbus.sendFrame(sframe)
+        self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
             try:
-                rframe = canbus.recvFrame()
+                rframe = self.can.recvFrame()
             except canbus.DeviceTimeout:
                 pass
             else:
@@ -95,11 +96,11 @@ class Driver(FirmwareBase):
     def __sendComplete(self, ch):
         sframe = canbus.Frame(1760 + ch, [0x05, __checksum & 0xFF, (__checksum & 0xFF00) >> 8, \
                             __size & 0xFF, (__size & 0xFF00) >> 8])
-        canbus.sendFrame(sframe)
+        self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
             try:
-                rframe = canbus.recvFrame()
+                rframe = self.can.recvFrame()
             except canbus.DeviceTimeout:
                 pass
             else:
@@ -109,7 +110,7 @@ class Driver(FirmwareBase):
                 if now > endtime: return False
 
     def download(self, node):
-        FirmwareBase.start_download(self, node)
+        channel = FirmwareBase.start_download(self, node)
         for n in range(self.__blocks * self.__blocksize):
             data.append(self.__ih[n])
         for block in range(self.__blocks):

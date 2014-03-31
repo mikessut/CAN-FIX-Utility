@@ -20,6 +20,7 @@
 import config
 import argparse
 import canbus
+import mainCommand
 
 Have_PyQt = True
 try:
@@ -46,10 +47,14 @@ parser.add_argument('--frame-count', type=int, default=0, help='Number of frames
 
 args = parser.parse_args()
 
-if Have_PyQt==False or args.interactive == True:
-    import mainCommand
-    mainCommand.run(args)
-else:
-    import mainWindow
+#if Have_PyQt==False or args.interactive == True:
+#    import mainCommand
+#    mainCommand.run(args)
+#else:
+#    import mainWindow
+#    mainWindow.run(args)
+
+mainCommand.run(args)
+
+if Have_PyQt==True and args.interactive == False:
     mainWindow.run(args)
-    

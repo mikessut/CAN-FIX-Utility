@@ -145,7 +145,7 @@ class Connection(object):
             self.adapter = canfixusb.Adapter()
         elif self.adapterString.lower() == 'easy':
             self.adapter = easy.Adapter()
-        elif self.adapterString.lower() == 'netowrk':
+        elif self.adapterString.lower() == 'network':
             self.adapter = network.Adapter()
         else:
             raise IndexError("Undefined CANBus Adapter " + str(self.adapterString))

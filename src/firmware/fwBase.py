@@ -15,13 +15,9 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-# This function is a placeholder for callbacks that have not been set
-
 import canbus
 import time
 import firmware
-
-canbusQueue = 2 #this is the queue that we'll use for firmware updates.
 
 class Channels():
     """A Class to keep up with free CANFIX Channels"""
@@ -87,7 +83,7 @@ class FirmwareBase:
         ch.ClearAll()
         while True: # Channel wait loop
             try:
-                rframe = canbus.recvFrame(canbusQueue)
+                rframe = self.can.recvFrame(canbusQueue)
                 ch.TestFrame(rframe)
             except canbus.DeviceTimeout:
                 pass
@@ -101,13 +97,13 @@ class FirmwareBase:
            False on timeout"""
         channel = ch.GetFreeChannel()
         sframe = canbus.Frame(1792 + canbus.srcNode, [node, 7, 1, 0xF7, channel])
-        canbus.sendFrame(sframe)
+        self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         ch.ClearAll()
         while True: # Channel wait loop
             if self.kill: raise firmware.FirmwareError("Canceled")
             try:
-                rframe = canbus.recvFrame(canbusQueue)
+                rframe = self.can.recvFrame(canbusQueue)
             except canbus.DeviceTimeout:
                 pass
             else:
@@ -119,10 +115,11 @@ class FirmwareBase:
         return True
 
     def start_download(self, node):
+        """this function is called from the derived class object to find
+           a free channel and send the firmware request messages."""
         ch = Channels()
         data = []
         attempt = 0
-        canbus.enableRecvQueue(canbusQueue)
         while True: # Firmware load request loop
             if self.kill: raise firmware.FirmwareError("Canceled")
             self.sendStatus("Trying Channel " + str(attempt))
@@ -132,7 +129,5 @@ class FirmwareBase:
             if self.__tryFirmwareReq(ch, node): break
         # Here we are in the Firmware load mode of the node    
         # Get our firmware bytes into a normal list
-        channel = ch.GetFreeChannel()
+        return ch.GetFreeChannel()
   
-    def end_download(self):
-        canbus.disableRecvQueue(canbusQueue)

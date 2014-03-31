@@ -26,10 +26,11 @@ from fwBase import FirmwareBase
 import time
 
 class Driver(FirmwareBase):
-    def __init__(self, filename):
+    def __init__(self, filename, can):
         FirmwareBase.__init__(self)
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)
+        self.can = can
         
         cs = crc.crc16()
         for each in range(self.__ih.minaddr(), self.__ih.maxaddr()+1):
