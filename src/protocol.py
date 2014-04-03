@@ -173,15 +173,15 @@ class Parameter(object):
         self.index = frame.data[1]
         self.function = frame.data[2]
         self.data = bytearray(frame.data[3:])
-        if self.function | 0x04:
+        if self.function & 0x04:
             self.__failure = True
         else:
             self.__failure = False
-        if self.function | 0x02:
+        if self.function & 0x02:
             self.quality = True
         else:
             self.quality = False
-        if self.function | 0x01:
+        if self.function & 0x01:
             self.annunciate = True
         else:
             self.annunciate = False
@@ -576,6 +576,7 @@ if __name__ == "__main__":
         frames.append(canbus.Frame(0x10E, [3, 1, 0, 0x02]))
         frames.append(canbus.Frame(0x587, [1, 0, 0, ord('7'), ord('2'), ord('7'), ord('W'), ord('B')]))
         frames.append(canbus.Frame(0x4DC, [4, 0, 0, 1, 2, 0, 0]))
+        frames.append(canbus.Frame(0x580, [5, 0, 0, 0x07, 4, 26]))
         frames.append(canbus.Frame(0x581, [5, 0, 0, 0xdd, 0x07, 4, 26]))
         frames.append(canbus.Frame(1795, [5, 3, 1, 2, 3]))
         frames.append(canbus.Frame(1773, [1, 2, 3, 4, 5]))

@@ -47,11 +47,11 @@ class FirmwareThread(QThread):
     def run(self):
         self.fw.download(self.node)
         self.progress.emit(100.0)
-        self.status.emit("Finished")
+        #self.status.emit("Finished")
 
 
 class dialogFirmware(QDialog, Ui_dialogFirmware):
-    def __init__(self):
+    def __init__(self, can):
         QDialog.__init__(self)
         self.setupUi(self)
         self.settings = QSettings()
@@ -60,6 +60,7 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
         #TODO: Check config and set the file, node and device to last used
         for each in devices.devices:
             self.comboDevice.addItem(each.name)
+        self.can = can
         
     def btnClick(self, btn):
         x = btn.text()
@@ -69,21 +70,27 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
             self.settings.setValue("firmware/filename", self.editFile.text())
             self.settings.setValue("firmware/node", node)
             self.settings.setValue("firmware/driver", driver)
-            #try:
-            self.fw = firmware.Firmware(driver, self.editFile.text())
-            
-             
+            try:
+                self.fw = firmware.Firmware(driver, self.editFile.text(), self.can)
+            except IOError:
+                qm = QMessageBox()
+                qm.setText("Firmware File Not Found")
+                qm.setWindowTitle("Error")
+                qm.setIcon(QMessageBox.Warning)
+                qm.exec_()
+                return
             self.fwThread = FirmwareThread(self.fw, node)
             self.fwThread.status.connect(self.labelStatus.setText)
             self.fwThread.progress.connect(self.progressBar.setValue)
             self.fwThread.finished.connect(self.fwComplete)
             
             self.fwThread.start()
-        if x == "Cancel":
+        if x == "Close":
             self.fw.stop()
                     
     def fwComplete(self):
-        self.labelStatus.setText("We Done")
+        #self.labelStatus.setText("We Done")
+        pass
         
     def btnFileClick(self):
         filename = filename = QFileDialog.getOpenFileName(self, 'Open File', '.')

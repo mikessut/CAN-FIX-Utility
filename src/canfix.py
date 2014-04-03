@@ -38,23 +38,17 @@ parser.add_argument('--bitrate', default=125, type=int, help='CANBus Bitrate')
 parser.add_argument('--serial-port', help='CANBus Adapter Serial Port Device Name')
 parser.add_argument('--ip-address', help='CANBus Network Adapter IP Address')
 parser.add_argument('--firmware-file', help='Firmware filename')
-parser.add_argument('--firmware-node', help='Node number to use in firmware download')
+parser.add_argument('--firmware-node', type=int, help='Node number to use in firmware download')
 parser.add_argument('--device', help='CANFIX Device Name')
-parser.add_argument('--device-id', help='CANFIX Device Identifier')
+parser.add_argument('--device-id', type=int, help='CANFIX Device Identifier')
 parser.add_argument('--list-devices', action='store_true', help='List all known devices and their device IDs')
 parser.add_argument('--listen', action='store_true', help='Listen on the CANBus network and print to STDOUT')
 parser.add_argument('--frame-count', type=int, default=0, help='Number of frames to print before exiting')
 
 args = parser.parse_args()
 
-#if Have_PyQt==False or args.interactive == True:
-#    import mainCommand
-#    mainCommand.run(args)
-#else:
-#    import mainWindow
-#    mainWindow.run(args)
-
 mainCommand.run(args)
 
 if Have_PyQt==True and args.interactive == False:
+    import mainWindow
     mainWindow.run(args)

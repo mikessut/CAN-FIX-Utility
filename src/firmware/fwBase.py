@@ -47,6 +47,8 @@ class FirmwareBase:
     def __init__(self):
         # .kill when set to True should stop downloads
         self.kill = False
+        self.__statusCallback = None
+        self.__progressCallback = None
         
     def setProgressCallback(self, progress):
         if callable(progress):
@@ -83,7 +85,7 @@ class FirmwareBase:
         ch.ClearAll()
         while True: # Channel wait loop
             try:
-                rframe = self.can.recvFrame(canbusQueue)
+                rframe = self.can.recvFrame()
                 ch.TestFrame(rframe)
             except canbus.DeviceTimeout:
                 pass
@@ -96,19 +98,19 @@ class FirmwareBase:
            if the response is correct and if so returns True returns
            False on timeout"""
         channel = ch.GetFreeChannel()
-        sframe = canbus.Frame(1792 + canbus.srcNode, [node, 7, 1, 0xF7, channel])
+        sframe = canbus.Frame(1792 + self.can.srcNode, [node, 7, 1, 0xF7, channel])
         self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         ch.ClearAll()
         while True: # Channel wait loop
             if self.kill: raise firmware.FirmwareError("Canceled")
             try:
-                rframe = self.can.recvFrame(canbusQueue)
+                rframe = self.can.recvFrame()
             except canbus.DeviceTimeout:
                 pass
             else:
                 if rframe.id == (1792 + node) and \
-                   rframe.data[0] == self.__srcnode: break
+                   rframe.data[0] == self.can.srcNode: break
             finally:
                 now = time.time()
                 if now > endtime: return False

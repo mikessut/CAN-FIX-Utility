@@ -20,8 +20,9 @@
 from intelhex import IntelHex
 import crc
 import canbus
+import time
 from fwBase import FirmwareBase
-
+import firmware
 
 class Driver(FirmwareBase):
     def __init__(self, filename, can):
@@ -41,7 +42,7 @@ class Driver(FirmwareBase):
         self.__currentblock = 0
 
 
-    def __fillBuffer(ch, address, data):
+    def __fillBuffer(self, ch, address, data):
         sframe = canbus.Frame(1760 + ch, [0x01, address & 0xFF, (address & 0xFF00) >> 8, 128])
         self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
@@ -54,14 +55,15 @@ class Driver(FirmwareBase):
                 if rframe.id == sframe.id+1 and \
                     rframe.data == sframe.data: break
                 now = time.time()
-                if now > endtime: return False
+                if now > endtime:
+                    return False
         for n in range(self.__blocksize / 8):
             #print data[address + (8*n):address + (8*n) + 8]
-            sendProgress(float(address + 8*n) / float(self.size))
             sframe.data = data[address + (8*n):address + (8*n) + 8]
             self.can.sendFrame(sframe)
             #time.sleep(0.3)
             # TODO Need to deal with the abort from the uC somewhere
+        return True
 
     def __erasePage(self, ch, address):
         sframe = canbus.Frame(1760 + ch, [0x02, address & 0xFF, (address & 0xFF00) >> 8, 64])
@@ -94,8 +96,8 @@ class Driver(FirmwareBase):
                 if now > endtime: return False
 
     def __sendComplete(self, ch):
-        sframe = canbus.Frame(1760 + ch, [0x05, __checksum & 0xFF, (__checksum & 0xFF00) >> 8, \
-                            __size & 0xFF, (__size & 0xFF00) >> 8])
+        sframe = canbus.Frame(1760 + ch, [0x05, self.__checksum & 0xFF, (self.__checksum & 0xFF00) >> 8, \
+                            self.__size & 0xFF, (self.__size & 0xFF00) >> 8])
         self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
@@ -110,27 +112,30 @@ class Driver(FirmwareBase):
                 if now > endtime: return False
 
     def download(self, node):
+        data=[]
         channel = FirmwareBase.start_download(self, node)
         for n in range(self.__blocks * self.__blocksize):
             data.append(self.__ih[n])
         for block in range(self.__blocks):
             address = block * 128
-            print "Buffer Fill at %d" % (address)
-            sendStatus("Writing Block %d of %d" % block, self.blocks)
+            #print "Buffer Fill at %d" % (address)
+            self.sendStatus("Writing Block %d of %d" % (block, self.__blocks))
+            self.sendProgress(float(block) / float(self.__blocks))
             self.__currentblock = block
-            self.__fillBuffer(channel, address, data)
-            # TODO Deal with timeout of above
+            while(self.__fillBuffer(channel, address, data)==False):
+                if self.kill: raise firmware.FirmwareError("Canceled")
             
             # Erase Page
-            print "Erase Page Address =", address
+            #print "Erase Page Address =", address
             self.__erasePage(channel ,address)
             
             # Write Page
-            print "Write Page Address =", address
+            #print "Write Page Address =", address
             self.__writePage(channel ,address)
             
-        self.__progress = 1.0
-        print "Download Complete Checksum", hex(self.__checksum), "Size", self.__size
+        #self.__progress = 1.0
+        #print "Download Complete Checksum", hex(self.__checksum), "Size", self.__size
         self.__sendComplete(channel)
-        sendStatus("Download Complete Checksum 0x%X, Size %d" % (hex(self.__checksum), self.__size))
-        FirmwareBase.end_download()
+        self.sendStatus("Download Complete Checksum 0x%X, Size %d" % (self.__checksum, self.__size))
+        self.sendProgress(1.0)
+        #FirmwareBase.end_download()

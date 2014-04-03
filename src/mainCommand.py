@@ -21,6 +21,7 @@ import canbus
 import config
 import devices
 import protocol
+import firmware
 
 can = None
 
@@ -85,7 +86,38 @@ def listen(frame_count):
             pass
         except KeyboardInterrupt:
             break
-    
+
+def findDevice(did):
+    for each in devices.devices:
+        if each.DeviceId == did:
+            return each
+    return None
+            
+def fwstatus(status):
+    print status
+
+def load_firmware(filename, node):
+    global can
+    f = canbus.Frame(0x700, [node, 0])
+    can.sendFrame(f)
+    while True:
+        try:
+            frame = can.recvFrame()
+            if frame.id == 0x700 + node:
+                device = findDevice(frame.data[3])
+                if device:
+                    print "Found", device.name, "At Node", node
+                    print "Using Firmware Driver", device.fwDriver
+                else:
+                    print "Unknown Device at that node"
+                    return   
+        except canbus.exceptions.DeviceTimeout:
+            break
+        except KeyboardInterrupt:
+            return
+    fw = firmware.Firmware(device.fwDriver, filename, can)
+    fw.setStatusCallback(fwstatus)
+    fw.download(node)
 
 def run(args):
     global can
@@ -93,9 +125,18 @@ def run(args):
     try:
         if args.list_devices == True:
             list_devices()
+        if args.firmware_file or args.firmware_node:
+            connect(args)
+            if args.firmware_file == None:
+                args.firmware_file = raw_input("Enter Firmware Filename:")
+            if args.firmware_node == None:
+                args.firmware_node = int(raw_input("Enter Node Number:"))
+            load_firmware(args.firmware_file, args.firmware_node)
         if args.listen == True:
             connect(args)
             listen(args.frame_count)
+            
+            
     except:
         disconnect()
         raise

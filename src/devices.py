@@ -61,6 +61,7 @@ def __getConfiguration(element, device):
 devices = []
 
 dirlist = os.listdir(config.DataPath + "devices")
+print "Loading Devices"
 
 for each in dirlist:
     if each[-4:] == ".xml":

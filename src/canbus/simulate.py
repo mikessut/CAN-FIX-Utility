@@ -22,7 +22,9 @@ import time
 import struct
 import canbus
 
-import inspect # For TESTING Only
+# Node states
+NORMAL = 0x00
+FW_UPDATE = 0x01
 
 class Node():
     def __init__(self, name = None):
@@ -34,6 +36,8 @@ class Node():
         self.FWVCode = 0x0000
         self.FWChannel = None
         self.frameFunction = None
+        self.state = NORMAL
+        self.fw_length = 0
         
     def setFunction(self, function):
         if callable(function):
@@ -43,32 +47,61 @@ class Node():
         
     def doFrame(self, frame):
         """Function that handles incoming frames for the node"""
-        if frame.id > 0x700 and frame.data[0] == self.nodeID:
-            # We start a response frame in case we need it
-            f = canbus.Frame(self.nodeID + 0x700, [frame.id - 0x700, frame.data[1]])
-            cmd = frame.data[1]
-            if cmd == 0: #Node identification
-                # TODO: Fix the model number part
-                f.data.extend([0x01, self.deviceType % 255, 1, 0 , 0, 0])
-            elif cmd == 1: # Bitrate Set Command
-                return None
-            elif cmd == 2: # Node Set Command
-                self.nodeID = frame.data[2]
-                f.data.append(0x00)
-            #TODO: Fix these so they work??
-            elif cmd == 3: # Disable Parameter
-                return None
-            elif cmd == 4: # Enable Parameter
-                return None
-            elif cmd == 5: # Node Report
-                return None
-            elif cmd == 7: # Firmware Update
-                FCode = frame.data[3]<<8 | frame.data[2]
-                if FCode == self.FWVCode:
-                    FWChannel = frame.data[4]
+        if self.state == NORMAL:
+            if frame.id >= 0x700 and frame.data[0] == self.nodeID:
+                # We start a response frame in case we need it
+                f = canbus.Frame(self.nodeID + 0x700, [frame.id - 0x700, frame.data[1]])
+                cmd = frame.data[1]
+                if cmd == 0: #Node identification
+                    # TODO: Fix the model number part
+                    f.data.extend([0x01, self.deviceType % 255, 1, 0 , 0, 0])
+                elif cmd == 1: # Bitrate Set Command
+                    return None
+                elif cmd == 2: # Node Set Command
+                    self.nodeID = frame.data[2]
                     f.data.append(0x00)
-            return f
-        
+                #TODO: Fix these so they work??
+                elif cmd == 3: # Disable Parameter
+                    return None
+                elif cmd == 4: # Enable Parameter
+                    return None
+                elif cmd == 5: # Node Report
+                    return None
+                elif cmd == 7: # Firmware Update
+                    FCode = frame.data[3]<<8 | frame.data[2]
+                    if FCode == self.FWVCode:
+                        self.FWChannel = frame.data[4]
+                        f.data.append(0x00)
+                        #print "Firmware Update Received", hex(FCode), hex(self.FWVCode)
+                        self.state = FW_UPDATE
+                return f
+        elif self.state == FW_UPDATE: #We're going to emulate AT328 Firmware update
+            if frame.id == (0x6E0 + self.FWChannel*2):
+                f = canbus.Frame(0x6E0 + self.FWChannel*2 + 1, frame.data)
+                if self.fw_length > 0: #Indicates we are writing buffer data
+                    self.fw_length-=len(frame.data)/2
+                    if self.fw_length <= 0:
+                        pass
+                        #print "No more data"
+                else: #Waiting for firmware command
+                    if frame.data[0] == 1: #Write to Buffer command
+                        self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        self.fw_length = frame.data[3]
+                        #print "Buffer Write", self.fw_address, self.fw_length
+                    elif frame.data[0] == 2: #Erase Page Command
+                        self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        #print "Erase Page", self.fw_address
+                    elif frame.data[0] == 3: #Write to Flash
+                        self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        #print "Write Page", self.fw_address
+                    elif frame.data[0] == 4: #Abort
+                        print "Abort"
+                    elif frame.data[0] == 5: #Complete Command
+                        crc = frame.data[2]<<8 | frame.data[1]
+                        length = frame.data[4]<<8 | frame.data[3]
+                        #print "Firmware Load Complete", crc, length
+                        self.state = NORMAL
+                return f
         return None
         
     def getFrame(self):
@@ -143,7 +176,7 @@ def __func_airdata(node):
             o = (int(time.time()*1000.0) % 20) - 10
             x = struct.pack('<l', (airdata['altitude']+o))
             frame.id = 0x184 #Indicated Altitude
-            frame.data = [node, 0, 0, ord(x[0]), ord(x[1]), ord(x[2]), ord(x[3])]
+            frame.data = [node, 0, 2, ord(x[0]), ord(x[1]), ord(x[2]), ord(x[3])]
             airdata['n'] += 1
         elif airdata['n'] == 2:
             o = (int(time.time()*1000.0) % 100) - 50
@@ -156,7 +189,34 @@ def __func_airdata(node):
             airdata['lasttime'] = t
             return None
         return frame
-    
+
+serialdata = {}
+serialdata['lasttime'] = 0.0
+serialdata['n'] = 0
+
+def __func_serial(node):
+    global serialdata
+    t = time.time()
+    frame = canbus.Frame()
+    if t > serialdata['lasttime'] + 1:
+        if serialdata['n'] == 0:
+            t = time.struct_time(time.gmtime())
+            frame.id = 0x580 #Time of day
+            frame.data = [node, 0, 0, t[3], t[4], t[5]]
+            serialdata['n']+=1
+        elif serialdata['n'] == 1:
+            frame.id = 0x581 #Date
+            t = time.struct_time(time.gmtime())
+            year = t[0]
+            frame.data = [node, 0, 0, year & 0x00FF, year >> 8, t[1], t[2]] 
+            serialdata['n']+=1        
+        else:
+            serialdata['n'] = 0
+            serialdata['lasttime'] = t
+            return None
+        return frame
+
+
 def configNodes():
     nodelist = []
     for each in range(3):
@@ -166,8 +226,13 @@ def configNodes():
         node.model = 0x001
         nodelist.append(node)
     nodelist[0].setFunction(__func_airdata)
+    nodelist[0].nodeID = nodelist[0].deviceType = 0x30
     nodelist[1].setFunction(__func_engine)
-    #nodelist[0].FMVCode = 
+    nodelist[1].nodeID = nodelist[1].deviceType = 0x40
+    nodelist[2].setFunction(__func_serial)
+    nodelist[2].nodeID = nodelist[2].deviceType = 0xB3
+    nodelist[2].FWVCode = 0xF701
+    
     return nodelist
     
     
@@ -199,7 +264,6 @@ class Adapter():
         print "Closing CAN Port"
 
     def sendFrame(self, frame):
-        print "sendFrame() Called"
         if frame.id < 0 or frame.id > 2047:
             raise ValueError("Frame ID out of range")
         else:
@@ -209,14 +273,13 @@ class Adapter():
                     self.__rQueue.put(result)
 
     def recvFrame(self):
-        #print "recvFrame() Called"
         for each in self.nodes:
             result = each.getFrame()
             if result:
                 self.__rQueue.put(result)
-            
         try:
-            return self.__rQueue.get(timeout = 0.25)
+            result = self.__rQueue.get(timeout = 0.25)
+            return result
         except Queue.Empty:
             raise DeviceTimeout()
         

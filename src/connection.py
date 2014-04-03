@@ -22,8 +22,6 @@ import serial
 import serial.tools.list_ports
 import canbus
 
-
-
 class Connection:
     """Represent a generic connection to a CANBus network"""
     def __init__(self):

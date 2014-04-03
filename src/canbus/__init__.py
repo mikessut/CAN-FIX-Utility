@@ -137,6 +137,7 @@ class Connection(object):
         self.timeout = 0.25
         self.sendQueue = Queue.Queue()
         self.recvQueue = Queue.Queue()
+        self.srcNode = 0
         
     def connect(self):
         if self.adapterString.lower() == 'simulate':
@@ -183,6 +184,7 @@ class Connection(object):
     def sendFrame(self, frame):
         if self.adapter == None:
             raise BusInitError("No Connection to CAN-Bus")
+        #print "Frame Sent", hex(frame.id), frame.data
         self.sendQueue.put(frame)
 
     def recvFrame(self, timeout = 0.25):
@@ -190,6 +192,7 @@ class Connection(object):
             raise BusInitError("No Connection to CAN-Bus")
         try:
             frame = self.recvQueue.get(timeout = timeout)
+            #print "Frame Received", hex(frame.id), frame.data
             return frame
         except Queue.Empty:
             raise DeviceTimeout()

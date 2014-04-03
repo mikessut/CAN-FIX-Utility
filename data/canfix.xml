@@ -2417,7 +2417,6 @@
   <name>Time</name>
   <type>USHORT[3]</type>
   <format>Hour, Min, Sec</format>
-  <multiplier>1</multiplier>
   <units>UTC</units>
 </parameter>
 <parameter>

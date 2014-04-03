@@ -42,7 +42,6 @@ class CommThread(QThread):
         
     def run(self):
         self.getout = False
-        
         while True:
             try:
                 frame = self.can.recvFrame()
@@ -54,7 +53,7 @@ class CommThread(QThread):
             finally:
                 if self.getout:
                     break
-            
+                        
     def stop(self):
         self.getout = True
         
@@ -241,7 +240,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if not self.connect(): # Try to connect
                 return
         self.commThread.stop()
-        diaFirmware = fwDialog.dialogFirmware()
+        diaFirmware = fwDialog.dialogFirmware(self.can)
         x = diaFirmware.exec_()
         self.commThread.start()
     
