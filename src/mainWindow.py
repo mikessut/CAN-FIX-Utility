@@ -189,8 +189,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.network = modelNetwork()
         self.viewNetwork.setModel(self.network)
         self.commThread = None
+        if args.adapter:
+            self.connect_auto(args)
         
-        
+    # Generic Connection Function
+    def __connect(self):
+        self.can.connect()
+        if self.can:
+            self.commThread = CommThread(self.can)
+            self.commThread.start()
+            self.statusbar.showMessage("Connected to %s" % 
+                                        (self.can.adapter.name))
+            self.actionConnect.setDisabled(True)
+            self.actionDisconnect.setEnabled(True)
+            return True
+        else:
+            self.statusbar.showMessage("Failed to connect to %s" % config.device)
+            return False
+    
+    # Called on startup if we have --adapter=xxx in args
+    def connect_auto(self, args):
+        self.can = canbus.Connection(args.adapter)
+        if args.bitrate:
+            self.can.bitrate = args.bitrate
+        if args.ip_address:
+            self.can.ipadress = args.ip_address
+        if args.serial_port:
+            self.can.devcie = args.serial_port
+        return self.__connect()
+    
+    # GUI connect function
     def connect(self):
         print "Connect..."
         connectDia = connectDialog()
@@ -204,18 +232,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.can.ipaddress = str(connectDia.editAddress.text())
             self.can.bitrate = 125 #TODO Change this to actually work
             self.can.timeout = 0.25
-            self.can.connect()
-            if self.can:
-                self.commThread = CommThread(self.can)
-                self.commThread.start()
-                self.statusbar.showMessage("Connected to %s" % 
-                                          (self.can.adapter.name))
-                self.actionConnect.setDisabled(True)
-                self.actionDisconnect.setEnabled(True)
-                return True
-            else:
-                self.statusbar.showMessage("Failed to connect to %s" % config.device)
-                return False
+            return self.__connect()
         else:
             print "Canceled"
             return False
