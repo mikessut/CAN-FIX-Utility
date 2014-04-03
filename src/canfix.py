@@ -44,6 +44,7 @@ parser.add_argument('--device-id', type=int, help='CANFIX Device Identifier')
 parser.add_argument('--list-devices', action='store_true', help='List all known devices and their device IDs')
 parser.add_argument('--listen', action='store_true', help='Listen on the CANBus network and print to STDOUT')
 parser.add_argument('--frame-count', type=int, default=0, help='Number of frames to print before exiting')
+parser.add_argument('--raw', action='store_true', help='Display raw frames')
 
 args = parser.parse_args()
 

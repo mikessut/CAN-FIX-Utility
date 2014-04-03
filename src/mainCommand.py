@@ -70,7 +70,7 @@ def list_devices():
     for each in devices.devices:
         print each.name, '[' + hex(each.DeviceId) + ']'
 
-def listen(frame_count):
+def listen(frame_count, raw):
     global can
     count = 0
     while True:
@@ -78,7 +78,10 @@ def listen(frame_count):
             frame = can.recvFrame()
             #print str(frame) + protocol.parameters[frame.id].name
             x = protocol.parseFrame(frame)
-            print str(frame)
+            if raw:
+                print str(frame)
+            else:
+                print protocol.Parameter(frame)
             count+=1
             if frame_count != 0:
                 if count > frame_count: break
@@ -134,7 +137,7 @@ def run(args):
             load_firmware(args.firmware_file, args.firmware_node)
         if args.listen == True:
             connect(args)
-            listen(args.frame_count)
+            listen(args.frame_count, args.raw)
             
             
     except:
