@@ -74,101 +74,140 @@ class connectDialog(QDialog, Ui_ConnectDialog):
         elif canbus.adapterList[x].type == "network":
             self.stackConfig.setCurrentIndex(1)
         else:
-            self.stackConfig.setCurrentIndex(2)
+            self.stackConfig.setCurrentIndex(2)        
+
+class LiveParameter(object):
+    def __init__(self, name, units, value):
+        self.name = name
+        self.units = units
+        self.setValue(value)
         
+    def setValue(self, value):
+        self.value = value
+        #self.update = time.time()
+
+class LiveParameterList(object):
+    def __init__(self):
+        self.list = []
         
+    def update(self, frame):
+        p = protocol.parseFrame(frame)
+        if isinstance(p, protocol.Parameter):
+            for each in self.list:
+                if each.name == p.name:
+                    each.setValue(p.value)
+                    return len(self.list) 
+            newparam = LiveParameter(p.name, p.units, p.value)
+            self.list.append(newparam)
+            return 0
+            
+    def getItem(self, row, column):
+        if column == 0:
+            return self.list[row].name
+        elif column == 1:
+            return self.list[row].value
+        elif column == 2:
+            return self.list[row].units
+    
+    def rowCount(self):
+        return len(self.list)
+
 class ModelData(QAbstractTableModel):
     def __init__(self):
         QAbstractTableModel.__init__(self)
-        #self.cf = protocol.CanFix(config.DataPath + "canfix.xml")
-        self.parlist = []
-        for i in protocol.parameters:
-            self.parlist.append(protocol.parameters[i])
-        self.parlist.sort(lambda a,b:cmp(a.id, b.id))
-        self.cols = 3
+        self.parlist = LiveParameterList()
         
-    def data(self, index, role = Qt.DisplayRole):
-        if not index.isValid(): 
-            return QVariant() 
-        elif role != Qt.DisplayRole: 
-            return QVariant() 
-        y = index.row()
-        x = index.column()
-        if x == 0:
-           Q = self.parlist[y].name
-        elif x == 1:
-           Q = self.parlist[y].units
-        elif x == 2:
-           Q = self.parlist[y].multiplier
-        else:
-           Q = None
-        return QVariant(Q)
+    def data(self, index, role):
+        if role == Qt.TextAlignmentRole:
+            return QVariant(int(Qt.AlignTop|Qt.AlignLeft))
+        if role != Qt.DisplayRole:
+            return QVariant()
+        item = self.parlist.getItem(index.row(), index.column())
+        return QVariant(item)
     
     def rowCount(self, parent = QModelIndex()):
-        return len(self.parlist)
+        return self.parlist.rowCount()
     
     def columnCount(self, parent = QModelIndex()):
-        return self.cols
+        return 3
     
     def headerData(self, col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             if col == 0:
                 return QVariant("Name")
             elif col == 1: 
-                return QVariant("Units")
+                return QVariant("Value")
             elif col == 2:
-                return QVariant("Multiplier")
+                return QVariant("Units")
             else:
                 return QVariant("")
-        if orientation == Qt.Vertical and role == Qt.DisplayRole:
-            return QVariant(self.parlist[col].id)
+        #if orientation == Qt.Vertical and role == Qt.DisplayRole:
+        #    return QVariant(self.parlist[col].id)
         return QVariant()
     
     def edit(self, index):
         print "Edit Data Row %d" % index.row()
 
+    def update(self, frame):
+        if self.parlist.update(frame):
+            self.dataChanged.emit(self.index(0,0),self.index(self.rowCount(), 3))
+        else:
+            self.modelReset.emit()
 
 class ModelNetwork(QAbstractItemModel):
     def __init__(self, parent=None):
-        super(modelNetwork, self).__init__(parent)
+        super(ModelNetwork, self).__init__(parent)
         self.parents=[]
-        self.rootItem = "Hello"
-        self.rows = 100
+        self.rootItem = QStandardItem()
+        self.rows = 10
         self.cols = 1
+        self.node = ["Device Type", "Model", "Parameters"]
         
-    def data(self, index, role = Qt.DisplayRole):
-        if not index.isValid(): 
-            return QVariant() 
-        elif role != Qt.DisplayRole: 
-            return QVariant() 
-        return QVariant((index.row()+1)*100 + index.column()+1)
-    
+    def data(self, index, role):
+        print "data()", index.row(), index.parent()
+        if role == Qt.TextAlignmentRole:
+            return QVariant(int(At.AlignTop|Qt.AlignLeft))
+        if role != Qt.DisplayRole:
+            return QVariant()
+        if index.parent()==self.rootItem:
+            return QVariant((index.row()+1)*100 + index.column()+1)
+        else:
+            return QVariant(self.node[index.row()])
+        
     def rowCount(self, parent):
-        return self.rows
+        if not parent.isValid():
+            print "rowCount() Invalid Parent"
+            return self.rows
+        if parent == self.rootItem:
+            print "rowCount() Parent = root"
+            return 2
+        return 0
     
     def columnCount(self, parent):
         return self.cols
     
     def headerData(self, col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant("Column")
-        if orientation == Qt.Vertical and role == Qt.DisplayRole:
-            return QVariant("Row")
+            return QVariant("CAN-FIX Network")
         return QVariant()
     
     def index(self, row, column, parent):
+        print "index() called", row, column
         if row < 0 or column < 0 or \
            row >= self.rowCount(parent) or column >= self.columnCount(parent):
             return QModelIndex()
         if not parent.isValid():
-            parentItem = self.rootItem
+            print "not parent.isValid()"
+            return self.createIndex(row, column, self.rootItem)
+        print "Make a child?"
         childItem = parentItem.child(row)
         if childItem:
+            print "return a child"
             return self.createIndex(row, colum, childItem)
         else:
-            return QModelIndex
-
-        
+            return QModelIndex()
+    
+    #def parent(self, child):
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, args):
@@ -176,8 +215,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.data = ModelData()
         self.tableData.setModel(self.data)
+        
         self.network = QStandardItemModel()
-        self.textTraffic.setReadOnly(True)
+        #self.network = ModelNetwork()
         parentItem = self.network.invisibleRootItem()
         for i in range(10):
             item = QStandardItem("Node " + str(i))
@@ -185,9 +225,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for each in range(3):
                 child = QStandardItem("Parameter " + str(each))
                 item.appendRow(child)
-            #parentItem = item
-        #self.network = modelNetwork()
         self.viewNetwork.setModel(self.network)
+        self.textTraffic.setReadOnly(True)
         self.commThread = None
         if args.adapter:
             self.connect_auto(args)
@@ -202,6 +241,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                         (self.can.adapter.name))
             self.actionConnect.setDisabled(True)
             self.actionDisconnect.setEnabled(True)
+            #TODO Need to make this come and go with tab focus
+            self.commThread.newFrame.connect(self.data.update)
             return True
         else:
             self.statusbar.showMessage("Failed to connect to %s" % config.device)
