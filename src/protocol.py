@@ -21,6 +21,8 @@ import config
 import xml.etree.ElementTree as ET
 import copy
 import struct
+import time
+import canbus
 
 class NodeAlarm(object):
     """Represents a Node Alarm"""
@@ -168,6 +170,7 @@ class Parameter(object):
     def setFrame(self, frame):
         self.__frame = frame
         p = parameters[frame.id]
+        self.__identifier = frame.id
         self.__parameterData(frame.id)
         self.node = frame.data[0]
         self.index = frame.data[1]
@@ -190,6 +193,8 @@ class Parameter(object):
             self.meta = p.auxdata[self.function>>4]
         except KeyError:
             self.meta = None
+        
+        self.updated = time.time()
         
     def getFrame(self):
         self.data = []
