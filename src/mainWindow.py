@@ -76,38 +76,29 @@ class connectDialog(QDialog, Ui_ConnectDialog):
         else:
             self.stackConfig.setCurrentIndex(2)        
 
-class LiveParameter(object):
-    def __init__(self, name, units, value):
-        self.name = name
-        self.units = units
-        self.setValue(value)
-        
-    def setValue(self, value):
-        self.value = value
-        #self.update = time.time()
-
 class LiveParameterList(object):
     def __init__(self):
-        self.list = []
-        
+        self.index = []
+        self.list = {}
+    
+    # this is the slot for the frame update signal
     def update(self, frame):
         p = protocol.parseFrame(frame)
         if isinstance(p, protocol.Parameter):
-            for each in self.list:
-                if each.name == p.name:
-                    each.setValue(p.value)
-                    return len(self.list) 
-            newparam = LiveParameter(p.name, p.units, p.value)
-            self.list.append(newparam)
+            if frame.id in self.list:
+                self.list[frame.id].frame = frame
+                return len(self.list) 
+            self.list[p.identifier] = p
+            self.index.append(self.list[p.identifier])
             return 0
             
     def getItem(self, row, column):
         if column == 0:
-            return self.list[row].name
+            return self.index[row].name
         elif column == 1:
-            return self.list[row].value
+            return self.index[row].value
         elif column == 2:
-            return self.list[row].units
+            return self.index[row].units
     
     def rowCount(self):
         return len(self.list)
