@@ -211,6 +211,12 @@ class Parameter(object):
     
     frame = property(getFrame, setFrame)
     
+    def valueStr(self):
+        if self.__identifier == 0x580: #Time  
+            return "%02i:%02i:%02i" % (self.value[0], self.value[1], self.value[2])
+        else:
+            return str(self.value)
+        
     def unpack(self):
         if self.type == "UINT, USHORT[2]": #Unusual case of the date
             x = []

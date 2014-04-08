@@ -96,7 +96,7 @@ class LiveParameterList(object):
         if column == 0:
             return self.index[row].name
         elif column == 1:
-            return self.index[row].value
+            return self.index[row].valueStr()
         elif column == 2:
             return self.index[row].units
     
@@ -252,7 +252,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     # GUI connect function
     def connect(self):
-        print "Connect..."
         connectDia = connectDialog()
         x = connectDia.exec_()
         if x:
@@ -266,11 +265,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.can.timeout = 0.25
             return self.__connect()
         else:
-            print "Canceled"
             return False
     
     def disconnect(self):
-        print "Disconnect() Called"
         if self.commThread:
             self.commThread.stop() 
             self.commThread.wait()

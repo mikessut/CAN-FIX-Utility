@@ -84,9 +84,7 @@ class SendThread(threading.Thread):
             finally:
                 if(self.getout):
                     break
-                #print "Send Thread", adapterIndex
-        print "End of the Send Thread"
-    
+        
     def quit(self):
         self.getout = True
 
@@ -112,8 +110,6 @@ class RecvThread(threading.Thread):
             finally:
                 if(self.getout):
                     break
-                #print "Receive Thread", adapterIndex
-        print "End of the Receive thread"
         
     def quit(self):
         self.getout = True

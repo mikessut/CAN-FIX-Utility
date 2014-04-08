@@ -1,0 +1,31 @@
+Test Firmware download on real hardware.
+
+Remove simulation adapter and create a simulator that works over a TCP socket and pretends to be a network adapter.
+
+Network Tree View Example...This is what the network monitor tree view should eventually look like.
+
+    Airdata Computer
+    +-Node ID       02
+    +-Device ID     0x056
+    +-Model         10234
+    +-Version       001
+    +-Parameters
+    +-Airspeed    123.4 knots
+    +-Altitude    8342 ft
+    +-OAT         23.5 degC
+    +-Configuration
+    +-Update      Continuous
+    +-Rate        750 mS
+    +-Vso         45.6 knots
+    +-OAT Enable  Yes
+    +-...
+    Engine Data Monitor
+    +-Node ID...
+  
+Node Configuration Dialog
+
+CAN Bus statistics
+
+Sort Data Model Index for the data table view
+
+Column Width on data table view
