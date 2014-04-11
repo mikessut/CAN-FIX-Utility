@@ -245,6 +245,10 @@ class Adapter():
         self.__rQueue = Queue.Queue()
         random.seed()
         self.nodes = configNodes()
+        # Statistics and counters
+        self.sentFrames = 0
+        self.recvFrames = 0
+        self.errors = 0
     
     def connect(self, config):
         print "Connecting to simulation adapter"
@@ -271,6 +275,7 @@ class Adapter():
                 result = each.doFrame(frame)
                 if result:
                     self.__rQueue.put(result)
+                    self.sentFrames+=1
 
     def recvFrame(self):
         for each in self.nodes:
@@ -279,6 +284,7 @@ class Adapter():
                 self.__rQueue.put(result)
         try:
             result = self.__rQueue.get(timeout = 0.25)
+            self.recvFrames+=1
             return result
         except Queue.Empty:
             raise DeviceTimeout()

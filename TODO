@@ -1,3 +1,5 @@
+Fix issue where more than one Firmware thread can be started from the dialog box.
+
 Test Firmware download on real hardware.
 
 Remove simulation adapter and create a simulator that works over a TCP socket and pretends to be a network adapter.
@@ -6,26 +8,30 @@ Network Tree View Example...This is what the network monitor tree view should ev
 
     Airdata Computer
     +-Node ID       02
-    +-Device ID     0x056
+    +-Device ID     0x32
     +-Model         10234
     +-Version       001
     +-Parameters
-    +-Airspeed    123.4 knots
-    +-Altitude    8342 ft
-    +-OAT         23.5 degC
+      +-Airspeed    123.4 knots
+        +-Vso       45.6 knots
+      +-Altitude    8342 ft
+      +-OAT         23.5 degC
     +-Configuration
-    +-Update      Continuous
-    +-Rate        750 mS
-    +-Vso         45.6 knots
-    +-OAT Enable  Yes
-    +-...
+      +-Update      Continuous
+      +-Rate        750 mS
+      +-Vso         45.6 knots
+      +-OAT Enable  Yes
+      +-...
     Engine Data Monitor
     +-Node ID...
-  
+
+Parameters that were disabled would be grayed out.  Node report commands can be sent when the node is expanded to get all the information.
+    
 Node Configuration Dialog
 
 CAN Bus statistics
 
-Sort Data Model Index for the data table view
-
 Column Width on data table view
+
+Change background color of data table if data is old and remove if it gets too old.
+

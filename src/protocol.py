@@ -246,6 +246,20 @@ class Parameter(object):
         else:
             return setValue(self.type, self.value, self.multiplier)
     
+    def __cmp__(self, other):
+        if self.__identifier < other.__identifier:
+            return -1
+        elif self.__identifier > other.__identifier:
+            return 1
+        else:
+            if self.index < other.index:
+                return -1
+            elif self.index > other.index:
+                return 1
+            else:
+                return 0
+
+    
     def __str__(self):
         s = '[' + str(self.node) + '] ' + self.name
         if self.meta: s = s + ' ' + self.meta

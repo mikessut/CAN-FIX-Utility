@@ -167,7 +167,8 @@ class Connection(object):
             self.recvThread.join()
         self.sendThread = None
         self.recvThread = None
-        
+        print "Frames Sent", self.adapter.sentFrames
+        print "Frames Received", self.adapter.recvFrames
         self.adapter.disconnect()
         self.adapter = None
         
