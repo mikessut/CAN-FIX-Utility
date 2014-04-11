@@ -27,6 +27,7 @@ import protocol
 from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
 import fwDialog
+import networkModel
 
 
 class CommThread(QThread):
@@ -90,6 +91,7 @@ class LiveParameterList(object):
                 return len(self.list) 
             self.list[p.identifier] = p
             self.index.append(self.list[p.identifier])
+            self.index.sort()
             return 0
             
     def getItem(self, row, column):
@@ -145,60 +147,7 @@ class ModelData(QAbstractTableModel):
         else:
             self.modelReset.emit()
 
-class ModelNetwork(QAbstractItemModel):
-    def __init__(self, parent=None):
-        super(ModelNetwork, self).__init__(parent)
-        self.parents=[]
-        self.rootItem = QStandardItem()
-        self.rows = 10
-        self.cols = 1
-        self.node = ["Device Type", "Model", "Parameters"]
-        
-    def data(self, index, role):
-        print "data()", index.row(), index.parent()
-        if role == Qt.TextAlignmentRole:
-            return QVariant(int(At.AlignTop|Qt.AlignLeft))
-        if role != Qt.DisplayRole:
-            return QVariant()
-        if index.parent()==self.rootItem:
-            return QVariant((index.row()+1)*100 + index.column()+1)
-        else:
-            return QVariant(self.node[index.row()])
-        
-    def rowCount(self, parent):
-        if not parent.isValid():
-            print "rowCount() Invalid Parent"
-            return self.rows
-        if parent == self.rootItem:
-            print "rowCount() Parent = root"
-            return 2
-        return 0
-    
-    def columnCount(self, parent):
-        return self.cols
-    
-    def headerData(self, col, orientation, role):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant("CAN-FIX Network")
-        return QVariant()
-    
-    def index(self, row, column, parent):
-        print "index() called", row, column
-        if row < 0 or column < 0 or \
-           row >= self.rowCount(parent) or column >= self.columnCount(parent):
-            return QModelIndex()
-        if not parent.isValid():
-            print "not parent.isValid()"
-            return self.createIndex(row, column, self.rootItem)
-        print "Make a child?"
-        childItem = parentItem.child(row)
-        if childItem:
-            print "return a child"
-            return self.createIndex(row, colum, childItem)
-        else:
-            return QModelIndex()
-    
-    #def parent(self, child):
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, args):
@@ -206,16 +155,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.data = ModelData()
         self.tableData.setModel(self.data)
+        header = self.tableData.horizontalHeader()
+        header.setResizeMode(QHeaderView.Stretch)
         
-        self.network = QStandardItemModel()
-        #self.network = ModelNetwork()
-        parentItem = self.network.invisibleRootItem()
-        for i in range(10):
-            item = QStandardItem("Node " + str(i))
-            parentItem.appendRow(item)
-            for each in range(3):
-                child = QStandardItem("Parameter " + str(each))
-                item.appendRow(child)
+        #self.network = QStandardItemModel()
+        self.network = networkModel.NetworkModel()
+        #parentItem = self.network.invisibleRootItem()
+        #for i in range(10):
+        #    item = QStandardItem("Node " + str(i))
+        #    parentItem.appendRow(item)
+        #    for each in range(3):
+        #        child = QStandardItem("Parameter " + str(each))
+        #        item.appendRow(child)
         self.viewNetwork.setModel(self.network)
         self.textTraffic.setReadOnly(True)
         self.commThread = None
