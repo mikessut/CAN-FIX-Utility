@@ -211,9 +211,19 @@ class Parameter(object):
     
     frame = property(getFrame, setFrame)
     
+    def getFullName(self):
+        if self.indexName:
+            return "%s %s %i" % (self.__name, self.indexName, self.index + 1)
+        else:
+            return self.__name 
+        
+    fullName = property(getFullName)
+    
     def valueStr(self):
         if self.__identifier == 0x580: #Time  
             return "%02i:%02i:%02i" % (self.value[0], self.value[1], self.value[2])
+        elif self.__identifier == 0x581: #Date
+            return "%i-%i-%i" % (self.value[0], self.value[1], self.value[2])
         else:
             return str(self.value)
         
