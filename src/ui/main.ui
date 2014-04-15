@@ -319,12 +319,12 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>635</x>
-     <y>479</y>
+     <x>621</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel">
-     <x>547</x>
-     <y>322</y>
+     <x>103</x>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
@@ -335,8 +335,8 @@
    <slot>trafficStart()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>525</x>
-     <y>484</y>
+     <x>508</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel">
      <x>484</x>
@@ -351,12 +351,60 @@
    <slot>trafficStop()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>576</x>
-     <y>485</y>
+     <x>564</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel">
      <x>564</x>
      <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>viewNetwork</sender>
+   <signal>expanded(QModelIndex)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>networkExpanded(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>335</x>
+     <y>271</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>261</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>viewNetwork</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>networkDblClicked(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>335</x>
+     <y>271</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>261</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>viewNetwork</sender>
+   <signal>customContextMenuRequested(QPoint)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>networkContextMenu(QPoint)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>239</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>524</x>
+     <y>-10</y>
     </hint>
    </hints>
   </connection>
@@ -369,5 +417,8 @@
   <slot>disconnect()</slot>
   <slot>trafficStart()</slot>
   <slot>trafficStop()</slot>
+  <slot>networkExpanded(QModelIndex)</slot>
+  <slot>networkDblClicked(QModelIndex)</slot>
+  <slot>networkContextMenu(QPoint)</slot>
  </slots>
 </ui>
