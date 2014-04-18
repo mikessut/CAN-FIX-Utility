@@ -19,9 +19,11 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+import time
+import protocol
 
 #Nodes in the network tree.  Not to be confused with CAN-FIX Nodes
-class TreeNode(object):
+class TreeItem(object):
     def __init__(self, name, parent=None):
         self.name = name
         self.parent = parent
@@ -44,52 +46,72 @@ class TreeNode(object):
     def __str__(self):
         return self.name
 
+class FixItem(TreeItem):
+    """Represents an actual CAN-FIX Network Node"""
+    def __init__(self, name, nodeID, parent=None):
+        super(FixItem, self).__init__(name, parent)
+        self.nodeID = nodeID
+        n = TreeItem("Node ID", self)
+        n.value = nodeID
+        self.children.append(n)
+        self.children.append(TreeItem("Device", self))
+        self.children.append(TreeItem("Model", self))
+        self.children.append(TreeItem("Version", self))
+        self.children.append(TreeItem("Parameters", self))
+        self.children.append(TreeItem("Configuration", self))
+        self.updated = time.time()
+    
+    def getParameterItem(self):
+        return self.children[4]
+    
+    parameterItem = property(getParameterItem)
+    
+    def __cmp__(self, other):
+        if self.nodeID < other.nodeID:
+            return -1
+        elif self.nodeID > other.nodeID:
+            return 1
+        else:
+            return 0
+
+class ParameterItem(TreeItem):
+    """Represents a CAN-FIX Parameter"""
+    def __init__(self, name, pid, parent=None):
+        super(ParameterItem, self).__init__(name, parent)
+        self.identifier = pid
+    
+
 # Debug print routine.
-def NodePrint(node, depth=0):
+def TreePrint(node, depth=0):
     for i in range(depth):
         print "",
-    print node, "<-", node.parent
+    #print node, "<-", node.parent
+    print node, node.value
     if node.children:
         for each in node.children:
-            NodePrint(each, depth+1)    
+            TreePrint(each, depth+1)    
 
 class NetworkModel(QAbstractItemModel):
     def __init__(self, parent=None):
         super(NetworkModel, self).__init__(parent)
         self.parents=[]
-        self.root = TreeNode("root")
+        self.root = TreeItem("root")
         self.rows = 0
         self.cols = 2
+        self.can = None
         
-        n = TreeNode("1 Airdata Computer", self.root)
-        p = TreeNode("Parameters", n)
-        p.children.append(TreeNode("Airspeed",p))
-        p.children.append(TreeNode("Altitude",p))
-        p.children.append(TreeNode("Outside Air Temperature",p))
-        p.children.append(TreeNode("True Airspeed",p))
-        n.children.append(p)
-        d = TreeNode("Device",n)
-        d.value = 14
-        n.children.append(d)
+        n = FixItem("Dummy", 1, self.root)
+        pp = n.parameterItem   
+        p = ParameterItem("Engine Power", 1310, pp)
+        p.value = "75"
+        pp.children.append(p)
+        p = ParameterItem("Total Engine Time", 1312, pp)
+        p.value = "250"
+        pp.children.append(p)
         self.root.children.append(n)
         
-        n = TreeNode("149 CAN-FIX Serial Converter", self.root)
-        p = TreeNode("Parameters", n)
-        p.children.append(TreeNode("Latitude",p))
-        p.children.append(TreeNode("Longitude",p))
-        p.children.append(TreeNode("Time",p))
-        p.children.append(TreeNode("Date",p))
-        n.children.append(p)
-        d = TreeNode("Device", n)
-        d.value = 12
-        n.children.append(d)
-        self.root.children.append(n)
-        
-        self.root.children.append(TreeNode("Node 3", self.root))
-        self.root.children.append(TreeNode("Node 4", self.root))
-        
-        #NodePrint(self.root)
-        
+    # The following functions are here for interface to the view.
+    
     def data(self, index, role):
         if role == Qt.TextAlignmentRole:
             return QVariant(int(Qt.AlignTop|Qt.AlignLeft))
@@ -140,3 +162,37 @@ class NetworkModel(QAbstractItemModel):
     def nodeFromIndex(self, index):
         return index.internalPointer() \
             if index.isValid() else self.root
+        
+    # These functions are for controlling the information in the model    
+    
+    def findNodeID(self, nodeid):
+        for each in self.root.children:
+            if each.nodeID == nodeid:
+                return each
+        return None
+    
+    def updateParameter(self, item, parameter):
+        p = item.parameterItem
+        for i, each in enumerate(p.children):
+            if each.identifier == parameter.identifier:
+                each.value = parameter.valueStr(units=True)
+                print "Update %s %i" % (each, i)
+                self.dataChanged.emit(self.createIndex(i,1,each), self.createIndex(i,1,each))
+                return
+        newp = ParameterItem(parameter.name, parameter.identifier, p)
+        p.children.append(newp)
+    
+    def update(self, frame):
+        p = protocol.parseFrame(frame)
+        if isinstance(p, protocol.Parameter):
+            item = self.findNodeID(p.node)
+            if item:
+                self.updateParameter(item, p)
+            else:
+                n = FixItem("Unknown", p.node, self.root)
+                self.root.children.append(n)
+                self.updateParameter(n, p)
+                self.modelReset.emit()
+        else:
+            print "Not a parameter"
+        
