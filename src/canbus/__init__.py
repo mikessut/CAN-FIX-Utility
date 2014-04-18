@@ -133,7 +133,7 @@ class Connection(object):
         self.timeout = 0.25
         self.sendQueue = Queue.Queue()
         self.recvQueue = Queue.Queue()
-        self.srcNode = 0
+        self.srcNode = 0xFF
         
     def connect(self):
         if self.adapterString.lower() == 'simulate':

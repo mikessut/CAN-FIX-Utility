@@ -123,6 +123,7 @@ def __func_fuel(node):
     pass
 
 engine = {}
+        
 engine['lasttime'] = time.time() + 0.25
 engine['cht'] = (357 - 32 ) * 5/9
 engine['egt'] = (1340 - 32) * 5/9
@@ -140,7 +141,7 @@ def __func_engine(node):
     if t > engine['lasttime'] + 1:
         if engine['n'] == 0:
             o = (int(time.time()*100) % 10) - 5
-            x = struct.pack('<H', (engine['cht']+o)*10)
+            x = struct.pack('<H', (engine['cht']+o+engine['i']/10.0)*10)
             frame.id = 0x500 #Cylinder Head Temperature
             frame.data = [node, engine['i'], 0, ord(x[0]), ord(x[1])]
             engine['i'] += 1
