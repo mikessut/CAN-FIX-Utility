@@ -89,5 +89,5 @@ if __name__ == "__main__":
         print each.name, each.DeviceId, each.modelNumber
         print "  FW Code =", each.fwUpdateCode
         print "  FW Driver = ", each.fwDriver
-        print "  Parmeters = ", each.parameters
+        print "  Parameters = ", each.parameters
             

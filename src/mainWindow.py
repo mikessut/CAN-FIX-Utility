@@ -57,7 +57,6 @@ class CommThread(QThread):
                         
     def stop(self):
         self.getout = True
-        
 
 class connectDialog(QDialog, Ui_ConnectDialog):
     def __init__(self):
@@ -86,17 +85,18 @@ class LiveParameterList(object):
     def update(self, frame):
         p = protocol.parseFrame(frame)
         if isinstance(p, protocol.Parameter):
-            if frame.id in self.list:
-                self.list[frame.id].frame = frame
+            ident = frame.id*16 + p.index
+            if ident in self.list:
+                self.list[ident].frame = frame
                 return len(self.list) 
-            self.list[p.identifier] = p
-            self.index.append(self.list[p.identifier])
+            self.list[ident] = p
+            self.index.append(self.list[ident])
             self.index.sort()
             return 0
             
     def getItem(self, row, column):
         if column == 0:
-            return self.index[row].name
+            return self.index[row].fullName
         elif column == 1:
             return self.index[row].valueStr()
         elif column == 2:
@@ -112,7 +112,7 @@ class ModelData(QAbstractTableModel):
         
     def data(self, index, role):
         if role == Qt.TextAlignmentRole:
-            return QVariant(int(Qt.AlignTop|Qt.AlignLeft))
+            return QVariant(int(Qt.AlignVCenter|Qt.AlignLeft))
         if role != Qt.DisplayRole:
             return QVariant()
         item = self.parlist.getItem(index.row(), index.column())
@@ -143,6 +143,7 @@ class ModelData(QAbstractTableModel):
 
     def update(self, frame):
         if self.parlist.update(frame):
+            #TODO At some point make this update only the row that was changed.
             self.dataChanged.emit(self.index(0,0),self.index(self.rowCount(), 3))
         else:
             self.modelReset.emit()
@@ -156,19 +157,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.data = ModelData()
         self.tableData.setModel(self.data)
         header = self.tableData.horizontalHeader()
-        header.setResizeMode(QHeaderView.Stretch)
+        header.setResizeMode(QHeaderView.ResizeToContents)
         
-        #self.network = QStandardItemModel()
         self.network = networkModel.NetworkModel()
-        #parentItem = self.network.invisibleRootItem()
-        #for i in range(10):
-        #    item = QStandardItem("Node " + str(i))
-        #    parentItem.appendRow(item)
-        #    for each in range(3):
-        #        child = QStandardItem("Parameter " + str(each))
-        #        item.appendRow(child)
         self.viewNetwork.setModel(self.network)
+        self.viewNetwork.setContextMenuPolicy(Qt.CustomContextMenu)
+                
         self.textTraffic.setReadOnly(True)
+        
+        actionStatus = QAction('Status', self)
+        actionConfigure = QAction('Configure', self)
+        actionEnable = QAction('Enable', self)
+        actionDisable = QAction('Disable', self)
+        actionFirmware = QAction('Firmware', self)
+        
+        self.popMenu = QMenu(self)
+        self.popMenu.addAction(actionConfigure)
+        self.popMenu.addAction(actionEnable)
+        self.popMenu.addAction(actionDisable)
+        self.popMenu.addSeparator()
+        self.popMenu.addAction(actionStatus)
+        
         self.commThread = None
         if args.adapter:
             self.connect_auto(args)
@@ -183,8 +192,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                         (self.can.adapter.name))
             self.actionConnect.setDisabled(True)
             self.actionDisconnect.setEnabled(True)
-            #TODO Need to make this come and go with tab focus
-            self.commThread.newFrame.connect(self.data.update)
+            self.commThread.newFrame.connect(self.updateFrame)
+            #We give the network model access to the can connection
+            self.network.can = self.can
             return True
         else:
             self.statusbar.showMessage("Failed to connect to %s" % config.device)
@@ -240,7 +250,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         diaFirmware = fwDialog.dialogFirmware(self.can)
         x = diaFirmware.exec_()
         self.commThread.start()
-    
+        
+    def updateFrame(self, frame):
+        tab = self.tabWidget.currentIndex()
+        if tab == 0: #Network Tree View
+            self.network.update(frame)
+            self.viewNetwork.resizeColumnToContents(0)
+        elif tab == 1: #Data Table View
+            self.data.update(frame)
+        elif tab == 3: #PFD
+            #PFD Update
+            pass
+        
     def trafficFrame(self, frame):
         if self.checkRaw.isChecked():
             self.textTraffic.appendPlainText(str(frame))
@@ -253,15 +274,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def networkClicked(self, index):
         print index.parent().data().toString() + " " + index.data().toString()
+    
+    def networkDblClicked(self, index):
+        print "Edit *", index.data().toString()
+    
+    def networkExpanded(self, index):
+        print "Expand ->", index.data().toString()
+        
+    def networkContextMenu(self, point):
+        self.popMenu.exec_(self.viewNetwork.mapToGlobal(point))  
         
     def trafficStart(self):
-        #self.commThread.newFrameString.connect(self.textTraffic.appendPlainText)
         self.commThread.newFrame.connect(self.trafficFrame)
         self.buttonStart.setDisabled(True)
         self.buttonStop.setEnabled(True)
 
     def trafficStop(self):
-        #self.commThread.newFrameString.disconnect(self.textTraffic.appendPlainText)
         self.commThread.newFrame.disconnect(self.trafficFrame)
         self.buttonStop.setDisabled(True)
         self.buttonStart.setEnabled(True)

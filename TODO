@@ -29,9 +29,13 @@ Parameters that were disabled would be grayed out.  Node report commands can be 
     
 Node Configuration Dialog
 
-CAN Bus statistics
-
-Column Width on data table view
-
 Change background color of data table if data is old and remove if it gets too old.
+
+Add Connection status to the status bar.  Something like a blinking green light or frame counter.
+
+Allow multiple devices to be defined in one .xml file?
+
+Fix bitrate selection on Connect Dialog Box
+
+Add Quality, Failure and Annunciate Flags to Data Table View
 

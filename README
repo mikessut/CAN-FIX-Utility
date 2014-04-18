@@ -11,7 +11,7 @@ probably work with 2.6.
 pySerial - For serial port communication to CAN Bus communication adapters.
 
 PyQt4 - The program will revert to an interactive command line program if
-PyQT4 is not available but the functionality is limited.
+PyQt4 is not available but the functionality is limited.
 
 The only adapters which are known to work are the Simulation adapter and
 the CAN-FIX-USB adapter which is the home grown Arduino based adapter that we
@@ -23,10 +23,17 @@ The EasySync adapter driver is close and could be made to work with minimal
 effort.  The Network adapter will probably just be a TCP based version of the
 CAN-FIX-USB driver.
 
-The only feature that really works now, is the traffic montitoring.  To monitor
-traffic on the bus make a connection to an adapter from the Comm menu, and
-select the Traffic tab on the main screen.  The start/stop buttons start and
-stop traffic monitoring and the Raw checkbox is used to toggle between showing
-the raw CAN frame and the decoded CAN-FIX information.
+The Data tab on the main screen will show the actual flight data that is
+currently seen on the network.
 
-Firmware downloading is the current priority.
+The Network tab gives more detailed information about the state of the
+network.
+
+To monitor traffic on the bus make a connection to an adapter from the Comm
+menu, and select the Traffic tab on the main screen.  The start/stop buttons
+start and stop traffic monitoring and the Raw checkbox is used to toggle
+between showing the raw CAN frame and the decoded CAN-FIX information.
+
+Firmware downloading is done but not tested.  The current work is being
+done on the Network tree view and the ability to monitor and configure
+the network from this view.
