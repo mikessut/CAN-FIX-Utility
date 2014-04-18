@@ -219,13 +219,16 @@ class Parameter(object):
         
     fullName = property(getFullName)
     
-    def valueStr(self):
+    def valueStr(self, units=False):
         if self.__identifier == 0x580: #Time  
             return "%02i:%02i:%02i" % (self.value[0], self.value[1], self.value[2])
         elif self.__identifier == 0x581: #Date
             return "%i-%i-%i" % (self.value[0], self.value[1], self.value[2])
         else:
-            return str(self.value)
+            if units:
+                return str(self.value) + " " + self.units
+            else:
+                return str(self.value)
         
     def unpack(self):
         if self.type == "UINT, USHORT[2]": #Unusual case of the date
