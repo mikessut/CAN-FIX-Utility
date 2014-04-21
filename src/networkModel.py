@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 #  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
@@ -21,6 +22,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import time
 import protocol
+import canbus
 
 #Nodes in the network tree.  Not to be confused with CAN-FIX Nodes
 class TreeItem(object):
@@ -79,6 +81,27 @@ class ParameterItem(TreeItem):
     def __init__(self, name, pid, parent=None):
         super(ParameterItem, self).__init__(name, parent)
         self.identifier = pid
+        self.index = 0
+        self.indexName = None
+    
+    def __str__(self):
+        if self.indexName:
+            return "%s %s %i" % (self.name, self.indexName, self.index +1)
+        else:
+            return self.name
+    
+    def __cmp__(self, other):
+        if self.identifier < other.identifier:
+            return -1
+        elif self.identifier > other.identifier:
+            return 1
+        else:
+            if self.indexName:
+                if self.index < other.index:
+                    return -1
+                elif self.index > other.index:
+                    return 1
+            return 0
     
 
 # Debug print routine.
@@ -100,17 +123,7 @@ class NetworkModel(QAbstractItemModel):
         self.cols = 2
         self.can = None
         
-        n = FixItem("Dummy", 1, self.root)
-        pp = n.parameterItem   
-        p = ParameterItem("Engine Power", 1310, pp)
-        p.value = "75"
-        pp.children.append(p)
-        p = ParameterItem("Total Engine Time", 1312, pp)
-        p.value = "250"
-        pp.children.append(p)
-        self.root.children.append(n)
-        
-    # The following functions are here for interface to the view.
+     # The following functions are here for interface to the view.
     
     def data(self, index, role):
         if role == Qt.TextAlignmentRole:
@@ -166,23 +179,36 @@ class NetworkModel(QAbstractItemModel):
     # These functions are for controlling the information in the model    
     
     def findNodeID(self, nodeid):
+        """returns the FixItem that has the matching node id"""
         for each in self.root.children:
             if each.nodeID == nodeid:
                 return each
         return None
     
+    def sendNodeID(self, nodeID):
+        p = protocol.NodeSpecific()
+        p.sendNode = self.can.srcNode
+        p.destNode = nodeID
+        f = p.getFrame()
+        print "sending node id request", nodeID, self.can.srcNode
+        self.can.sendFrame(f)
+    
     def updateParameter(self, item, parameter):
+        #TODO deal with index and meta data
         p = item.parameterItem
         for i, each in enumerate(p.children):
-            if each.identifier == parameter.identifier:
+            if each == parameter:
                 each.value = parameter.valueStr(units=True)
-                print "Update %s %i" % (each, i)
                 self.dataChanged.emit(self.createIndex(i,1,each), self.createIndex(i,1,each))
                 return
         newp = ParameterItem(parameter.name, parameter.identifier, p)
+        if parameter.indexName:
+            newp.indexName = parameter.indexName
+            newp.index = parameter.index
         p.children.append(newp)
     
     def update(self, frame):
+        """This should be called with a canbus frame each time one is received"""
         p = protocol.parseFrame(frame)
         if isinstance(p, protocol.Parameter):
             item = self.findNodeID(p.node)
@@ -193,6 +219,15 @@ class NetworkModel(QAbstractItemModel):
                 self.root.children.append(n)
                 self.updateParameter(n, p)
                 self.modelReset.emit()
+                self.sendNodeID(p.node)
+        elif isinstance(p, protocol.NodeSpecific):
+            if p.controlCode == 0: # Node Identification
+                print "Node ID %i -> %i" % (p.sendNode, p.destNode)
+                item = self.findNodeID(p.sendNode)
+                if item:
+                    item.children[1].value = p.data[0]
+                    self.dataChanged.emit(self.createIndex(0,0,item.children[1]), self.createIndex(len(self.root),1,item.children[1]))
+                
         else:
-            print "Not a parameter"
+            print "Not recognized"
         

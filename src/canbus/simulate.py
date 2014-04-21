@@ -29,7 +29,7 @@ FW_UPDATE = 0x01
 class Node():
     def __init__(self, name = None):
         self.name = name
-        self.nodeID = 255
+        self.nodeID = 1
         self.deviceType = 0
         self.model = 0xAABBCC
         self.FWRevision = 1
@@ -49,6 +49,7 @@ class Node():
         """Function that handles incoming frames for the node"""
         if self.state == NORMAL:
             if frame.id >= 0x700 and frame.data[0] == self.nodeID:
+                print "Got Node ID requst from", frame.data[0], self.nodeID
                 # We start a response frame in case we need it
                 f = canbus.Frame(self.nodeID + 0x700, [frame.id - 0x700, frame.data[1]])
                 cmd = frame.data[1]
