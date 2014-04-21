@@ -253,11 +253,20 @@ class Parameter(object):
     
     def pack(self):
         if self.type == "UINT, USHORT[2]": # unusual case of the date
-           pass
+           x=[]
+           x.extend(setValue("UINT", self.value[0]))
+           x.extend(setValue("USHORT", self.value[1]))
+           x.extend(setValue("USHORT", self.value[2]))
+           return x
         elif '[' in self.type:
             y = self.type.strip(']').split('[')
-            if y[0] == 'CHAR':
-                return setValue(self.type, self.value)
+            #if y[0] == 'CHAR':
+            #    return setValue(self.type, self.value)
+            #else:
+            x = []
+            for n in range(int(y[1])):
+                x.extend(setValue(y[0], self.value[n]))
+            return x
         else:
             return setValue(self.type, self.value, self.multiplier)
     
@@ -430,7 +439,7 @@ def getValue(datatype, data, multiplier):
             return str(data)
         return None
         
-def setValue(datatype, value, multiplier):
+def setValue(datatype, value, multiplier=1):
     table = {"SHORT":"<b", "USHORT":"<B", "UINT":"<H",
              "INT":"<h", "DINT":"<l", "UDINT":"<L", "FLOAT":"<f"}
     
@@ -443,7 +452,7 @@ def setValue(datatype, value, multiplier):
         return [ord(y) for y in x] # Convert packed string into ints
     except KeyError:
         if "CHAR" in datatype:
-            return value
+            return [ord(value)]
         return None
         
 def parseFrame(frame):
@@ -643,11 +652,24 @@ if __name__ == "__main__":
         p.name = "indicated Airspeed"
         p.value = 132.4
         p.node = 12
-        #p.annunciate = True
-        #p.index = 0
-        #p.meta = "Max"
-        #p.meta = 4
+        print p
+        print p.getFrame()
         
+        p.name = "time"
+        p.value = [1,2,3]
+        p.node = 13
+        print p
+        print p.getFrame()
+        
+        p.name = "date"
+        p.value = [2014,2,3]
+        p.node = 14
+        print p
+        print p.getFrame()
+        
+        p.name = "Aircraft Identifier"
+        p.value = ['7', '2', '7', 'W', 'B']
+        p.node = 15
         print p
         print p.getFrame()
         

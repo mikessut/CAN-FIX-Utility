@@ -81,20 +81,30 @@ class ServerRecvThread(StoppableThread):
 
 
 class NodeParameter(protocol.Parameter):
-    def __init__(self):
+    def __init__(self, name=None):
         super(NodeParameter, self).__init__()
         self.enabled = True
         self.interval = 1
         self.passcount = 0
         self.meanValue = 0
         self.noise = 0.005
+        if name:
+            self.name = name
     
     def process(self):
         self.passcount += 1
         if self.passcount == self.interval:
-            #TODO Need to deal with non-floating point values, time, bits etc.
             self.passcount = 0
-            self.value = self.meanValue + (random.random() - 0.5) *2 * (self.noise * self.meanValue)
+            if self.identifier == 0x580: # Time
+                t = time.struct_time(time.gmtime())
+                self.value = [t[3], t[4], t[5]]
+            elif self.identifier == 0x581: # Date
+                t = time.struct_time(time.gmtime())
+                self.value = [t[0], t[1], t[2]]
+            elif self.identifier == 0x587: # Aircraft ID
+                self.value = ['7', '2', '7', 'W', 'B']
+            else:
+                self.value = self.meanValue + (random.random() - 0.5) *2 * (self.noise * self.meanValue)
             #print self.value
             return self.getFrame()
         
@@ -177,14 +187,19 @@ if __name__ == "__main__":
             st.start()
             rt.start()
             nt = NodeThread(10, st.sendQueue, name="Air Data Node")
-            p = NodeParameter()
-            p.name = "indicated airspeed"
+            p = NodeParameter("indicated airspeed")
             p.meanValue = 180.0
             nt.parameters.append(p)
-            p = NodeParameter()
-            p.name = "indicated altitude"
+            p = NodeParameter("indicated altitude")
             p.meanValue = 8500
             p.noise = 0.001
+            nt.parameters.append(p)
+            p = NodeParameter("time")
+            nt.parameters.append(p)
+            p = NodeParameter("date")
+            nt.parameters.append(p)
+            p = NodeParameter("Aircraft Identifier")
+            p.interval = 10
             nt.parameters.append(p)
             nt.start()
             while True:
