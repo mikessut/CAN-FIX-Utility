@@ -59,7 +59,9 @@ class Parameter(object):
             self.__failure = False
             self.__quality = False
             self.__annunciate = False
+            self.value = 0
             self.index = 0
+            self.node = 0
             self.__meta = None
             self.function = 0
 
@@ -346,6 +348,9 @@ class NodeSpecific(object):
     def __init__(self, frame=None):
         if frame != None:
             self.setFrame(frame)
+        else:
+            self.controlCode = 0
+            self.data = []
 
     def setFrame(self, frame):
         self.sendNode = frame.id -1792
@@ -639,9 +644,9 @@ if __name__ == "__main__":
         p.value = 132.4
         p.node = 12
         #p.annunciate = True
-        p.index = 0
+        #p.index = 0
         #p.meta = "Max"
-        p.meta = 4
+        #p.meta = 4
         
         print p
         print p.getFrame()
