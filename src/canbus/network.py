@@ -16,35 +16,118 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from exceptions import *
+import socket
+import canbus
+
 
 class Adapter():
     """Class that represents a generic TCP/IP to CAN Bus Adapter"""
     def __init__(self):
-        self.name = "Dumb Network Driver"
+        self.name = "CANFIX Network Adapter"
         self.shortname = "network"
         self.type = "network"
     
-    def connect(self):
-        print "Connecting to simulation adapter"
+    def __readResponse(self, ch):
+        s = ""
+
+        while 1:
+            x = self.ser.read()
+            if len(x) == 0:
+                raise DeviceTimeout
+            else:
+                s = s + x
+                if x == '\n':
+                    if s[0] == ch.lower(): # Good Response
+                        return s
+                    if s[0] == "*": # Error
+                        raise BusReadError("Error " + s[1] + " Returned")
+
+    def __sendCommand(self, command, attempts = 3):
+        n = 0 #attempt counter
+        if command[-1] != '\n':
+            command = command + '\n'
+        
+        while True:
+            self.ser.write(command)
+            try:
+                result = self.__readResponse(command[0])
+                return result
+            except DeviceTimeout:
+                if n == attempts:
+                    raise BusReadError("Timeout waiting for adapter")
+            except BusReadError:
+                if n == attempts:
+                    raise BusReadError("Unable to send Command " + command)
+                time.sleep(self.timeout)
+            n+=1
+        
+        
+    def connect(self, config):
+        try:
+            self.bitrate = config.bitrate
+        except KeyError:
+            self.bitrate = 125
+        bitrates = {125:"B125\n", 250:"B250\n", 500:"B500\n", 1000:"B1000\n"}
+        try:
+            self.portname = config.device
+        except KeyError:
+            self.portname = comports[0][0]
+            print "Setting Port to default" + self.portname
+        try:
+            self.timeout = config.timeout
+        except KeyError:
+            self.timeout = 0.25
+        
+        try:
+            self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
+            
+            print "Reseting CAN-FIX-it"
+            self.__sendCommand("K")
+            print "Setting Bit Rate"
+            self.__sendCommand(bitrates[self.bitrate])
+            self.open()
+        except BusReadError:
+            raise BussInitError("Unable to Initialize CAN Port")
+    
+    def disconnect(self):
+        self.close()
 
     def open(self):
         print "Opening CAN Port"
-
+        self.__sendCommand("O")
+        
     def close(self):
         print "Closing CAN Port"
+        self.__sendCommand("C")
 
     def error(self):
-        print "Closing CAN Port"
+        self.ser.write("E\r")
+        try:
+            result = self.__readResponse("E")
+        except DeviceTimeout:
+            raise BusInitError("Timeout waiting for Adapter")
+        except BusReadError:
+            raise BusInitError("Unable to Close CAN Port")
+        return int(result, 16)
 
     def sendFrame(self, frame):
-        if frame['id'] < 0 or frame['id'] > 2047:
+        if frame.id < 0 or frame.id > 2047:
             raise ValueError("Frame ID out of range")
+        xmit = "W"
+        xmit = xmit + '%03X' % frame.id
+        xmit = xmit + ':'
+        for each in frame.data:
+            xmit = xmit + '%02X' % each
+        xmit = xmit + '\n'
+        self.__sendCommand(xmit)
 
     def recvFrame(self):
-        frame = {}
-        frame['id'] = int(result[1:4], 16)
-        frame['data'] = []
-        for n in range(int(result[4], 16)):
-            frame['data'].append(int(result[5+n*2:7+n*2], 16))
-        print frame
+        result = self.__readResponse("R")
+        
+        if result[0] != 'r':
+            raise BusReadError("Unknown response from Adapter")
+        data= []
+        for n in range((len(result)-5)/2):
+            data.append(int(result[5+n*2:7+n*2], 16))
+        frame = canbus.Frame(int(result[1:4], 16), data)
         return frame
