@@ -227,7 +227,7 @@ class Parameter(object):
         elif self.__identifier == 0x581: #Date
             return "%i-%i-%i" % (self.value[0], self.value[1], self.value[2])
         else:
-            if units:
+            if self.units:
                 return str(self.value) + " " + self.units
             else:
                 return str(self.value)
