@@ -54,6 +54,7 @@ class ServerSendThread(StoppableThread):
                 if self.stopped(): break
             else:
                 if result:
+                    #print "->", str(result),
                     self.socket.send(str(result))
         
         print "ServerSendThread Quitting"
@@ -65,17 +66,34 @@ class ServerRecvThread(StoppableThread):
     def __init__(self, socket, name):
         super(ServerRecvThread, self).__init__(name)
         self.socket = socket
-    
+        self.nodelist = []
+        self.sendQueue = None
+        
     def run(self):
         while True:
             try:
                 result = self.socket.recv(1024)
+                #print "<-", result,
             except socket.timeout:
                 if self.stopped(): break
             else:
                 if not result: break
-                print result
-        #self.socket.shutdown(socket.SHUT_RDWR)
+                if result[0]=='B': # Bitrate set
+                    print "Set Bitrate to", result[1:-1]
+                    self.sendQueue.put('b\n')
+                elif result[0]=='O': # Open Port
+                    print "Open CAN Connection"
+                    self.sendQueue.put('o\n')
+                elif result[0]=='C': # Open Port
+                    print "Close CAN Connection"
+                    self.sendQueue.put('c\n')
+                elif result[0]=='E': # Error Request
+                    print "Error Request"
+                    self.sendQueue.put('e\n')
+                elif result[0]=='W': # Write Frame
+                    self.sendQueue.put('w\n')
+                else:
+                    print result,
         self.socket.close()
         print "ServerRecvThread Quitting"
 
@@ -141,7 +159,7 @@ class NodeThread(StoppableThread):
             #TODO Deal with incoming messages here.
             
         
-        print "NodeThread Quitting"
+        print self.name, "Quitting"
 
 class CommandThread(threading.Thread):
     def __init__(self):
@@ -152,6 +170,8 @@ class CommandThread(threading.Thread):
             s = raw_input('>')
             if s == 'exit':
                 break
+
+nodelist = []
         
 if __name__ == "__main__":
     try:
@@ -181,9 +201,10 @@ if __name__ == "__main__":
         else:
             c.settimeout(1.0)
             print 'got connection from', addr
-            
+            nodelist = []
             st = ServerSendThread(c, name="Send Thread")
             rt = ServerRecvThread(c, name="Receive Thread")
+            rt.sendQueue = st.sendQueue
             st.start()
             rt.start()
             nt = NodeThread(10, st.sendQueue, name="Air Data Node")
@@ -201,7 +222,10 @@ if __name__ == "__main__":
             p = NodeParameter("Aircraft Identifier")
             p.interval = 10
             nt.parameters.append(p)
-            nt.start()
+            nodelist.append(nt)
+            rt.nodelist = nodelist
+            for each in nodelist:
+                each.start()
             while True:
                 time.sleep(1.0)
                 if not ct.is_alive() or not rt.is_alive():

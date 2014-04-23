@@ -39,3 +39,9 @@ Fix bitrate selection on Connect Dialog Box
 
 Add Quality, Failure and Annunciate Flags to Data Table View
 
+Protocol module unit tests.  This thing has a bunch of ways to not work.  Needs testing.
+
+Separate canbus and protocol modules into packages that can be used in other programs.
+I'll probably rename the protocol module canfix but I'll need a new neame for this 
+utility program.
+

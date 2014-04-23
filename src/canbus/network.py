@@ -26,17 +26,26 @@ class Adapter():
         self.name = "CANFIX Network Adapter"
         self.shortname = "network"
         self.type = "network"
+        # Statistics and counters
+        self.sentFrames = 0
+        self.recvFrames = 0
+        self.errors = 0
+    
     
     def __readResponse(self, ch):
         s = ""
 
         while 1:
-            x = self.ser.read()
-            if len(x) == 0:
+            try:
+                #TODO: This is probably not very efficient but
+                # having a buffer bigger than 1 allows for
+                # multiple frames.  Need to handle that
+                x = self.socket.recv(1)
+            except socket.timeout:
                 raise DeviceTimeout
             else:
                 s = s + x
-                if x == '\n':
+                if s[-1] == '\n':
                     if s[0] == ch.lower(): # Good Response
                         return s
                     if s[0] == "*": # Error
@@ -48,7 +57,7 @@ class Adapter():
             command = command + '\n'
         
         while True:
-            self.ser.write(command)
+            self.socket.send(command)
             try:
                 result = self.__readResponse(command[0])
                 return result
@@ -69,25 +78,27 @@ class Adapter():
             self.bitrate = 125
         bitrates = {125:"B125\n", 250:"B250\n", 500:"B500\n", 1000:"B1000\n"}
         try:
-            self.portname = config.device
+            self.host = config.ipaddress
         except KeyError:
-            self.portname = comports[0][0]
-            print "Setting Port to default" + self.portname
+            self.host = "127.0.0.1"
+        try:
+            self.port = config.port
+        except KeyError:
+            self.port = 63349
         try:
             self.timeout = config.timeout
         except KeyError:
             self.timeout = 0.25
         
         try:
-            self.ser = serial.Serial(self.portname, 115200, timeout=self.timeout)
-            
-            print "Reseting CAN-FIX-it"
-            self.__sendCommand("K")
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.settimeout(self.timeout)
+            self.socket.connect((self.host, self.port))
             print "Setting Bit Rate"
             self.__sendCommand(bitrates[self.bitrate])
             self.open()
         except BusReadError:
-            raise BussInitError("Unable to Initialize CAN Port")
+            raise BusInitError("Unable to Initialize CAN Port")
     
     def disconnect(self):
         self.close()
@@ -99,6 +110,7 @@ class Adapter():
     def close(self):
         print "Closing CAN Port"
         self.__sendCommand("C")
+        self.socket.close()
 
     def error(self):
         self.ser.write("E\r")
@@ -120,6 +132,7 @@ class Adapter():
             xmit = xmit + '%02X' % each
         xmit = xmit + '\n'
         self.__sendCommand(xmit)
+        self.sentFrames += 1
 
     def recvFrame(self):
         result = self.__readResponse("R")
@@ -130,4 +143,5 @@ class Adapter():
         for n in range((len(result)-5)/2):
             data.append(int(result[5+n*2:7+n*2], 16))
         frame = canbus.Frame(int(result[1:4], 16), data)
+        self.recvFrames += 1
         return frame
