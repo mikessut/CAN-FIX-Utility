@@ -114,9 +114,9 @@ def TreePrint(node, depth=0):
         for each in node.children:
             TreePrint(each, depth+1)    
 
-class NetworkModel(QAbstractItemModel):
+class NetworkTreeModel(QAbstractItemModel):
     def __init__(self, parent=None):
-        super(NetworkModel, self).__init__(parent)
+        super(NetworkTreeModel, self).__init__(parent)
         self.parents=[]
         self.root = TreeItem("root")
         self.rows = 0

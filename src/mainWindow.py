@@ -28,6 +28,8 @@ from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
 import fwDialog
 import networkModel
+import treeModel
+import tableModel
 
 
 class CommThread(QThread):
@@ -76,90 +78,17 @@ class connectDialog(QDialog, Ui_ConnectDialog):
         else:
             self.stackConfig.setCurrentIndex(2)        
 
-class LiveParameterList(object):
-    def __init__(self):
-        self.index = []
-        self.list = {}
-    
-    # this is the slot for the frame update signal
-    def update(self, frame):
-        p = protocol.parseFrame(frame)
-        if isinstance(p, protocol.Parameter):
-            ident = frame.id*16 + p.index
-            if ident in self.list:
-                self.list[ident].frame = frame
-                return len(self.list) 
-            self.list[ident] = p
-            self.index.append(self.list[ident])
-            self.index.sort()
-            return 0
-            
-    def getItem(self, row, column):
-        if column == 0:
-            return self.index[row].fullName
-        elif column == 1:
-            return self.index[row].valueStr()
-        elif column == 2:
-            return self.index[row].units
-    
-    def rowCount(self):
-        return len(self.list)
-
-class ModelData(QAbstractTableModel):
-    def __init__(self):
-        QAbstractTableModel.__init__(self)
-        self.parlist = LiveParameterList()
-        
-    def data(self, index, role):
-        if role == Qt.TextAlignmentRole:
-            return QVariant(int(Qt.AlignVCenter|Qt.AlignLeft))
-        if role != Qt.DisplayRole:
-            return QVariant()
-        item = self.parlist.getItem(index.row(), index.column())
-        return QVariant(item)
-    
-    def rowCount(self, parent = QModelIndex()):
-        return self.parlist.rowCount()
-    
-    def columnCount(self, parent = QModelIndex()):
-        return 3
-    
-    def headerData(self, col, orientation, role):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            if col == 0:
-                return QVariant("Name")
-            elif col == 1: 
-                return QVariant("Value")
-            elif col == 2:
-                return QVariant("Units")
-            else:
-                return QVariant("")
-        #if orientation == Qt.Vertical and role == Qt.DisplayRole:
-        #    return QVariant(self.parlist[col].id)
-        return QVariant()
-    
-    def edit(self, index):
-        print "Edit Data Row %d" % index.row()
-
-    def update(self, frame):
-        if self.parlist.update(frame):
-            #TODO At some point make this update only the row that was changed.
-            self.dataChanged.emit(self.index(0,0),self.index(self.rowCount(), 3))
-        else:
-            self.modelReset.emit()
-
-
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, args):
         QMainWindow.__init__(self)
         self.setupUi(self)
-        self.data = ModelData()
+        self.data = tableModel.ModelData()
         self.tableData.setModel(self.data)
         header = self.tableData.horizontalHeader()
         header.setResizeMode(QHeaderView.ResizeToContents)
         
-        self.network = networkModel.NetworkModel()
+        self.network = treeModel.NetworkTreeModel()
         self.viewNetwork.setModel(self.network)
         self.viewNetwork.setContextMenuPolicy(Qt.CustomContextMenu)
                 
