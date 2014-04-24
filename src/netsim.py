@@ -45,6 +45,7 @@ class ServerSendThread(StoppableThread):
         super(ServerSendThread, self).__init__(name)
         self.socket = socket
         self.sendQueue = Queue.Queue()
+        self.debug = False
     
     def run(self):
         while True:
@@ -54,26 +55,34 @@ class ServerSendThread(StoppableThread):
                 if self.stopped(): break
             else:
                 if result:
-                    #print "->", str(result),
-                    self.socket.send(str(result))
+                   
+                    if isinstance(result, canbus.Frame):
+                        s = frameToString(result)
+                    else:
+                        s = str(result)
+                    if self.debug:
+                        print "-> %s" % (s,),
+                    self.socket.send(s)
         
         print "ServerSendThread Quitting"
     
 
         
 class ServerRecvThread(StoppableThread):
-    """This thread handles inbound CAN frames from the client"""
+    """This thread handles inbound messages from the client"""
     def __init__(self, socket, name):
         super(ServerRecvThread, self).__init__(name)
         self.socket = socket
         self.nodelist = []
         self.sendQueue = None
+        self.debug = False
         
     def run(self):
         while True:
             try:
                 result = self.socket.recv(1024)
-                #print "<-", result,
+                if self.debug:
+                    print "<-", result,
             except socket.timeout:
                 if self.stopped(): break
             else:
@@ -90,10 +99,15 @@ class ServerRecvThread(StoppableThread):
                 elif result[0]=='E': # Error Request
                     print "Error Request"
                     self.sendQueue.put('e\n')
-                elif result[0]=='W': # Write Frame
+                elif result[0]=='W': # Inbound Frame
+                    # Send the response and put the frame into
+                    # each nodes inbound frame Queue
                     self.sendQueue.put('w\n')
+                    f = stringToFrame(result)
+                    for each in self.nodelist:
+                        each.frameQueue.put(f)
                 else:
-                    print result,
+                    pass
         self.socket.close()
         print "ServerRecvThread Quitting"
 
@@ -123,9 +137,11 @@ class NodeParameter(protocol.Parameter):
                 self.value = ['7', '2', '7', 'W', 'B']
             else:
                 self.value = self.meanValue + (random.random() - 0.5) *2 * (self.noise * self.meanValue)
-            #print self.value
             return self.getFrame()
-        
+
+# Node states
+NORMAL = 0x00
+FW_UPDATE = 0x01
     
 class NodeThread(StoppableThread):
     def __init__(self, nodeID, sendQueue, name=None):
@@ -135,31 +151,95 @@ class NodeThread(StoppableThread):
         self.deviceID = 0x00
         self.model = 0x00
         self.version = 0x0000
-        self.period = 1.000
+        self.period = 1.000 # How often we update parameters
         self.enabled = False
         self.parameters = []
         self.frameQueue = Queue.Queue()
+        self.state = NORMAL
 
     def run(self):
         while True:
-            time.sleep(self.period)
-            if self.stopped(): break
-            for each in self.parameters:
-                if each.enabled:
-                    each.node = self.nodeID
-                    result = each.process()
-                    if result:
-                        xmit = "r"
-                        xmit = xmit + '%03X' % result.id
-                        xmit = xmit + ':'
-                        for each in result.data:
-                            xmit = xmit + '%02X' % each
-                        xmit = xmit + '\n'
-                        self.sendQueue.put(xmit)
-            #TODO Deal with incoming messages here.
-            
-        
+            # Process any incoming frames that apply to us
+            # We use the frame queue timeout as the period timing
+            try:
+                frame = self.frameQueue.get(timeout=self.period)
+                self.handleFrame(frame)
+            except Queue.Empty:
+                # When the queue is empty the timeout has expired
+                if self.stopped(): break
+                # Process all the parameters
+                for each in self.parameters:
+                    if each.enabled:
+                        each.node = self.nodeID
+                        result = each.process()
+                        if result:
+                            xmit = "r"
+                            xmit = xmit + '%03X' % result.id
+                            xmit = xmit + ':'
+                            for each in result.data:
+                                xmit = xmit + '%02X' % each
+                            xmit = xmit + '\n'
+                            self.sendQueue.put(xmit)
         print self.name, "Quitting"
+        
+    def handleFrame(self, frame):
+        if self.state == NORMAL:
+            if frame.id >= 0x700 and frame.data[0] == self.nodeID:
+                # We start a response frame in case we need it
+                f = canbus.Frame(self.nodeID + 0x700, [frame.id - 0x700, frame.data[1]])
+                cmd = frame.data[1]
+                if cmd == 0: #Node identification
+                    # TODO: Fix the model number part
+                    print "Got Node ID requst from", frame.data[0], self.nodeID
+                    f.data.extend([0x01, self.deviceID % 255, 1, 0 , 0, 0])
+                elif cmd == 1: # Bitrate Set Command
+                    return None
+                elif cmd == 2: # Node Set Command
+                    self.nodeID = frame.data[2]
+                    f.data.append(0x00)
+                #TODO: Fix these so they work??
+                elif cmd == 3: # Disable Parameter
+                    return None
+                elif cmd == 4: # Enable Parameter
+                    return None
+                elif cmd == 5: # Node Report
+                    return None
+                elif cmd == 7: # Firmware Update
+                    FCode = frame.data[3]<<8 | frame.data[2]
+                    if FCode == self.FWVCode:
+                        self.FWChannel = frame.data[4]
+                        f.data.append(0x00)
+                        #print "Firmware Update Received", hex(FCode), hex(self.FWVCode)
+                        self.state = FW_UPDATE
+                self.sendQueue.put(f)
+        #elif self.state == FW_UPDATE: #We're going to emulate AT328 Firmware update
+            #if frame.id == (0x6E0 + self.FWChannel*2):
+                #f = canbus.Frame(0x6E0 + self.FWChannel*2 + 1, frame.data)
+                #if self.fw_length > 0: #Indicates we are writing buffer data
+                    #self.fw_length-=len(frame.data)/2
+                    #if self.fw_length <= 0:
+                        #pass
+                        ##print "No more data"
+                #else: #Waiting for firmware command
+                    #if frame.data[0] == 1: #Write to Buffer command
+                        #self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        #self.fw_length = frame.data[3]
+                        ##print "Buffer Write", self.fw_address, self.fw_length
+                    #elif frame.data[0] == 2: #Erase Page Command
+                        #self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        ##print "Erase Page", self.fw_address
+                    #elif frame.data[0] == 3: #Write to Flash
+                        #self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        ##print "Write Page", self.fw_address
+                    #elif frame.data[0] == 4: #Abort
+                        #print "Abort"
+                    #elif frame.data[0] == 5: #Complete Command
+                        #crc = frame.data[2]<<8 | frame.data[1]
+                        #length = frame.data[4]<<8 | frame.data[3]
+                        ##print "Firmware Load Complete", crc, length
+                        #self.state = NORMAL
+                #return f
+        return None
 
 class CommandThread(threading.Thread):
     def __init__(self):
@@ -172,7 +252,27 @@ class CommandThread(threading.Thread):
                 break
 
 nodelist = []
-        
+
+def stringToFrame(s):
+    """Converts a String from the clien to a canbus frame"""
+    data= []
+    for n in range((len(s)-5)/2):
+        data.append(int(s[5+n*2:7+n*2], 16))
+    f = canbus.Frame(int(s[1:4], 16), data)
+    return f
+
+def frameToString(f):
+    """Converts a canbus frame into the string that we send
+       to the client"""
+    s = "r"
+    s = s + '%03X' % f.id
+    s = s + ':'
+    for each in f.data:
+        s = s + "%02X" % each
+    s = s + '\n'
+    return s
+
+
 if __name__ == "__main__":
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -205,6 +305,7 @@ if __name__ == "__main__":
             st = ServerSendThread(c, name="Send Thread")
             rt = ServerRecvThread(c, name="Receive Thread")
             rt.sendQueue = st.sendQueue
+            st.debug = rt.debug = True
             st.start()
             rt.start()
             nt = NodeThread(10, st.sendQueue, name="Air Data Node")

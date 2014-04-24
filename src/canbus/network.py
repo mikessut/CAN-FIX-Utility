@@ -31,7 +31,6 @@ class Adapter():
         self.recvFrames = 0
         self.errors = 0
     
-    
     def __readResponse(self, ch):
         s = ""
 
@@ -89,7 +88,6 @@ class Adapter():
             self.timeout = config.timeout
         except KeyError:
             self.timeout = 0.25
-        
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.settimeout(self.timeout)
@@ -131,9 +129,9 @@ class Adapter():
         for each in frame.data:
             xmit = xmit + '%02X' % each
         xmit = xmit + '\n'
-        self.__sendCommand(xmit)
         self.sentFrames += 1
-
+        self.__sendCommand(xmit)
+        
     def recvFrame(self):
         result = self.__readResponse("R")
         
