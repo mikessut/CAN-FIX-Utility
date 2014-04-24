@@ -149,8 +149,8 @@ class NodeThread(StoppableThread):
         self.nodeID = nodeID
         self.sendQueue = sendQueue
         self.deviceID = 0x00
-        self.model = 0x00
-        self.version = 0x0000
+        self.model = 0x000000
+        self.version = 0x00
         self.period = 1.000 # How often we update parameters
         self.enabled = False
         self.parameters = []
@@ -184,10 +184,11 @@ class NodeThread(StoppableThread):
                 f = canbus.Frame(self.nodeID + 0x700, [frame.id - 0x700, frame.data[1]])
                 cmd = frame.data[1]
                 if cmd == 0: #Node identification
-                    # TODO: Fix the model number part
                     if _debug:
                         print "Node ID requst from", frame.data[0], self.nodeID
-                    f.data.extend([0x01, self.deviceID % 255, 1, 0 , 0, 0])
+                    f.data.extend([0x01, self.deviceID & 0xFF, 
+                                   self.version & 0xFF, self.model & 0xFF,
+                                   self.model >> 8 & 0xFF, self.model >> 16 & 0xFF])
                 elif cmd == 1: # Bitrate Set Command
                     return None
                 elif cmd == 2: # Node Set Command
@@ -272,8 +273,8 @@ def nodeListConfig(sendthread):
     l = []
     nt = NodeThread(179, sendthread.sendQueue, name="Air Data Node")
     nt.deviceID = 179
-    nt.model = 1
-    nt.version = 0x07FE
+    nt.model = 0x0A0B0C
+    nt.version = 0xEE
     p = NodeParameter("indicated airspeed")
     p.meanValue = 180.0
     nt.parameters.append(p)
