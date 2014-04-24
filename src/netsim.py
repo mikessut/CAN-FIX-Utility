@@ -32,7 +32,7 @@ class StoppableThread(threading.Thread):
         self.__stop = threading.Event()
         
     def stop(self):
-        print "Stopping Thread", self.name
+        if _debug: print "Stopping Thread", self.name
         self.__stop.set()
         
     def stopped(self):
@@ -45,7 +45,6 @@ class ServerSendThread(StoppableThread):
         super(ServerSendThread, self).__init__(name)
         self.socket = socket
         self.sendQueue = Queue.Queue()
-        self.debug = False
     
     def run(self):
         while True:
@@ -60,11 +59,11 @@ class ServerSendThread(StoppableThread):
                         s = frameToString(result)
                     else:
                         s = str(result)
-                    if self.debug:
+                    if _debug:
                         print "-> %s" % (s,),
                     self.socket.send(s)
         
-        print "ServerSendThread Quitting"
+        if _debug: print "ServerSendThread Quitting"
     
 
         
@@ -75,38 +74,43 @@ class ServerRecvThread(StoppableThread):
         self.socket = socket
         self.nodelist = []
         self.sendQueue = None
-        self.debug = False
         
     def run(self):
         while True:
             try:
                 result = self.socket.recv(1024)
-                if self.debug:
-                    print "<-", result,
             except socket.timeout:
                 if self.stopped(): break
             else:
                 if not result: break
-                if result[0]=='B': # Bitrate set
-                    print "Set Bitrate to", result[1:-1]
-                elif result[0]=='O': # Open Port
-                    print "Open CAN Connection"
-                elif result[0]=='C': # Open Port
-                    print "Close CAN Connection"
-                elif result[0]=='E': # Error Request
-                    print "Error Request"
-                elif result[0]=='W': # Inbound Frame
-                    # Send the response and put the frame into
-                    # each nodes inbound frame Queue
-                    #self.sendQueue.put('w\n')
-                    f = stringToFrame(result)
-                    for each in self.nodelist:
-                        each.frameQueue.put(f)
-                else:
-                    pass
+                clist = result.split('\n')
+                for each in clist:
+                    self.handleCommand(each)
         self.socket.close()
-        print "ServerRecvThread Quitting"
+        if _debug: print "ServerRecvThread Quitting"
 
+    def handleCommand(self, command):
+        if len(command) <= 0: return
+        if _debug:
+            print "<-", command
+        if command[0]=='B': # Bitrate set
+            if _debug: print "Set Bitrate to", command[1:-1]
+        elif command[0]=='O': # Open Port
+            if _debug: print "Open CAN Connection"
+        elif command[0]=='C': # Open Port
+            if _debug: print "Close CAN Connection"
+        elif command[0]=='E': # Error Request
+            if _debug: print "Error Request"
+        elif command[0]=='W': # Inbound Frame
+            # Send the response and put the frame into
+            # each nodes inbound frame Queue
+            #self.sendQueue.put('w\n')
+            f = stringToFrame(command)
+            for each in self.nodelist:
+                each.frameQueue.put(f)
+        else:
+            pass
+    
 
 class NodeParameter(protocol.Parameter):
     def __init__(self, name=None):
@@ -171,7 +175,7 @@ class NodeThread(StoppableThread):
                         if result:
                             xmit = frameToString(result)
                             self.sendQueue.put(xmit)
-        print self.name, "Quitting"
+        if _debug: print self.name, "Quitting"
         
     def handleFrame(self, frame):
         if self.state == NORMAL:
@@ -181,7 +185,8 @@ class NodeThread(StoppableThread):
                 cmd = frame.data[1]
                 if cmd == 0: #Node identification
                     # TODO: Fix the model number part
-                    print "Got Node ID requst from", frame.data[0], self.nodeID
+                    if _debug:
+                        print "Node ID requst from", frame.data[0], self.nodeID
                     f.data.extend([0x01, self.deviceID % 255, 1, 0 , 0, 0])
                 elif cmd == 1: # Bitrate Set Command
                     return None
@@ -242,8 +247,6 @@ class CommandThread(threading.Thread):
             if s == 'exit':
                 break
 
-nodelist = []
-
 def stringToFrame(s):
     """Converts a String from the clien to a canbus frame"""
     data= []
@@ -263,8 +266,41 @@ def frameToString(f):
     s = s + '\n'
     return s
 
+nodelist = []
+
+def nodeListConfig(sendthread):
+    l = []
+    nt = NodeThread(179, sendthread.sendQueue, name="Air Data Node")
+    nt.deviceID = 179
+    nt.model = 1
+    nt.version = 0x07FE
+    p = NodeParameter("indicated airspeed")
+    p.meanValue = 180.0
+    nt.parameters.append(p)
+    p = NodeParameter("indicated altitude")
+    p.meanValue = 8500
+    p.noise = 0.001
+    nt.parameters.append(p)
+    p = NodeParameter("time")
+    nt.parameters.append(p)
+    p = NodeParameter("date")
+    nt.parameters.append(p)
+    p = NodeParameter("Aircraft Identifier")
+    p.interval = 10
+    nt.parameters.append(p)
+    l.append(nt)
+    
+    return l
+
+_debug = False
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='CAN-FIX Configuration Utility')
+    parser.add_argument('--debug', '-d', action='store_true', help='Debug Mode')
+    args = parser.parse_args()
+    if args.debug:
+        _debug = True
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = "0.0.0.0"
@@ -291,33 +327,13 @@ if __name__ == "__main__":
                 break
         else:
             c.settimeout(1.0)
-            print 'got connection from', addr
-            nodelist = []
+            if _debug: print 'got connection from', addr
             st = ServerSendThread(c, name="Send Thread")
             rt = ServerRecvThread(c, name="Receive Thread")
+            nodelist = nodeListConfig(st)
             rt.sendQueue = st.sendQueue
-            st.debug = rt.debug = True
             st.start()
             rt.start()
-            nt = NodeThread(179, st.sendQueue, name="Air Data Node")
-            nt.deviceID = 179
-            nt.model = 1
-            nt.version = 0x07FE
-            p = NodeParameter("indicated airspeed")
-            p.meanValue = 180.0
-            nt.parameters.append(p)
-            p = NodeParameter("indicated altitude")
-            p.meanValue = 8500
-            p.noise = 0.001
-            nt.parameters.append(p)
-            p = NodeParameter("time")
-            nt.parameters.append(p)
-            p = NodeParameter("date")
-            nt.parameters.append(p)
-            p = NodeParameter("Aircraft Identifier")
-            p.interval = 10
-            nt.parameters.append(p)
-            nodelist.append(nt)
             rt.nodelist = nodelist
             for each in nodelist:
                 each.start()
