@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 #  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
@@ -225,7 +224,7 @@ class NetworkTreeModel(QAbstractItemModel):
                 print "Node ID %i -> %i" % (p.sendNode, p.destNode)
                 item = self.findNodeID(p.sendNode)
                 if item:
-                    item.children[1].value = p.data[0]
+                    item.children[1].value = p.data[1]
                     self.dataChanged.emit(self.createIndex(0,0,item.children[1]), self.createIndex(len(self.root),1,item.children[1]))
                 
         else:

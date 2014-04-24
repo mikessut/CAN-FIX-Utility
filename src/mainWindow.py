@@ -83,13 +83,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, args):
         QMainWindow.__init__(self)
         self.setupUi(self)
+        self.network = networkModel.NetworkModel()
         self.data = tableModel.ModelData()
         self.tableData.setModel(self.data)
         header = self.tableData.horizontalHeader()
         header.setResizeMode(QHeaderView.ResizeToContents)
         
-        self.network = treeModel.NetworkTreeModel()
-        self.viewNetwork.setModel(self.network)
+        self.netView = treeModel.NetworkTreeModel()
+        self.viewNetwork.setModel(self.netView)
         self.viewNetwork.setContextMenuPolicy(Qt.CustomContextMenu)
                 
         self.textTraffic.setReadOnly(True)
@@ -122,8 +123,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.actionConnect.setDisabled(True)
             self.actionDisconnect.setEnabled(True)
             self.commThread.newFrame.connect(self.updateFrame)
+            self.commThread.newFrame.connect(self.network.update)
             #We give the network model access to the can connection
-            self.network.can = self.can
+            self.netView.can = self.can
             return True
         else:
             self.statusbar.showMessage("Failed to connect to %s" % config.device)
@@ -183,7 +185,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def updateFrame(self, frame):
         tab = self.tabWidget.currentIndex()
         if tab == 0: #Network Tree View
-            self.network.update(frame)
+            self.netView.update(frame)
             self.viewNetwork.resizeColumnToContents(0)
         elif tab == 1: #Data Table View
             self.data.update(frame)

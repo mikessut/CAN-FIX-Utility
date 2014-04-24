@@ -27,13 +27,11 @@ import config
 
 # Import and add each Adapter class from the files.  There may be a way
 # to do this in a loop but for now this will work.
-import simulate
 import canfixusb
 import easy
 import network
 
-adapterList = [simulate.Adapter(),
-               canfixusb.Adapter(),
+adapterList = [canfixusb.Adapter(),
                easy.Adapter(),
                network.Adapter()]
 

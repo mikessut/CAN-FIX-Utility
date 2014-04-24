@@ -22,4 +22,44 @@
 #  the currently connected network will be kept here and then
 #  distributed to the parts of the program that need it.
 
-pass
+import time
+import protocol
+import canbus
+import threading
+
+
+class CFNode(object):
+    """This class represents a CAN-FIX Node on the network"""
+    def __init__(self, nodeID=None):
+        self.nodeID = nodeID
+        self.deviceID = 0x00
+        self.model = 0x000000
+        self.version = 0x00
+        self.parameters = []
+        self.configruation = []
+        self.updated = time.time()
+
+class NetworkModel(object):
+    """This class represents a CAN-FIX network.  It contains
+       network specific information, configuration and a list
+       of all the current nodes seen on the network"""
+    def __init__(self):
+        self.nodes = []
+    
+    def __findNode(self, nodeid):
+        """Find and return the node with the given ID"""
+        for each in self.nodes:
+            if each.nodeID == nodeID: return each
+        return None
+
+    def update(self, frame):
+        p = protocol.parseFrame(frame)
+        if isinstance(p, protocol.Parameter):
+            print "Parameter:", p
+        elif isinstance(p, protocol.NodeAlarm):
+            print "Node Alarm:", p
+        elif isinstance(p, protocol.NodeSpecific):
+            print "Node Specific:", p
+        elif isinstance(p, protocol.TwoWayMsg):
+            print "2 Way Message:", p
+
