@@ -89,20 +89,16 @@ class ServerRecvThread(StoppableThread):
                 if not result: break
                 if result[0]=='B': # Bitrate set
                     print "Set Bitrate to", result[1:-1]
-                    self.sendQueue.put('b\n')
                 elif result[0]=='O': # Open Port
                     print "Open CAN Connection"
-                    self.sendQueue.put('o\n')
                 elif result[0]=='C': # Open Port
                     print "Close CAN Connection"
-                    self.sendQueue.put('c\n')
                 elif result[0]=='E': # Error Request
                     print "Error Request"
-                    self.sendQueue.put('e\n')
                 elif result[0]=='W': # Inbound Frame
                     # Send the response and put the frame into
                     # each nodes inbound frame Queue
-                    self.sendQueue.put('w\n')
+                    #self.sendQueue.put('w\n')
                     f = stringToFrame(result)
                     for each in self.nodelist:
                         each.frameQueue.put(f)
@@ -173,12 +169,7 @@ class NodeThread(StoppableThread):
                         each.node = self.nodeID
                         result = each.process()
                         if result:
-                            xmit = "r"
-                            xmit = xmit + '%03X' % result.id
-                            xmit = xmit + ':'
-                            for each in result.data:
-                                xmit = xmit + '%02X' % each
-                            xmit = xmit + '\n'
+                            xmit = frameToString(result)
                             self.sendQueue.put(xmit)
         print self.name, "Quitting"
         
@@ -308,7 +299,10 @@ if __name__ == "__main__":
             st.debug = rt.debug = True
             st.start()
             rt.start()
-            nt = NodeThread(10, st.sendQueue, name="Air Data Node")
+            nt = NodeThread(179, st.sendQueue, name="Air Data Node")
+            nt.deviceID = 179
+            nt.model = 1
+            nt.version = 0x07FE
             p = NodeParameter("indicated airspeed")
             p.meanValue = 180.0
             nt.parameters.append(p)

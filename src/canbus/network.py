@@ -30,6 +30,7 @@ class Adapter():
         self.sentFrames = 0
         self.recvFrames = 0
         self.errors = 0
+        self.lasterror = None
     
     def __readResponse(self, ch):
         s = ""
@@ -48,27 +49,13 @@ class Adapter():
                     if s[0] == ch.lower(): # Good Response
                         return s
                     if s[0] == "*": # Error
-                        raise BusReadError("Error " + s[1] + " Returned")
-
-    def __sendCommand(self, command, attempts = 3):
-        n = 0 #attempt counter
+                        self.lasterror = s[1]
+                        self.errors += 1
+                        
+    def __sendCommand(self, command):
         if command[-1] != '\n':
             command = command + '\n'
-        
-        while True:
-            self.socket.send(command)
-            try:
-                result = self.__readResponse(command[0])
-                return result
-            except DeviceTimeout:
-                if n == attempts:
-                    raise BusReadError("Timeout waiting for adapter")
-            except BusReadError:
-                if n == attempts:
-                    raise BusReadError("Unable to send Command " + command)
-                time.sleep(self.timeout)
-            n+=1
-        
+        self.socket.send(command)
         
     def connect(self, config):
         try:
@@ -111,14 +98,7 @@ class Adapter():
         self.socket.close()
 
     def error(self):
-        self.ser.write("E\r")
-        try:
-            result = self.__readResponse("E")
-        except DeviceTimeout:
-            raise BusInitError("Timeout waiting for Adapter")
-        except BusReadError:
-            raise BusInitError("Unable to Close CAN Port")
-        return int(result, 16)
+        return self.errors
 
     def sendFrame(self, frame):
         if frame.id < 0 or frame.id > 2047:
