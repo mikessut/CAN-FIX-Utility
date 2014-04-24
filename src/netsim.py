@@ -138,6 +138,11 @@ class NodeParameter(protocol.Parameter):
             else:
                 self.value = self.meanValue + (random.random() - 0.5) *2 * (self.noise * self.meanValue)
             return self.getFrame()
+    
+    def report(self):
+        """Calling this function will make us report
+           our information on the next pass"""
+        self.passcount = self.interval
 
 # Node states
 NORMAL = 0x00
@@ -200,6 +205,8 @@ class NodeThread(StoppableThread):
                 elif cmd == 4: # Enable Parameter
                     return None
                 elif cmd == 5: # Node Report
+                    for each in self.parameters:
+                        each.report()
                     return None
                 elif cmd == 7: # Firmware Update
                     FCode = frame.data[3]<<8 | frame.data[2]
