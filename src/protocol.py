@@ -368,13 +368,12 @@ class NodeSpecific(object):
         self.data = frame.data[2:]
     
     def getFrame(self):
-        frame = canbus.Frame()
-        frame.id = self.sendNode + 1792
-        frame.data.append(self.destNode)
-        frame.data.append(self.controlCode)
+        f = canbus.Frame(self.sendNode + 1792)
+        f.data.append(self.destNode)
+        f.data.append(self.controlCode)
         for each in self.data:
-            frame.data.append(each)
-        return frame
+            f.data.append(each)
+        return f
     
     frame = property(getFrame, setFrame)
     

@@ -184,14 +184,6 @@ class NetworkTreeModel(QAbstractItemModel):
                 return each
         return None
     
-    def sendNodeID(self, nodeID):
-        p = protocol.NodeSpecific()
-        p.sendNode = self.can.srcNode
-        p.destNode = nodeID
-        f = p.getFrame()
-        print "sending node id request", nodeID, self.can.srcNode
-        self.can.sendFrame(f)
-    
     def updateParameter(self, item, parameter):
         #TODO deal with index and meta data
         p = item.parameterItem
@@ -217,8 +209,8 @@ class NetworkTreeModel(QAbstractItemModel):
                 n = FixItem("Unknown", p.node, self.root)
                 self.root.children.append(n)
                 self.updateParameter(n, p)
+                #TODO: emit datachanged instead of reset
                 self.modelReset.emit()
-                self.sendNodeID(p.node)
         elif isinstance(p, protocol.NodeSpecific):
             if p.controlCode == 0: # Node Identification
                 print "Node ID %i -> %i" % (p.sendNode, p.destNode)

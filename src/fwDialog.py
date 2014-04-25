@@ -93,5 +93,5 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
         pass
         
     def btnFileClick(self):
-        filename = filename = QFileDialog.getOpenFileName(self, 'Open File', '.')
+        filename = QFileDialog.getOpenFileName(self, 'Open File', '.')
         self.editFile.setText(filename)

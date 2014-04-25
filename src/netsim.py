@@ -125,7 +125,7 @@ class NodeParameter(protocol.Parameter):
     
     def process(self):
         self.passcount += 1
-        if self.passcount == self.interval:
+        if self.passcount >= self.interval:
             self.passcount = 0
             if self.identifier == 0x580: # Time
                 t = time.struct_time(time.gmtime())
@@ -189,8 +189,6 @@ class NodeThread(StoppableThread):
                 f = canbus.Frame(self.nodeID + 0x700, [frame.id - 0x700, frame.data[1]])
                 cmd = frame.data[1]
                 if cmd == 0: #Node identification
-                    if _debug:
-                        print "Node ID requst from", frame.data[0], self.nodeID
                     f.data.extend([0x01, self.deviceID & 0xFF, 
                                    self.version & 0xFF, self.model & 0xFF,
                                    self.model >> 8 & 0xFF, self.model >> 16 & 0xFF])
@@ -289,12 +287,21 @@ def nodeListConfig(sendthread):
     p.meanValue = 8500
     p.noise = 0.001
     nt.parameters.append(p)
+    l.append(nt)
+    
+    nt = NodeThread(40, sendthread.sendQueue, name="System Data Node")
+    nt.deviceID = 41
+    nt.model = 0x0D0E0F
+    nt.version = 0x02
     p = NodeParameter("time")
     nt.parameters.append(p)
     p = NodeParameter("date")
+    p.interval = 30
+    p.report()
     nt.parameters.append(p)
     p = NodeParameter("Aircraft Identifier")
     p.interval = 10
+    p.report()
     nt.parameters.append(p)
     l.append(nt)
     

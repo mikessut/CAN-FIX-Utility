@@ -125,7 +125,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.commThread.newFrame.connect(self.updateFrame)
             self.commThread.newFrame.connect(self.network.update)
             #We give the network model access to the can connection
-            self.netView.can = self.can
+            self.network.can = self.can
             return True
         else:
             self.statusbar.showMessage("Failed to connect to %s" % config.device)
@@ -239,7 +239,10 @@ def run(args):
     mWindow = MainWindow(args)
     app.aboutToQuit.connect(getout)
     mWindow.show()
-    sys.exit(app.exec_())
-
+    result = app.exec_()
+    # DEBUG Only
+    print mWindow.network
+    sys.exit(result)
+    
 if __name__ == "__main__":
     run()

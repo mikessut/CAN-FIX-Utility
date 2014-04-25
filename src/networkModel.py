@@ -32,12 +32,27 @@ class CFNode(object):
     """This class represents a CAN-FIX Node on the network"""
     def __init__(self, nodeID=None):
         self.nodeID = nodeID
+        self.name = "Unknown"
         self.deviceID = 0x00
         self.model = 0x000000
         self.version = 0x00
         self.parameters = []
         self.configruation = []
         self.updated = time.time()
+    
+    def updateParameter(self, par):
+        self.updated = time.time()
+    
+    def __str__(self):
+        s = "%s 0x%02X\n" % (self.name, self.nodeID)
+        s += "  Device ID %i\n" % (self.deviceID, )
+        s += "  Model Number %X\n" % self.model
+        s += "  Version %X\n" % self.version
+        s += "  Parameters"
+        for each in self.parameters:
+            s += "    %s" % each
+        s += "\n  Last Update " + str(time.time()-self.updated) + "\n"
+        return s
 
 class NetworkModel(object):
     """This class represents a CAN-FIX network.  It contains
@@ -45,21 +60,52 @@ class NetworkModel(object):
        of all the current nodes seen on the network"""
     def __init__(self):
         self.nodes = []
+        self.can = None
     
     def __findNode(self, nodeid):
         """Find and return the node with the given ID"""
         for each in self.nodes:
-            if each.nodeID == nodeID: return each
+            if each.nodeID == nodeid: return each
         return None
 
+    def __addNode(self, nodeid):
+        node = CFNode(nodeid)
+        self.nodes.append(node)
+        p = protocol.NodeSpecific()
+        p.controlCode = 0x00 # Node Id Command
+        p.sendNode = self.can.srcNode
+        p.destNode = nodeid
+        f = p.getFrame()
+        self.can.sendFrame(f)
+        p.controlCode = 0x05 # Node Report Command
+        f = p.getFrame()
+        self.can.sendFrame(f)
+        return node
+    
     def update(self, frame):
         p = protocol.parseFrame(frame)
         if isinstance(p, protocol.Parameter):
-            print "Parameter:", p
+            node = self.__findNode(p.node)
+            if node == None: # Node not in list, add it
+                node = self.__addNode(p.node)
+            assert node
+            node.updateParameter(p)
         elif isinstance(p, protocol.NodeAlarm):
-            print "Node Alarm:", p
+            pass
         elif isinstance(p, protocol.NodeSpecific):
-            print "Node Specific:", p
+            node = self.__findNode(p.sendNode)
+            if node == None:
+                node = self.__addNode(p.sendNode)
+            assert node
+            if p.controlCode == 0: # Node ID
+                node.deviceID = p.data[1]
+                node.version = p.data[2]
+                node.model = p.data[3] | p.data[4]<<8 | p.data[5]<<16
         elif isinstance(p, protocol.TwoWayMsg):
-            print "2 Way Message:", p
+            pass
 
+    def __str__(self):
+        s = ""
+        for each in self.nodes:
+            s += str(each)
+        return s
