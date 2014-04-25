@@ -52,9 +52,13 @@ def getSerialPortList():
 
 class Frame(object):
     """Class represents a CANBus frame"""
-    def __init__(self, id=0, data=[]):
+    def __init__(self, id=0, data=None):
         self.id = id
-        self.data = data
+        if data == None:
+            self.data = []
+        else:
+            self.data = data
+        
     def __str__(self):
         s = hex(self.id)[2:] + ':'
         for each in self.data:
