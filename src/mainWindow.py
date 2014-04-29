@@ -80,11 +80,17 @@ class connectDialog(QDialog, Ui_ConnectDialog):
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+    # Signals
+    sigParameterAdded = pyqtSignal(protocol.Parameter, name="parameterAdded")
+    sigParameterChanged = pyqtSignal(protocol.Parameter, name="parameterChanged")
+            
     def __init__(self, args):
         QMainWindow.__init__(self)
         self.setupUi(self)
         self.network = networkModel.NetworkModel()
         self.data = tableModel.ModelData()
+        self.sigParameterAdded.connect(self.data.parameterAdd)
+        self.sigParameterChanged.connect(self.data.parameterChange)
         self.tableData.setModel(self.data)
         header = self.tableData.horizontalHeader()
         header.setResizeMode(QHeaderView.ResizeToContents)
@@ -122,14 +128,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                         (self.can.adapter.name))
             self.actionConnect.setDisabled(True)
             self.actionDisconnect.setEnabled(True)
-            self.commThread.newFrame.connect(self.updateFrame)
+            #self.commThread.newFrame.connect(self.updateFrame)
             self.commThread.newFrame.connect(self.network.update)
             #We give the network model access to the can connection
             self.network.can = self.can
+            self.network.setCallback("parameterAdded", self.parameterAdded)
+            self.network.setCallback("parameterChanged", self.parameterChanged)
             return True
         else:
             self.statusbar.showMessage("Failed to connect to %s" % config.device)
             return False
+    
+    def parameterAdded(self, parameter):
+        self.sigParameterAdded.emit(parameter)
+    def parameterChanged(self, parameter):
+        self.sigParameterChanged.emit(parameter)
+        
     
     # Called on startup if we have --adapter=xxx in args
     def connect_auto(self, args):

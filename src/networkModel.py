@@ -26,6 +26,7 @@ import time
 import protocol
 import canbus
 import threading
+import devices
 
 
 class CFNode(object):
@@ -42,7 +43,14 @@ class CFNode(object):
     
     def updateParameter(self, par):
         self.updated = time.time()
-    
+        for i,each in enumerate(self.parameters):
+            if each == par:
+                each = par
+                return i # returning the index indicates change
+        else:
+            self.parameters.append(par) #Add new parameter
+            return None
+        
     def __str__(self):
         s = "%s 0x%02X\n" % (self.name, self.nodeID)
         s += "  Device ID %i\n" % (self.deviceID, )
@@ -50,7 +58,7 @@ class CFNode(object):
         s += "  Version %X\n" % self.version
         s += "  Parameters"
         for each in self.parameters:
-            s += "    %s" % each
+            s += "\n    %s" % each
         s += "\n  Last Update " + str(time.time()-self.updated) + "\n"
         return s
 
@@ -61,6 +69,11 @@ class NetworkModel(object):
     def __init__(self):
         self.nodes = []
         self.can = None
+        # Data Update Callback Functions
+        self.parameterAdded = None
+        self.parameterChanged = None
+        self.nodeAdded = None
+        self.nodeChanged = None
     
     def __findNode(self, nodeid):
         """Find and return the node with the given ID"""
@@ -89,7 +102,13 @@ class NetworkModel(object):
             if node == None: # Node not in list, add it
                 node = self.__addNode(p.node)
             assert node
-            node.updateParameter(p)
+            result = node.updateParameter(p)
+            if result != None:
+                if self.parameterChanged:
+                    self.parameterChanged(p)
+            else:
+                if self.parameterAdded:
+                    self.parameterAdded(p)
         elif isinstance(p, protocol.NodeAlarm):
             pass
         elif isinstance(p, protocol.NodeSpecific):
@@ -101,8 +120,22 @@ class NetworkModel(object):
                 node.deviceID = p.data[1]
                 node.version = p.data[2]
                 node.model = p.data[3] | p.data[4]<<8 | p.data[5]<<16
+                device = devices.findDevice(node.deviceID, node.model)
+                if device:
+                    node.name = device.name
         elif isinstance(p, protocol.TwoWayMsg):
             pass
+        
+    def setCallback(self, name, func):
+        if name.lower() == "parameteradded":
+            self.parameterAdded = func
+        elif name.lower() == "parameterchanged":
+            self.parameterChanged = func
+        elif name.lower() == "nodeadded":
+            self.nodeAdded = func
+        elif name.lower() == "nodechanged":
+            self.nodeChanged = func
+ 
 
     def __str__(self):
         s = ""
