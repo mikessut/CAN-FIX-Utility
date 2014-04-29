@@ -6,8 +6,6 @@ Fix issue where more than one Firmware thread can be started from the dialog box
 
 Test Firmware download on real hardware.
 
-Remove simulation adapter and create a simulator that works over a TCP socket and pretends to be a network adapter.
-
 Network Tree View Example...This is what the network monitor tree view should eventually look like.
 
     Airdata Computer
@@ -49,3 +47,8 @@ Separate canbus and protocol modules into packages that can be used in other pro
 I'll probably rename the protocol module canfix but I'll need a new neame for this 
 utility program.
 
+Protocol Help Reference, parameter definitions frame definitions etc.  Basically
+the specification but in a help type format.  Probably HTML viewer of some kind
+with enough smarts to either read the canfix.xml or generated from it.
+
+Online device file and protocol file updates?  Maybe online updates.  Links to online help?

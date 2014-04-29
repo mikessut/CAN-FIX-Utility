@@ -83,6 +83,11 @@ for each in dirlist:
             __getConfiguration(root, newdevice)
             devices.append(newdevice)
             
+def findDevice(device, model):
+    for each in devices:
+        if each.DeviceId == device and each.modelNumber == model:
+            return each
+    return None
 
 if __name__ == "__main__":
     for each in devices:

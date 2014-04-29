@@ -287,6 +287,10 @@ def nodeListConfig(sendthread):
     p.meanValue = 8500
     p.noise = 0.001
     nt.parameters.append(p)
+    p = NodeParameter("static air temperature")
+    p.meanValue = 22
+    p.noise = 0.001
+    nt.parameters.append(p)
     l.append(nt)
     
     nt = NodeThread(40, sendthread.sendQueue, name="System Data Node")
@@ -303,6 +307,59 @@ def nodeListConfig(sendthread):
     p.interval = 10
     p.report()
     nt.parameters.append(p)
+    l.append(nt)
+    
+    nt = NodeThread(0x40, sendthread.sendQueue, name="Engine Data Node")
+    nt.deviceID = 0x40
+    nt.model = 0xABCDEF
+    nt.version = 0x03
+    p = NodeParameter("Cylinder Head Temperature #1")
+    p.index = 0
+    p.meanValue = 190
+    nt.parameters.append(p)
+    p = NodeParameter("Cylinder Head Temperature #1")
+    p.index = 1
+    p.meanValue = 190
+    nt.parameters.append(p)
+    p = NodeParameter("Cylinder Head Temperature #1")
+    p.index = 2
+    p.meanValue = 190
+    nt.parameters.append(p)
+    p = NodeParameter("Cylinder Head Temperature #1")
+    p.index = 3
+    p.meanValue = 190
+    nt.parameters.append(p)
+    p = NodeParameter("Exhaust Gas Temperature #1")
+    p.index = 0
+    p.meanValue = 700
+    nt.parameters.append(p)
+    p = NodeParameter("Exhaust Gas Temperature #1")
+    p.index = 1
+    p.meanValue = 700
+    nt.parameters.append(p)
+    p = NodeParameter("Exhaust Gas Temperature #1")
+    p.index = 2
+    p.meanValue = 700
+    nt.parameters.append(p)
+    p = NodeParameter("Exhaust Gas Temperature #1")
+    p.index = 3
+    p.meanValue = 700
+    nt.parameters.append(p)
+    p = NodeParameter("Oil Temperature #1")
+    p.meanValue = 95
+    nt.parameters.append(p)
+    p = NodeParameter("Oil Pressure #1")
+    p.meanValue = 70
+    nt.parameters.append(p)
+    p = NodeParameter("N1 or Engine RPM #1")
+    p.meanValue = 2450
+    p.noise = 0.001
+    nt.parameters.append(p)
+    p = NodeParameter("Manifold Pressure #1")
+    p.meanValue = 24.50
+    p.noise=0.001
+    nt.parameters.append(p)
+    nt.period = 0.9
     l.append(nt)
     
     return l
