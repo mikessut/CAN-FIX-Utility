@@ -13,15 +13,14 @@ pySerial - For serial port communication to CAN Bus communication adapters.
 PyQt4 - The program will revert to an interactive command line program if
 PyQt4 is not available but the functionality is limited.
 
-The only adapters which are known to work are the Simulation adapter and
+The only adapters which are known to work are the network adapter and
 the CAN-FIX-USB adapter which is the home grown Arduino based adapter that we
 made specifically for doing this kind of work. You can find details on it at...
 
 https://github.com/birkelbach/ArduinoCAN
 
 The EasySync adapter driver is close and could be made to work with minimal
-effort.  The Network adapter will probably just be a TCP based version of the
-CAN-FIX-USB driver.
+effort.
 
 The Data tab on the main screen will show the actual flight data that is
 currently seen on the network.

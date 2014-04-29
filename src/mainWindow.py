@@ -132,18 +132,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.commThread.newFrame.connect(self.network.update)
             #We give the network model access to the can connection
             self.network.can = self.can
-            self.network.setCallback("parameterAdded", self.parameterAdded)
-            self.network.setCallback("parameterChanged", self.parameterChanged)
+            self.network.setCallback("parameterAdded", self.sigParameterAdded.emit)
+            self.network.setCallback("parameterChanged", self.sigParameterChanged.emit)
             return True
         else:
             self.statusbar.showMessage("Failed to connect to %s" % config.device)
             return False
     
-    def parameterAdded(self, parameter):
-        self.sigParameterAdded.emit(parameter)
-    def parameterChanged(self, parameter):
-        self.sigParameterChanged.emit(parameter)
-        
     
     # Called on startup if we have --adapter=xxx in args
     def connect_auto(self, args):
