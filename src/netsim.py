@@ -30,6 +30,7 @@ class StoppableThread(threading.Thread):
     def __init__(self, name):
         super(StoppableThread, self).__init__(name=name)
         self.__stop = threading.Event()
+        self.__enable = threading.Event()
         
     def stop(self):
         if _debug: print "Stopping Thread", self.name
@@ -37,7 +38,16 @@ class StoppableThread(threading.Thread):
         
     def stopped(self):
         return self.__stop.isSet()
+    
+    def enable(self):
+        self.__enable.set()
+    
+    def disable(self):
+        self.__enable.clear()
         
+    def enabled(self):
+        return self.__enable.isSet()
+    
 
 class ServerSendThread(StoppableThread):
     """This thread handles outbound CAN frames to the client"""
@@ -97,8 +107,12 @@ class ServerRecvThread(StoppableThread):
             if _debug: print "Set Bitrate to", command[1:-1]
         elif command[0]=='O': # Open Port
             if _debug: print "Open CAN Connection"
+            for node in self.nodelist:
+                node.enable()
         elif command[0]=='C': # Open Port
             if _debug: print "Close CAN Connection"
+            for node in self.nodelist:
+                node.disable()
         elif command[0]=='E': # Error Request
             if _debug: print "Error Request"
         elif command[0]=='W': # Inbound Frame
@@ -145,8 +159,9 @@ class NodeParameter(protocol.Parameter):
         self.passcount = self.interval
 
 # Node states
-NORMAL = 0x00
-FW_UPDATE = 0x01
+OFF = 0x00
+NORMAL = 0x01
+FW_UPDATE = 0x02
     
 class NodeThread(StoppableThread):
     def __init__(self, nodeID, sendQueue, name=None):
@@ -157,29 +172,33 @@ class NodeThread(StoppableThread):
         self.model = 0x000000
         self.version = 0x00
         self.period = 1.000 # How often we update parameters
-        self.enabled = False
         self.parameters = []
         self.frameQueue = Queue.Queue()
         self.state = NORMAL
 
     def run(self):
         while True:
-            # Process any incoming frames that apply to us
-            # We use the frame queue timeout as the period timing
-            try:
-                frame = self.frameQueue.get(timeout=self.period)
-                self.handleFrame(frame)
-            except Queue.Empty:
-                # When the queue is empty the timeout has expired
+            if self.enabled():
+                # Process any incoming frames that apply to us
+                # We use the frame queue timeout as the period timing
+                try:
+                    frame = self.frameQueue.get(timeout=self.period)
+                    self.handleFrame(frame)
+                except Queue.Empty:
+                    # When the queue is empty the timeout has expired
+                    if self.stopped(): break
+                    # Process all the parameters
+                    for each in self.parameters:
+                        if each.enabled:
+                            each.node = self.nodeID
+                            result = each.process()
+                            if result:
+                                xmit = frameToString(result)
+                                self.sendQueue.put(xmit)
+            else:
+                time.sleep(self.period)
                 if self.stopped(): break
-                # Process all the parameters
-                for each in self.parameters:
-                    if each.enabled:
-                        each.node = self.nodeID
-                        result = each.process()
-                        if result:
-                            xmit = frameToString(result)
-                            self.sendQueue.put(xmit)
+            
         if _debug: print self.name, "Quitting"
         
     def handleFrame(self, frame):
