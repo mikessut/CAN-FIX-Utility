@@ -62,9 +62,17 @@ class FixItem(TreeItem):
         self.children.append(TreeItem("Configuration", self))
         self.updated = time.time()
     
+    def getDeviceItem(self):
+        return self.children[1]
+    deviceItem = property(getDeviceItem)
+    def getModelItem(self):
+        return self.children[2]
+    modelItem = property(getModelItem)
+    def getVersionItem(self):
+        return self.children[3]
+    versionItem = property(getVersionItem)
     def getParameterItem(self):
         return self.children[4]
-    
     parameterItem = property(getParameterItem)
     
     def __cmp__(self, other):
@@ -176,7 +184,7 @@ class NetworkTreeModel(QAbstractItemModel):
             if index.isValid() else self.root
         
     # These functions are for controlling the information in the model    
-    
+    # Most of these are called as slots from the main networkModel
     def findNodeID(self, nodeid):
         """returns the FixItem that has the matching node id"""
         for each in self.root.children:
@@ -184,41 +192,35 @@ class NetworkTreeModel(QAbstractItemModel):
                 return each
         return None
     
-    def updateParameter(self, item, parameter):
-        #TODO deal with index and meta data
+    def nodeAdd(self, nodeid):
+        n = FixItem("Unknown", nodeid, self.root)
+        self.root.children.append(n)
+        self.modelReset.emit()
+    
+    def nodeIdent(self, nodeid, info):
+        item = self.findNodeID(nodeid)
+        item.name = info['name']
+        item.deviceItem.value = info['deviceid']
+        item.modelItem.value = info['model']
+        item.versionItem.value = info['version']
+        #self.dataChanged.emit(self.createIndex(0,0,p), self.createIndex(1,1,p))
+        
+    def parameterAdd(self, parameter):
+        item = self.findNodeID(parameter.node)
+        p = item.parameterItem
+        newp = ParameterItem(parameter.name, parameter.identifier, p)
+        newp.value = parameter.valueStr()
+        if parameter.indexName:
+            newp.indexName = parameter.indexName
+            newp.index = parameter.index
+        p.children.append(newp)
+        #self.dataChanged.emit(self.createIndex(0,0,p), self.createIndex(1,1,p))
+                
+    def parameterChange(self, parameter):
+        item = self.findNodeID(parameter.node)
         p = item.parameterItem
         for i, each in enumerate(p.children):
             if each == parameter:
                 each.value = parameter.valueStr(units=True)
                 self.dataChanged.emit(self.createIndex(i,1,each), self.createIndex(i,1,each))
-                return
-        newp = ParameterItem(parameter.name, parameter.identifier, p)
-        if parameter.indexName:
-            newp.indexName = parameter.indexName
-            newp.index = parameter.index
-        p.children.append(newp)
-    
-    def update(self, frame):
-        """This should be called with a canbus frame each time one is received"""
-        p = protocol.parseFrame(frame)
-        if isinstance(p, protocol.Parameter):
-            item = self.findNodeID(p.node)
-            if item:
-                self.updateParameter(item, p)
-            else:
-                n = FixItem("Unknown", p.node, self.root)
-                self.root.children.append(n)
-                self.updateParameter(n, p)
-                #TODO: emit datachanged instead of reset
-                self.modelReset.emit()
-        elif isinstance(p, protocol.NodeSpecific):
-            if p.controlCode == 0: # Node Identification
-                print "Node ID %i -> %i" % (p.sendNode, p.destNode)
-                item = self.findNodeID(p.sendNode)
-                if item:
-                    item.children[1].value = p.data[1]
-                    self.dataChanged.emit(self.createIndex(0,0,item.children[1]), self.createIndex(len(self.root),1,item.children[1]))
-                
-        else:
-            print "Not recognized"
-        
+

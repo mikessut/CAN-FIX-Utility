@@ -70,10 +70,11 @@ class NetworkModel(object):
         self.nodes = []
         self.can = None
         # Data Update Callback Functions
-        self.parameterAdded = None
-        self.parameterChanged = None
-        self.nodeAdded = None
-        self.nodeChanged = None
+        self.parameterAdded = None   # function(protocol.Parameter)
+        self.parameterChanged = None # function(protocol.Parameter)
+        self.nodeAdded = None        # function(int) - Node ID
+        self.nodeChanged = None      # function(int, int) - Old Node ID, New Node ID
+        self.nodeIdent = None        # function(int, {}) - nodeid, {name, deviceid, model, version}
     
     def __findNode(self, nodeid):
         """Find and return the node with the given ID"""
@@ -81,9 +82,12 @@ class NetworkModel(object):
             if each.nodeID == nodeid: return each
         return None
 
+    
     def __addNode(self, nodeid):
         node = CFNode(nodeid)
         self.nodes.append(node)
+        if self.nodeAdded:
+            self.nodeAdded(nodeid)
         p = protocol.NodeSpecific()
         p.controlCode = 0x00 # Node Id Command
         p.sendNode = self.can.srcNode
@@ -123,6 +127,9 @@ class NetworkModel(object):
                 device = devices.findDevice(node.deviceID, node.model)
                 if device:
                     node.name = device.name
+                if self.nodeIdent:
+                    self.nodeIdent(p.sendNode, {"name":node.name, "deviceid":node.deviceID, 
+                                                "model":node.model, "version":node.version})
         elif isinstance(p, protocol.TwoWayMsg):
             pass
         
@@ -135,6 +142,8 @@ class NetworkModel(object):
             self.nodeAdded = func
         elif name.lower() == "nodechanged":
             self.nodeChanged = func
+        elif name.lower() == "nodeident":
+            self.nodeIdent = func
  
 
     def __str__(self):

@@ -83,11 +83,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # Signals
     sigParameterAdded = pyqtSignal(protocol.Parameter, name="parameterAdded")
     sigParameterChanged = pyqtSignal(protocol.Parameter, name="parameterChanged")
-            
+    sigNodeAdded = pyqtSignal(int, name="nodeAdded")
+    sigNodeIdent = pyqtSignal(int, dict, name="nodeAdded")
+    
     def __init__(self, args):
         QMainWindow.__init__(self)
         self.setupUi(self)
         self.network = networkModel.NetworkModel()
+        
         self.data = tableModel.ModelData()
         self.sigParameterAdded.connect(self.data.parameterAdd)
         self.sigParameterChanged.connect(self.data.parameterChange)
@@ -96,6 +99,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         header.setResizeMode(QHeaderView.ResizeToContents)
         
         self.netView = treeModel.NetworkTreeModel()
+        self.sigNodeAdded.connect(self.netView.nodeAdd)
+        self.sigNodeIdent.connect(self.netView.nodeIdent)
+        self.sigParameterAdded.connect(self.netView.parameterAdd)
+        self.sigParameterChanged.connect(self.netView.parameterChange)
         self.viewNetwork.setModel(self.netView)
         self.viewNetwork.setContextMenuPolicy(Qt.CustomContextMenu)
                 
@@ -132,8 +139,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.commThread.newFrame.connect(self.network.update)
             #We give the network model access to the can connection
             self.network.can = self.can
+            # The network model is generic (not PyQt) so these tie the callbacks to the signals
             self.network.setCallback("parameterAdded", self.sigParameterAdded.emit)
+            self.network.setCallback("nodeIdent", self.sigNodeIdent.emit)
             self.network.setCallback("parameterChanged", self.sigParameterChanged.emit)
+            self.network.setCallback("nodeAdded", self.sigNodeAdded.emit)
             return True
         else:
             self.statusbar.showMessage("Failed to connect to %s" % config.device)
