@@ -238,6 +238,8 @@ class Parameter(object):
             x.append(getValue("UINT", self.data[0:2],1))
             x.append(getValue("USHORT", self.data[2:3], 1))
             x.append(getValue("USHORT", self.data[3:4], 1))
+            for each in x:
+                if each==None: self.__failure=True
         elif '[' in self.type:
             y = self.type.strip(']').split('[')
             if y[0] == 'CHAR':
@@ -247,8 +249,11 @@ class Parameter(object):
                 size = getTypeSize(y[0])
                 for n in range(int(y[1])):
                     x.append(getValue(y[0], self.data[size*n:size*n+size], self.multiplier))
+                for each in x:
+                    if each==None: self.__failure=True
         else:
             x = getValue(self.type, self.data, self.multiplier)
+            if x == None: self.__failure = True
         return x
     
     def pack(self):
@@ -437,6 +442,8 @@ def getValue(datatype, data, multiplier):
         if "CHAR" in datatype:
             return str(data)
         return None
+    except struct.error:
+        return None
         
 def setValue(datatype, value, multiplier=1):
     table = {"SHORT":"<b", "USHORT":"<B", "UINT":"<H",
@@ -621,6 +628,7 @@ if __name__ == "__main__":
         frames.append(canbus.Frame(0x183, [2, 0, 0x10, 0, 0]))
         frames.append(canbus.Frame(0x183, [2, 0, 0x20, 0xD0, 0x7]))
         frames.append(canbus.Frame(0x183, [2, 0, 0x30, 44, 2]))
+        frames.append(canbus.Frame(0x183, [2, 0, 0x30, 44]))
         frames.append(canbus.Frame(0x184, [2, 0, 0, 0xd0, 0x7, 0, 0]))
         frames.append(canbus.Frame(0x184, [2, 0, 0, 0xff, 0xff, 255, 255]))
         frames.append(canbus.Frame(0x102, [3, 0, 0, 0x55, 0xAA]))
