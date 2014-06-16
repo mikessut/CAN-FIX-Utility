@@ -335,7 +335,7 @@
    <slot>trafficStart()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>508</x>
+     <x>507</x>
      <y>471</y>
     </hint>
     <hint type="destinationlabel">
@@ -408,6 +408,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>viewNetwork</sender>
+   <signal>collapsed(QModelIndex)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>networkCollapsed(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>482</x>
+     <y>242</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>484</x>
+     <y>-15</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>connect()</slot>
@@ -420,5 +436,6 @@
   <slot>networkExpanded(QModelIndex)</slot>
   <slot>networkDblClicked(QModelIndex)</slot>
   <slot>networkContextMenu(QPoint)</slot>
+  <slot>networkCollapsed(QModelIndex)</slot>
  </slots>
 </ui>

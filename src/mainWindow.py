@@ -223,13 +223,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.data.edit(index)
     
     def networkClicked(self, index):
-        print index.parent().data().toString() + " " + index.data().toString()
+        pass
+        #print index.parent().data().toString() + " " + index.data().toString()
     
     def networkDblClicked(self, index):
-        print "Edit *", index.data().toString()
+        item = index.internalPointer()
+        if isinstance(item, treeModel.FixItem):
+            print "Edit Node", item.nodeID
+        else:
+            print type(item)
+        #print "Edit *", index.data().toString()
     
     def networkExpanded(self, index):
-        print "Expand ->", index.data().toString()
+        #print "Expand ->", index.data().toString()
+        self.viewNetwork.resizeColumnToContents(0)
+        
+    def networkCollapsed(self, index):
+        #print "Collapse <-", index.data().toString()
+        self.viewNetwork.resizeColumnToContents(0)
         
     def networkContextMenu(self, point):
         self.popMenu.exec_(self.viewNetwork.mapToGlobal(point))  
