@@ -171,6 +171,7 @@ class NodeThread(StoppableThread):
         self.deviceID = 0x00
         self.model = 0x000000
         self.version = 0x00
+        self.FWVCode = 0x00
         self.period = 1.000 # How often we update parameters
         self.parameters = []
         self.frameQueue = Queue.Queue()
@@ -230,36 +231,39 @@ class NodeThread(StoppableThread):
                     if FCode == self.FWVCode:
                         self.FWChannel = frame.data[4]
                         f.data.append(0x00)
-                        #print "Firmware Update Received", hex(FCode), hex(self.FWVCode)
+                        print "Firmware Update Received", hex(FCode), hex(self.FWVCode)
                         self.state = FW_UPDATE
+                    else:
+                        return None # FWCode doesn't match don't send response.
                 self.sendQueue.put(f)
-        #elif self.state == FW_UPDATE: #We're going to emulate AT328 Firmware update
-            #if frame.id == (0x6E0 + self.FWChannel*2):
-                #f = canbus.Frame(0x6E0 + self.FWChannel*2 + 1, frame.data)
-                #if self.fw_length > 0: #Indicates we are writing buffer data
-                    #self.fw_length-=len(frame.data)/2
-                    #if self.fw_length <= 0:
-                        #pass
-                        ##print "No more data"
-                #else: #Waiting for firmware command
-                    #if frame.data[0] == 1: #Write to Buffer command
-                        #self.fw_address = frame.data[2]<<8 | frame.data[1]
-                        #self.fw_length = frame.data[3]
-                        ##print "Buffer Write", self.fw_address, self.fw_length
-                    #elif frame.data[0] == 2: #Erase Page Command
-                        #self.fw_address = frame.data[2]<<8 | frame.data[1]
-                        ##print "Erase Page", self.fw_address
-                    #elif frame.data[0] == 3: #Write to Flash
-                        #self.fw_address = frame.data[2]<<8 | frame.data[1]
-                        ##print "Write Page", self.fw_address
-                    #elif frame.data[0] == 4: #Abort
-                        #print "Abort"
-                    #elif frame.data[0] == 5: #Complete Command
-                        #crc = frame.data[2]<<8 | frame.data[1]
-                        #length = frame.data[4]<<8 | frame.data[3]
-                        ##print "Firmware Load Complete", crc, length
-                        #self.state = NORMAL
-                #return f
+                
+        elif self.state == FW_UPDATE: #We're going to emulate AT328 Firmware update
+            if frame.id == (0x6E0 + self.FWChannel*2):
+                f = canbus.Frame(0x6E0 + self.FWChannel*2 + 1, frame.data)
+                if self.fw_length > 0: #Indicates we are writing buffer data
+                    self.fw_length-=len(frame.data)/2
+                    if self.fw_length <= 0:
+                        pass
+                        #print "No more data"
+                else: #Waiting for firmware command
+                    if frame.data[0] == 1: #Write to Buffer command
+                        self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        self.fw_length = frame.data[3]
+                        #print "Buffer Write", self.fw_address, self.fw_length
+                    elif frame.data[0] == 2: #Erase Page Command
+                        self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        #print "Erase Page", self.fw_address
+                    elif frame.data[0] == 3: #Write to Flash
+                        self.fw_address = frame.data[2]<<8 | frame.data[1]
+                        #print "Write Page", self.fw_address
+                    elif frame.data[0] == 4: #Abort
+                        print "Abort"
+                    elif frame.data[0] == 5: #Complete Command
+                        crc = frame.data[2]<<8 | frame.data[1]
+                        length = frame.data[4]<<8 | frame.data[3]
+                        #print "Firmware Load Complete", crc, length
+                        self.state = NORMAL
+                return f
         return None
 
 class CommandThread(threading.Thread):
