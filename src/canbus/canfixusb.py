@@ -28,6 +28,8 @@ class Adapter():
         self.shortname = "canfixusb"
         self.type = "serial"
         self.ser = None
+        self.sentFrames = 0
+        self.recvFrames = 0
         
     def __readResponse(self, ch):
         s = ""
@@ -89,7 +91,7 @@ class Adapter():
             self.__sendCommand(bitrates[self.bitrate])
             self.open()
         except BusReadError:
-            raise BussInitError("Unable to Initialize CAN Port")
+            raise BusInitError("Unable to Initialize CAN Port")
     
     def disconnect(self):
         self.close()
