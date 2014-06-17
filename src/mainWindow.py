@@ -23,7 +23,7 @@ import sys
 import canbus
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-import protocol
+import canfix
 from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
 import fwDialog
@@ -81,8 +81,8 @@ class connectDialog(QDialog, Ui_ConnectDialog):
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     # Signals
-    sigParameterAdded = pyqtSignal(protocol.Parameter, name="parameterAdded")
-    sigParameterChanged = pyqtSignal(protocol.Parameter, name="parameterChanged")
+    sigParameterAdded = pyqtSignal(canfix.Parameter, name="parameterAdded")
+    sigParameterChanged = pyqtSignal(canfix.Parameter, name="parameterChanged")
     sigNodeAdded = pyqtSignal(int, name="nodeAdded")
     sigNodeIdent = pyqtSignal(int, dict, name="nodeAdded")
     
@@ -216,7 +216,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.checkRaw.isChecked():
             self.textTraffic.appendPlainText(str(frame))
         else:
-            p = protocol.parseFrame(frame)
+            p = canfix.parseFrame(frame)
             self.textTraffic.appendPlainText(str(p))
     
     def dataEdit(self, index):

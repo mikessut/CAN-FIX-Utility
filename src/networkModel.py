@@ -23,7 +23,7 @@
 #  distributed to the parts of the program that need it.
 
 import time
-import protocol
+import canfix
 import canbus
 import threading
 import devices
@@ -70,8 +70,8 @@ class NetworkModel(object):
         self.nodes = []
         self.can = None
         # Data Update Callback Functions
-        self.parameterAdded = None   # function(protocol.Parameter)
-        self.parameterChanged = None # function(protocol.Parameter)
+        self.parameterAdded = None   # function(canfix.Parameter)
+        self.parameterChanged = None # function(canfix.Parameter)
         self.nodeAdded = None        # function(int) - Node ID
         self.nodeChanged = None      # function(int, int) - Old Node ID, New Node ID
         self.nodeIdent = None        # function(int, {}) - nodeid, {name, deviceid, model, version}
@@ -88,7 +88,7 @@ class NetworkModel(object):
         self.nodes.append(node)
         if self.nodeAdded:
             self.nodeAdded(nodeid)
-        p = protocol.NodeSpecific()
+        p = canfix.NodeSpecific()
         p.controlCode = 0x00 # Node Id Command
         p.sendNode = self.can.srcNode
         p.destNode = nodeid
@@ -100,8 +100,8 @@ class NetworkModel(object):
         return node
     
     def update(self, frame):
-        p = protocol.parseFrame(frame)
-        if isinstance(p, protocol.Parameter):
+        p = canfix.parseFrame(frame)
+        if isinstance(p, canfix.Parameter):
             node = self.__findNode(p.node)
             if node == None: # Node not in list, add it
                 node = self.__addNode(p.node)
@@ -113,9 +113,9 @@ class NetworkModel(object):
             else:
                 if self.parameterAdded:
                     self.parameterAdded(p)
-        elif isinstance(p, protocol.NodeAlarm):
+        elif isinstance(p, canfix.NodeAlarm):
             pass
-        elif isinstance(p, protocol.NodeSpecific):
+        elif isinstance(p, canfix.NodeSpecific):
             node = self.__findNode(p.sendNode)
             if node == None:
                 node = self.__addNode(p.sendNode)
@@ -130,7 +130,7 @@ class NetworkModel(object):
                 if self.nodeIdent:
                     self.nodeIdent(p.sendNode, {"name":node.name, "deviceid":node.deviceID, 
                                                 "model":node.model, "version":node.version})
-        elif isinstance(p, protocol.TwoWayMsg):
+        elif isinstance(p, canfix.TwoWayMsg):
             pass
         
     def setCallback(self, name, func):

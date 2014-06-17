@@ -20,7 +20,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import time
-import protocol
 import canbus
 
 #Nodes in the network tree.  Not to be confused with CAN-FIX Nodes

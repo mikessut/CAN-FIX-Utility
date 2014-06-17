@@ -20,7 +20,7 @@
 import canbus
 import config
 import devices
-import protocol
+import canfix
 import firmware
 
 can = None
@@ -76,12 +76,12 @@ def listen(frame_count, raw):
     while True:
         try:
             frame = can.recvFrame()
-            #print str(frame) + protocol.parameters[frame.id].name
-            x = protocol.parseFrame(frame)
+            #print str(frame) + canfix.parameters[frame.id].name
+            x = canfix.parseFrame(frame)
             if raw:
                 print str(frame)
             else:
-                print protocol.Parameter(frame)
+                print canfix.Parameter(frame)
             count+=1
             if frame_count != 0:
                 if count > frame_count: break

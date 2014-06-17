@@ -19,7 +19,7 @@
 
 import socket
 import threading
-import protocol
+import canfix
 import canbus
 import time
 import Queue
@@ -126,7 +126,7 @@ class ServerRecvThread(StoppableThread):
             pass
     
 
-class NodeParameter(protocol.Parameter):
+class NodeParameter(canfix.Parameter):
     def __init__(self, name=None):
         super(NodeParameter, self).__init__()
         self.enabled = True
