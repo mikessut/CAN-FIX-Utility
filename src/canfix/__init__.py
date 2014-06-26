@@ -35,6 +35,7 @@ class NodeAlarm(object):
         self.node = frame.id
         self.alarm = frame.data[0] + frame.data[1]*256
         self.data = frame.data[2:]
+        self.data += [0] * (5-len(self.data)) # Pad data with zeros
     
     def getFrame(self):
         frame = canbus.Frame()
@@ -55,6 +56,7 @@ class Parameter(object):
     """Represents a normal parameter update frame"""
     def __init__(self, frame=None):
         if frame != None:
+            if len(frame.data) < 4: return None
             self.setFrame(frame)
         else:
             self.__failure = False
@@ -463,9 +465,11 @@ def setValue(datatype, value, multiplier=1):
         return None
         
 def parseFrame(frame):
-    """Determine what type of frame is given and return an object
-       that represents what that frame is"""
-    if frame.id < 256:
+    """Determine what type of CAN-FIX frame this is and return an object
+       that represents that frame type properly.  Returns None on error"""
+    if frame.id ==0: # Undefined
+        return None
+    elif frame.id < 256:
         return NodeAlarm(frame)
     elif frame.id < 1760:
         return Parameter(frame)

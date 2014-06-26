@@ -18,15 +18,11 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import canbus
-import canfix
-import tests
-
-def run_tests():
-    tests.run_tests()
 
 if __name__ == "__main__":
     import argparse
+    import canfix
+
     parser = argparse.ArgumentParser(description='CAN-FIX Configuration Utility Protocol Module')
     parser.add_argument('--print-canfix', '-p', action='store_true', help='Print CAN-FIX Protocol Information')
     args = parser.parse_args()
@@ -41,7 +37,8 @@ if __name__ == "__main__":
         for each in canfix.parameters:
             print canfix.parameters[each]
     else:
-        run_tests()
+        import tests
+        tests.run_tests()
 
 
         
