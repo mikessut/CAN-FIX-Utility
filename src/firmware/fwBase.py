@@ -61,6 +61,12 @@ class FirmwareBase:
             self.__statusCallback = status
         else:
             raise TypeError("Argument passed is not a function")
+    
+    def setStopCallback(self, stop):
+        if callable(stop):
+            self.__stopCallback = stop
+        else:
+            raise TypeError("Argument passed is not a function")
         
     def sendStatus(self, status):
         """Function used by this object to test that the callback
@@ -76,6 +82,8 @@ class FirmwareBase:
             
     def stop(self):
         self.kill = True
+        if self.__stopCallback:
+            self.__stopCallback()
         
     # Download support functions
     def __tryChannel(self, ch):

@@ -42,7 +42,10 @@ class Driver(FirmwareBase):
         progress = 0.0
         self.sendStatus("Starting Download to Node " + str(node))
         while True:
-            if self.kill==True: return
+            if self.kill==True: 
+                self.sendProgress(0.0)
+                self.sendStatus("Download Stopped")
+                return
             time.sleep(0.1)
             self.sendProgress(progress)
             progress = progress + 0.01

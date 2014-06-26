@@ -37,6 +37,7 @@ class FirmwareThread(QThread):
         self.node = node
         self.fw.setStatusCallback(self.setStatus)
         self.fw.setProgressCallback(self.setProgress)
+        self.fw.setStopCallback(self.setZeroProgress)
     
     def setStatus(self, status):
         self.status.emit(status)
@@ -44,10 +45,11 @@ class FirmwareThread(QThread):
     def setProgress(self, progress):
         self.progress.emit(progress * 100.0)
         
+    def setZeroProgress(self):
+        self.progress.emit(0.0)
+        
     def run(self):
         self.fw.download(self.node)
-        self.progress.emit(100.0)
-        #self.status.emit("Finished")
 
 
 class dialogFirmware(QDialog, Ui_dialogFirmware):
@@ -85,6 +87,10 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
             self.fwThread.finished.connect(self.fwComplete)
             
             self.fwThread.start()
+            btn.setText("Stop")
+        if x == "Stop":
+            self.fw.stop()
+            btn.setText("Apply")
         if x == "Close":
             self.fw.stop()
                     
