@@ -123,7 +123,11 @@ class Driver(FirmwareBase):
             self.sendProgress(float(block) / float(self.__blocks))
             self.__currentblock = block
             while(self.__fillBuffer(channel, address, data)==False):
-                if self.kill: raise firmware.FirmwareError("Canceled")
+                if self.kill:
+                    self.sendProgress(0.0)
+                    self.sendStatus("Download Stopped")
+                    return
+                    #raise firmware.FirmwareError("Canceled")
             
             # Erase Page
             #print "Erase Page Address =", address

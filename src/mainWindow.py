@@ -197,7 +197,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if not self.connect(): # Try to connect
                 return
         self.commThread.stop()
-        diaFirmware = fwDialog.dialogFirmware(self.can)
+        diaFirmware = fwDialog.dialogFirmware(self.can, self.network)
         x = diaFirmware.exec_()
         self.commThread.start()
         

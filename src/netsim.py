@@ -228,13 +228,15 @@ class NodeThread(StoppableThread):
                     return None
                 elif cmd == 7: # Firmware Update
                     FCode = frame.data[3]<<8 | frame.data[2]
+                    print("Firmware code %X received, %X expected" % (FCode, self.FWVCode))
                     if FCode == self.FWVCode:
                         self.FWChannel = frame.data[4]
                         f.data.append(0x00)
                         print "Firmware Update Received", hex(FCode), hex(self.FWVCode)
                         self.state = FW_UPDATE
                     else:
-                        return None # FWCode doesn't match don't send response.
+                        f.data.append(0x01) # Send Error for FWCode not matching
+                        #return None # FWCode doesn't match don't send response.
                 self.sendQueue.put(f)
                 
         elif self.state == FW_UPDATE: #We're going to emulate AT328 Firmware update
@@ -275,6 +277,8 @@ class CommandThread(threading.Thread):
             s = raw_input('>')
             if s == 'exit':
                 break
+            else:
+                print("Unknownd Command %s" % s)
 
 def stringToFrame(s):
     """Converts a String from the clien to a canbus frame"""
@@ -303,6 +307,7 @@ def nodeListConfig(sendthread):
     nt.deviceID = 179
     nt.model = 0x0A0B0C
     nt.version = 0xEE
+    nt.FWVCode = 0xF722
     p = NodeParameter("indicated airspeed")
     p.meanValue = 180.0
     nt.parameters.append(p)

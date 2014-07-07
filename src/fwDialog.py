@@ -53,13 +53,13 @@ class FirmwareThread(QThread):
 
 
 class dialogFirmware(QDialog, Ui_dialogFirmware):
-    def __init__(self, can):
+    def __init__(self, can, netmodel):
         QDialog.__init__(self)
         self.setupUi(self)
         self.settings = QSettings()
+        # Check config and set the file, node and device to last used
         self.editFile.setText(self.settings.value("firmware/filename").toString())
         self.spinNode.setValue(self.settings.value("firmware/node", 1).toInt()[0])
-        #TODO: Check config and set the file, node and device to last used
         for each in devices.devices:
             self.comboDevice.addItem(each.name)
         self.can = can
