@@ -1,29 +1,46 @@
-Fix issue where more than one Firmware thread can be started from the dialog box.
+Remove canbus and canfix packages and used python-can and python-canfix
 
-Test Firmware download on real hardware.
+Parameters that were disabled would be grayed out.  Node report commands can be
+sent when the node is expanded to get all the information.
 
-Parameters that were disabled would be grayed out.  Node report commands can be sent when the node is expanded to get all the information.
-    
 Node Configuration Dialog
 
 Change background color of data table if data is old and remove if it gets too old.
 
-Add Connection status to the status bar.  Something like a blinking green light or frame counter.
+Add Connection status to the status bar.  Something like a blinking green light
+or frame counter.
 
 Allow multiple devices to be defined in one .xml file?
 
-Fix bitrate selection on Connect Dialog Box
+Fix Connection Dialog box to work with python-can
 
 Add Quality, Failure and Annunciate Flags to Data Table View
 
-Protocol module unit tests.  This thing has a bunch of ways to not work.  Needs testing.
-
-Separate canbus and protocol modules into packages that can be used in other programs.
-I'll probably rename the protocol module canfix but I'll need a new neame for this 
-utility program.
+[Protocol module unit tests.  This thing has a bunch of ways to not work.  Needs
+testing.] Not needed if using python-canfix
 
 Protocol Help Reference, parameter definitions frame definitions etc.  Basically
 the specification but in a help type format.  Probably HTML viewer of some kind
 with enough smarts to either read the canfix.xml or generated from it.
 
-Online device file and protocol file updates?  Maybe online updates.  Links to online help?
+Online device file and protocol file updates?  Maybe online updates.  Links to
+online help?
+
+Put fgfs, netsim and serialtest into one program.  This way the simulations and
+command structure can be together in one app.  It would eliminate a lot of
+duplication of code.
+
+Firmware updating has some problems:
+
+  Test Firmware download on real hardware.
+
+  Need to use the actual FW Code for each device type.  Right now it's hard
+  coded in the __TryChannel function in FirmwwareBase class.  Also the FWDialog
+  should try to figure out what kind of device is at the specified node.  The
+  node  number is given so it should be able to ascertain from the node info and
+  the EDS  files what the device type is.  If none is found then ask...
+
+  Also need to test channel busyness
+
+  There's too much code duplication in the firmware drivers.  They should be
+  dumber and the firmware base class should do more of the work.
