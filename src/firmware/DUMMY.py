@@ -20,9 +20,9 @@
 # This is a fake firmware driver that is just used for testing
 
 from intelhex import IntelHex
-import crc
+from . import crc
 import canbus
-from fwBase import FirmwareBase
+from .fwBase import FirmwareBase
 import time
 
 class Driver(FirmwareBase):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2014 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -20,9 +20,9 @@
 import socket
 import threading
 import canfix
-import canbus
+import can
 import time
-import Queue
+import queue
 import sys
 import random
 
@@ -31,52 +31,52 @@ class StoppableThread(threading.Thread):
         super(StoppableThread, self).__init__(name=name)
         self.__stop = threading.Event()
         self.__enable = threading.Event()
-        
+
     def stop(self):
-        if _debug: print "Stopping Thread", self.name
+        if _debug: print("Stopping Thread", self.name)
         self.__stop.set()
-        
+
     def stopped(self):
         return self.__stop.isSet()
-    
+
     def enable(self):
         self.__enable.set()
-    
+
     def disable(self):
         self.__enable.clear()
-        
+
     def enabled(self):
         return self.__enable.isSet()
-    
+
 
 class ServerSendThread(StoppableThread):
     """This thread handles outbound CAN frames to the client"""
     def __init__(self, socket, name=None):
         super(ServerSendThread, self).__init__(name)
         self.socket = socket
-        self.sendQueue = Queue.Queue()
-    
+        self.sendQueue = queue.Queue()
+
     def run(self):
         while True:
             try:
                 result = self.sendQueue.get(timeout=1.0)
-            except Queue.Empty:
+            except queue.Empty:
                 if self.stopped(): break
             else:
                 if result:
-                   
+
                     if isinstance(result, canbus.Frame):
                         s = frameToString(result)
                     else:
                         s = str(result)
                     if _debug:
-                        print "-> %s" % (s,),
+                        print("-> %s" % (s,), end=' ')
                     self.socket.send(s)
-        
-        if _debug: print "ServerSendThread Quitting"
-    
 
-        
+        if _debug: print("ServerSendThread Quitting")
+
+
+
 class ServerRecvThread(StoppableThread):
     """This thread handles inbound messages from the client"""
     def __init__(self, socket, name):
@@ -84,7 +84,7 @@ class ServerRecvThread(StoppableThread):
         self.socket = socket
         self.nodelist = []
         self.sendQueue = None
-        
+
     def run(self):
         while True:
             try:
@@ -97,24 +97,24 @@ class ServerRecvThread(StoppableThread):
                 for each in clist:
                     self.handleCommand(each)
         self.socket.close()
-        if _debug: print "ServerRecvThread Quitting"
+        if _debug: print("ServerRecvThread Quitting")
 
     def handleCommand(self, command):
         if len(command) <= 0: return
         if _debug:
-            print "<-", command
+            print("<-", command)
         if command[0]=='B': # Bitrate set
-            if _debug: print "Set Bitrate to", command[1:-1]
+            if _debug: print("Set Bitrate to", command[1:-1])
         elif command[0]=='O': # Open Port
-            if _debug: print "Open CAN Connection"
+            if _debug: print("Open CAN Connection")
             for node in self.nodelist:
                 node.enable()
         elif command[0]=='C': # Open Port
-            if _debug: print "Close CAN Connection"
+            if _debug: print("Close CAN Connection")
             for node in self.nodelist:
                 node.disable()
         elif command[0]=='E': # Error Request
-            if _debug: print "Error Request"
+            if _debug: print("Error Request")
         elif command[0]=='W': # Inbound Frame
             # Send the response and put the frame into
             # each nodes inbound frame Queue
@@ -124,7 +124,7 @@ class ServerRecvThread(StoppableThread):
                 each.frameQueue.put(f)
         else:
             pass
-    
+
 
 class NodeParameter(canfix.Parameter):
     def __init__(self, name=None):
@@ -136,7 +136,7 @@ class NodeParameter(canfix.Parameter):
         self.noise = 0.005
         if name:
             self.name = name
-    
+
     def process(self):
         self.passcount += 1
         if self.passcount >= self.interval:
@@ -152,7 +152,7 @@ class NodeParameter(canfix.Parameter):
             else:
                 self.value = self.meanValue + (random.random() - 0.5) *2 * (self.noise * self.meanValue)
             return self.getFrame()
-    
+
     def report(self):
         """Calling this function will make us report
            our information on the next pass"""
@@ -162,7 +162,7 @@ class NodeParameter(canfix.Parameter):
 OFF = 0x00
 NORMAL = 0x01
 FW_UPDATE = 0x02
-    
+
 class NodeThread(StoppableThread):
     def __init__(self, nodeID, sendQueue, name=None):
         super(NodeThread, self).__init__(name)
@@ -174,7 +174,7 @@ class NodeThread(StoppableThread):
         self.FWVCode = 0x00
         self.period = 1.000 # How often we update parameters
         self.parameters = []
-        self.frameQueue = Queue.Queue()
+        self.frameQueue = queue.Queue()
         self.state = NORMAL
 
     def run(self):
@@ -185,7 +185,7 @@ class NodeThread(StoppableThread):
                 try:
                     frame = self.frameQueue.get(timeout=self.period)
                     self.handleFrame(frame)
-                except Queue.Empty:
+                except queue.Empty:
                     # When the queue is empty the timeout has expired
                     if self.stopped(): break
                     # Process all the parameters
@@ -199,9 +199,9 @@ class NodeThread(StoppableThread):
             else:
                 time.sleep(self.period)
                 if self.stopped(): break
-            
-        if _debug: print self.name, "Quitting"
-        
+
+        if _debug: print(self.name, "Quitting")
+
     def handleFrame(self, frame):
         if self.state == NORMAL:
             if frame.id >= 0x700 and frame.data[0] == self.nodeID:
@@ -209,7 +209,7 @@ class NodeThread(StoppableThread):
                 f = canbus.Frame(self.nodeID + 0x700, [frame.id - 0x700, frame.data[1]])
                 cmd = frame.data[1]
                 if cmd == 0: #Node identification
-                    f.data.extend([0x01, self.deviceID & 0xFF, 
+                    f.data.extend([0x01, self.deviceID & 0xFF,
                                    self.version & 0xFF, self.model & 0xFF,
                                    self.model >> 8 & 0xFF, self.model >> 16 & 0xFF])
                 elif cmd == 1: # Bitrate Set Command
@@ -228,17 +228,17 @@ class NodeThread(StoppableThread):
                     return None
                 elif cmd == 7: # Firmware Update
                     FCode = frame.data[3]<<8 | frame.data[2]
-                    print("Firmware code %X received, %X expected" % (FCode, self.FWVCode))
+                    print(("Firmware code %X received, %X expected" % (FCode, self.FWVCode)))
                     if FCode == self.FWVCode:
                         self.FWChannel = frame.data[4]
                         f.data.append(0x00)
-                        print "Firmware Update Received", hex(FCode), hex(self.FWVCode)
+                        print("Firmware Update Received", hex(FCode), hex(self.FWVCode))
                         self.state = FW_UPDATE
                     else:
                         f.data.append(0x01) # Send Error for FWCode not matching
                         #return None # FWCode doesn't match don't send response.
                 self.sendQueue.put(f)
-                
+
         elif self.state == FW_UPDATE: #We're going to emulate AT328 Firmware update
             if frame.id == (0x6E0 + self.FWChannel*2):
                 f = canbus.Frame(0x6E0 + self.FWChannel*2 + 1, frame.data)
@@ -259,7 +259,7 @@ class NodeThread(StoppableThread):
                         self.fw_address = frame.data[2]<<8 | frame.data[1]
                         #print "Write Page", self.fw_address
                     elif frame.data[0] == 4: #Abort
-                        print "Abort"
+                        print("Abort")
                     elif frame.data[0] == 5: #Complete Command
                         crc = frame.data[2]<<8 | frame.data[1]
                         length = frame.data[4]<<8 | frame.data[3]
@@ -271,14 +271,14 @@ class NodeThread(StoppableThread):
 class CommandThread(threading.Thread):
     def __init__(self):
         super(CommandThread, self).__init__()
-        
+
     def run(self):
         while True:
-            s = raw_input('>')
+            s = input('>')
             if s == 'exit':
                 break
             else:
-                print("Unknownd Command %s" % s)
+                print(("Unknownd Command %s" % s))
 
 def stringToFrame(s):
     """Converts a String from the clien to a canbus frame"""
@@ -320,7 +320,7 @@ def nodeListConfig(sendthread):
     p.noise = 0.001
     nt.parameters.append(p)
     l.append(nt)
-    
+
     nt = NodeThread(40, sendthread.sendQueue, name="System Data Node")
     nt.deviceID = 41
     nt.model = 0x0D0E0F
@@ -336,7 +336,7 @@ def nodeListConfig(sendthread):
     p.report()
     nt.parameters.append(p)
     l.append(nt)
-    
+
     nt = NodeThread(0x40, sendthread.sendQueue, name="Engine Data Node")
     nt.deviceID = 0x40
     nt.model = 0xABCDEF
@@ -389,7 +389,7 @@ def nodeListConfig(sendthread):
     nt.parameters.append(p)
     nt.period = 0.9
     l.append(nt)
-    
+
     return l
 
 _debug = False
@@ -406,15 +406,15 @@ if __name__ == "__main__":
         host = "0.0.0.0"
         port = 63349 #NEFIX on keypad
         s.bind((host, port))
-    except socket.error, msg:
-        print "Failed to create socket", msg
+    except socket.error as msg:
+        print("Failed to create socket", msg)
         sys.exit(-1)
 
     s.settimeout(1.0)
     s.listen(5)
     ct = CommandThread()
     ct.start()
-        
+
     while True:
         try:
             c, addr = s.accept()
@@ -427,7 +427,7 @@ if __name__ == "__main__":
                 break
         else:
             c.settimeout(1.0)
-            if _debug: print 'got connection from', addr
+            if _debug: print('got connection from', addr)
             st = ServerSendThread(c, name="Send Thread")
             rt = ServerRecvThread(c, name="Receive Thread")
             nodelist = nodeListConfig(st)

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2012 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,11 @@ import glob
 import os
 import platform
 
+try:
+    import configparser
+except:
+    import ConfigParser as configparser
+
 # The DataPath is the location of our XML device definition and
 # protocol definition files.  It is simply a string of the absolute
 # path to the data directory.
@@ -38,21 +43,41 @@ DataPath = os.path.dirname(os.path.dirname(__file__)) + "/data/"
 # module will test each one to see if it really is a serial port.
 portlist = []
 
-system_name = platform.system()
-if system_name == "Windows":
-    # Scan for available ports.
-    for i in range(256):
-        available.append(i)
-elif system_name == "Darwin":
-    # Mac
-    portlist.extend(glob.glob('/dev/tty*'))
-    portlist.extend(glob.glob('/dev/cu*'))
-else:
-    # Assume Linux or something else
-    portlist.extend(glob.glob('/dev/ttyACM*'))
-    portlist.extend(glob.glob('/dev/ttyUSB*'))
-    portlist.extend(glob.glob('/dev/ttyS*'))
-# Example for manually adding device names.    
-#portlist.append('/dev/ttyXYZ123456789')
+interface = None
+channel = None
+bitrate = None
+node = None
 
+def initialize(file):
+    global config
+    global interface
+    global channel
+    
+    config = configparser.RawConfigParser()
 
+    print(file)
+
+    config.read(file)
+
+    interface = config.get("can", "interface")
+    channel = config.get("can", "channel")
+    #br = config.get("can", "bitrate")
+    #if br: bitrate = br
+    node = int(config.get("can", "node"))
+
+    system_name = platform.system()
+    if system_name == "Windows":
+        # Scan for available ports.
+        for i in range(256):
+            available.append(i)
+    elif system_name == "Darwin":
+        # Mac
+        portlist.extend(glob.glob('/dev/tty*'))
+        portlist.extend(glob.glob('/dev/cu*'))
+    else:
+        # Assume Linux or something else
+        portlist.extend(glob.glob('/dev/ttyACM*'))
+        portlist.extend(glob.glob('/dev/ttyUSB*'))
+        portlist.extend(glob.glob('/dev/ttyS*'))
+    # Example for manually adding device names.
+    #portlist.append('/dev/ttyXYZ123456789')

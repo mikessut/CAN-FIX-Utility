@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2012 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import canbus
+import can
 import string
 import argparse
 
@@ -28,10 +28,10 @@ class FirmwareError(Exception):
 
 def Firmware(driver, filename, can):
     if driver == "AT328":
-        import AT328
+        from . import AT328
         return AT328.Driver(filename, can)
     elif driver == "DUMMY":
-        import DUMMY
+        from . import DUMMY
         return DUMMY.Driver(filename, can)
     else:
         raise FirmwareError("No such device")
@@ -58,6 +58,6 @@ def config():
 #***** MAIN ROUTINE *****
 def main():
     exit()
-       
+
 if __name__ == '__main__':
     main()

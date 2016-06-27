@@ -36,7 +36,7 @@ class Simulator():
         """This function works just like serial.write() except that it
            will print the data if --verbose was set"""
         if self.verbose:
-            print ">", ch
+            print(">", ch)
         self.ser.write(ch)
         
     def recv(self):
@@ -44,7 +44,7 @@ class Simulator():
            will print the data if --verbose was set"""
         ch = self.ser.read()
         if self.verbose:
-            print "<", ch
+            print("<", ch)
         return ch
  
     def start(self):
@@ -69,7 +69,7 @@ class Simulator():
                     self.send('c\n')
                 elif s[0] == 'W':
                     self.send('w\n')
-                print s,
+                print(s, end=' ')
                 s = ""
     
     def respond(self, data=""):

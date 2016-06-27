@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2012 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -17,40 +17,77 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#import sys
-import serial
-import serial.tools.list_ports
-import canbus
+# This module represents a generic CAN Bus connection.  One CAN connection
+# is made on the backend and it is shared among all parts of the program
+# that need a 'dedicated' connection.  Similar to the loopback in socketcan
+
+import threading
+import can
+try:
+    import queue
+except:
+    import Queue as queue
+
+_connections = []
+_bus = None
+_busLock = threading.Lock()
+_recvThread = None
 
 class Connection:
     """Represent a generic connection to a CANBus network"""
     def __init__(self):
-        self.connectCallback = None
-        self.portdef = {}
-        
-    def connect(self, portname):
-        try:
-            self.ser = serial.Serial(portname, 115200, timeout=1)
-            self.ser.write('V\r')
-            version = self.ser.read(5)
-        except:
-            return None
-        if version:
-            self.portdef["Version"] = version
-            self.portdef["Port"] = self.ser.name
-            self.portdef["Baudrate"] = self.ser.baudrate
-            return self.portdef
-        else:
-            return None
-        
-    def disconnect(self):
-       self.ser.close()
-       self.portdef = {}
-       
-    def getPortList(self):
-        """Return a list of available ports"""
-        self.portList = serial.tools.list_ports.comports()
-        list = []
-        for each in self.portList:
-           list.append(each[0])
-        return list
+        self.recvQueue = queue.Queue()
+
+    def send(self, msg):
+        sendMsg(msg)
+
+    def recv(self, block = True, timeout = None):
+        return self.recvQueue.get(block, timeout = timeout)
+
+
+class RecvThread(threading.Thread):
+    def __init__(self):
+        super(RecvThread, self).__init__()
+        self.getout = False
+
+    def run(self):
+        while self.getout == False:
+            msg = _bus.recv(timeout = 1.0)
+            if msg:
+                #print(msg)
+                for each in _connections:
+                    each.recvQueue.put(msg)
+
+    def stop(self):
+        self.getout = True
+
+
+def sendMsg(msg):
+    with _buslock:
+        _bus.send(msg)
+
+def initialize(interface, channel, **kwargs):
+    global _bus
+    global _recvThread
+    _bus = can.interface.Bus(channel, bustype = interface, **kwargs)
+    _recvThread = RecvThread()
+    _recvThread.start()
+
+
+def stop():
+    _recvThread.stop()
+    if _recvThread.is_alive():
+        _recvThread.join(1.0)
+    #if _recvThread.is_alive():
+    #    raise plugin.PluginFail
+    _bus.shutdown()
+    _connections = []
+
+
+def connect():
+    conn = Connection()
+    _connections.append(conn)
+    return conn
+
+def disconnect(conn):
+    _connections.remove(conn)

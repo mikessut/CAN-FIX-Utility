@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2012 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -19,24 +19,18 @@
 
 import config
 import argparse
-import canbus
-import mainCommand
-
-Have_PyQt = True
-try:
-    from PyQt4.QtGui import *
-except ImportError:
-    Have_PyQt = False
+import logging
+import logging.config
 
 parser = argparse.ArgumentParser(description='CAN-FIX Configuration Utility Program')
 parser.add_argument('--interactive', '-i', action='store_true', help='Run in interactive mode')
-l=[]
-for each in canbus.adapterList:
-    l.append(each.shortname)
-parser.add_argument('--adapter', choices=l, help='CANBus Connection Adapter Name')
+l=['socketcan', 'serial', 'kvaser', 'pcan', 'usb2can']
+# for each in canbus.adapterList:
+#     l.append(each.shortname)
+parser.add_argument('--interface', choices=l, help='CANBus Connection Interface Name')
+parser.add_argument('--channel', help='CANBus Channel or Device file')
 parser.add_argument('--bitrate', default=125, type=int, help='CANBus Bitrate')
-parser.add_argument('--serial-port', help='CANBus Adapter Serial Port Device Name')
-parser.add_argument('--ip-address', help='CANBus Network Adapter IP Address')
+#parser.add_argument('--ip-address', help='CANBus Network Adapter IP Address')
 parser.add_argument('--firmware-file', help='Firmware filename')
 parser.add_argument('--firmware-node', type=int, help='Node number to use in firmware download')
 parser.add_argument('--device', help='CANFIX Device Name')
@@ -45,11 +39,36 @@ parser.add_argument('--list-devices', action='store_true', help='List all known 
 parser.add_argument('--listen', action='store_true', help='Listen on the CANBus network and print to STDOUT')
 parser.add_argument('--frame-count', type=int, default=0, help='Number of frames to print before exiting')
 parser.add_argument('--raw', action='store_true', help='Display raw frames')
+parser.add_argument('--config-file', type=argparse.FileType('r'),
+                        help='Alternate configuration file')
+parser.add_argument('--log-config', type=argparse.FileType('w'),
+                        help='Alternate logger configuration file')
+
 
 args = parser.parse_args()
 
-mainCommand.run(args)
+config_file = args.config_file if args.config_file else 'config/main.ini'
+log_config_file = args.log_config if args.log_config else config_file
 
-if Have_PyQt==True and args.interactive == False:
+config.initialize(config_file)
+
+# Initialize Logger
+logging.config.fileConfig(log_config_file)
+log = logging.getLogger()
+
+# Now we start doing our job
+import mainCommand
+import connection
+
+connection.initialize(config.interface, config.channel)
+mainCommand.run(args)
+connection.stop()
+
+if args.interactive == False:
+    try:
+        from PyQt4.QtGui import *
+    except ImportError:
+        log.error("PyQt Not Found")
+
     import mainWindow
     mainWindow.run(args)

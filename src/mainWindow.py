@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2012 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -38,11 +38,11 @@ class CommThread(QThread):
     newFrame = pyqtSignal(canbus.Frame)
     # .. The other with a formatted string.
     newFrameString = pyqtSignal('QString')
-    
+
     def __init__(self, can):
         QThread.__init__(self)
         self.can = can
-        
+
     def run(self):
         self.getout = False
         while True:
@@ -56,7 +56,7 @@ class CommThread(QThread):
             finally:
                 if self.getout:
                     break
-                        
+
     def stop(self):
         self.getout = True
 
@@ -69,14 +69,14 @@ class connectDialog(QDialog, Ui_ConnectDialog):
             self.comboPort.addItem(each)
         for each in canbus.adapterList:
             self.comboAdapter.addItem(each.name)
-            
+
     def adapterChange(self, x):
         if canbus.adapterList[x].type == "serial":
             self.stackConfig.setCurrentIndex(0)
         elif canbus.adapterList[x].type == "network":
             self.stackConfig.setCurrentIndex(1)
         else:
-            self.stackConfig.setCurrentIndex(2)        
+            self.stackConfig.setCurrentIndex(2)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -85,19 +85,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     sigParameterChanged = pyqtSignal(canfix.Parameter, name="parameterChanged")
     sigNodeAdded = pyqtSignal(int, name="nodeAdded")
     sigNodeIdent = pyqtSignal(int, dict, name="nodeAdded")
-    
+
     def __init__(self, args):
         QMainWindow.__init__(self)
         self.setupUi(self)
         self.network = networkModel.NetworkModel()
-        
+
         self.data = tableModel.ModelData()
         self.sigParameterAdded.connect(self.data.parameterAdd)
         self.sigParameterChanged.connect(self.data.parameterChange)
         self.tableData.setModel(self.data)
         header = self.tableData.horizontalHeader()
         header.setResizeMode(QHeaderView.ResizeToContents)
-        
+
         self.netView = treeModel.NetworkTreeModel()
         self.sigNodeAdded.connect(self.netView.nodeAdd)
         self.sigNodeIdent.connect(self.netView.nodeIdent)
@@ -105,33 +105,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.sigParameterChanged.connect(self.netView.parameterChange)
         self.viewNetwork.setModel(self.netView)
         self.viewNetwork.setContextMenuPolicy(Qt.CustomContextMenu)
-                
+
         self.textTraffic.setReadOnly(True)
-        
+
         actionStatus = QAction('Status', self)
         actionConfigure = QAction('Configure', self)
         actionEnable = QAction('Enable', self)
         actionDisable = QAction('Disable', self)
         actionFirmware = QAction('Firmware', self)
-        
+
         self.popMenu = QMenu(self)
         self.popMenu.addAction(actionConfigure)
         self.popMenu.addAction(actionEnable)
         self.popMenu.addAction(actionDisable)
         self.popMenu.addSeparator()
         self.popMenu.addAction(actionStatus)
-        
+
         self.commThread = None
         if args.adapter:
             self.connect_auto(args)
-        
+
     # Generic Connection Function
     def __connect(self):
         self.can.connect()
         if self.can:
             self.commThread = CommThread(self.can)
             self.commThread.start()
-            self.statusbar.showMessage("Connected to %s" % 
+            self.statusbar.showMessage("Connected to %s" %
                                         (self.can.adapter.name))
             self.actionConnect.setDisabled(True)
             self.actionDisconnect.setEnabled(True)
@@ -148,8 +148,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.statusbar.showMessage("Failed to connect to %s" % config.device)
             return False
-    
-    
+
+
     # Called on startup if we have --adapter=xxx in args
     def connect_auto(self, args):
         self.can = canbus.Connection(args.adapter)
@@ -160,7 +160,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if args.serial_port:
             self.can.devcie = args.serial_port
         return self.__connect()
-    
+
     # GUI connect function
     def connect(self):
         connectDia = connectDialog()
@@ -177,16 +177,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return self.__connect()
         else:
             return False
-    
+
     def disconnect(self):
         if self.commThread:
-            self.commThread.stop() 
+            self.commThread.stop()
             self.commThread.wait()
         self.can.disconnect()
         self.commThread = None
         self.actionConnect.setEnabled(True)
         self.actionDisconnect.setDisabled(True)
-    
+
     def loadFirmware(self):
         if not self.commThread or not self.commThread.isRunning():
             qm = QMessageBox()
@@ -200,7 +200,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         diaFirmware = fwDialog.dialogFirmware(self.can, self.network)
         x = diaFirmware.exec_()
         self.commThread.start()
-        
+
     def updateFrame(self, frame):
         tab = self.tabWidget.currentIndex()
         if tab == 0: #Network Tree View
@@ -211,40 +211,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif tab == 3: #PFD
             #PFD Update
             pass
-        
+
     def trafficFrame(self, frame):
         if self.checkRaw.isChecked():
             self.textTraffic.appendPlainText(str(frame))
         else:
             p = canfix.parseFrame(frame)
             self.textTraffic.appendPlainText(str(p))
-    
+
     def dataEdit(self, index):
         self.data.edit(index)
-    
+
     def networkClicked(self, index):
         pass
         #print index.parent().data().toString() + " " + index.data().toString()
-    
+
     def networkDblClicked(self, index):
         item = index.internalPointer()
         if isinstance(item, treeModel.FixItem):
-            print "Edit Node", item.nodeID
+            print("Edit Node", item.nodeID)
         else:
-            print type(item)
+            print(type(item))
         #print "Edit *", index.data().toString()
-    
+
     def networkExpanded(self, index):
         #print "Expand ->", index.data().toString()
         self.viewNetwork.resizeColumnToContents(0)
-        
+
     def networkCollapsed(self, index):
         #print "Collapse <-", index.data().toString()
         self.viewNetwork.resizeColumnToContents(0)
-        
+
     def networkContextMenu(self, point):
-        self.popMenu.exec_(self.viewNetwork.mapToGlobal(point))  
-        
+        self.popMenu.exec_(self.viewNetwork.mapToGlobal(point))
+
     def trafficStart(self):
         self.commThread.newFrame.connect(self.trafficFrame)
         self.buttonStart.setDisabled(True)
@@ -258,7 +258,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 def getout():
     global mWindow
-    
+
     MainWindow.disconnect(mWindow)
 
 def run(args):
@@ -271,8 +271,8 @@ def run(args):
     mWindow.show()
     result = app.exec_()
     # DEBUG Only
-    print mWindow.network
+    print(mWindow.network)
     sys.exit(result)
-    
+
 if __name__ == "__main__":
     run()

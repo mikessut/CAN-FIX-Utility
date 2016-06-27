@@ -18,6 +18,7 @@
 import canbus
 import time
 import firmware
+import collections
 
 class Channels():
     """A Class to keep up with free CANFIX Channels"""
@@ -51,19 +52,19 @@ class FirmwareBase:
         self.__progressCallback = None
         
     def setProgressCallback(self, progress):
-        if callable(progress):
+        if isinstance(progress, collections.Callable):
             self.__progressCallback = progress
         else:
             raise TypeError("Argument passed is not a function")
         
     def setStatusCallback(self, status):
-        if callable(status):
+        if isinstance(status, collections.Callable):
             self.__statusCallback = status
         else:
             raise TypeError("Argument passed is not a function")
     
     def setStopCallback(self, stop):
-        if callable(stop):
+        if isinstance(stop, collections.Callable):
             self.__stopCallback = stop
         else:
             raise TypeError("Argument passed is not a function")

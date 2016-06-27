@@ -18,10 +18,10 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from intelhex import IntelHex
-import crc
+from . import crc
 import canbus
 import time
-from fwBase import FirmwareBase
+from .fwBase import FirmwareBase
 import firmware
 
 class Driver(FirmwareBase):

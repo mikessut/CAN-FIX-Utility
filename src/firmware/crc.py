@@ -70,7 +70,7 @@ class crc16:
 
 
 if __name__ == '__main__':
-    buffer = range(64)
+    buffer = list(range(64))
 
     crc = crc16()
 
@@ -78,5 +78,5 @@ if __name__ == '__main__':
         crc.addByte(each)
 
     result = crc.getResult()
-    print result
-    print hex(result)
+    print(result)
+    print(hex(result))

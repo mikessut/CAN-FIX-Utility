@@ -43,7 +43,7 @@ def __getFirmWare(element, device):
             code = root.attrib['code']
             driver = root.attrib['driver']
         except KeyError as key:
-            print "Unable to find Firmware Code or Driver for", device.name
+            print("Unable to find Firmware Code or Driver for", device.name)
         else:
             device.fwUpdateCode = int(code, 0)
             device.fwDriver = driver
@@ -61,21 +61,21 @@ def __getConfiguration(element, device):
 devices = []
 
 dirlist = os.listdir(config.DataPath + "devices")
-print "Loading Devices"
+print("Loading Devices")
 
 for each in dirlist:
     if each[-4:] == ".xml":
         tree = ET.parse(config.DataPath + "devices/" + each)
         root = tree.getroot()
         if root.tag != "device":
-            print "No device defined in", each
+            print("No device defined in", each)
             continue
         try:
             name = root.attrib['name']
             did = root.attrib['id']
             model = root.attrib['model']
         except KeyError as key:
-            print "Unable to find %s in %s" % (key, each)
+            print("Unable to find %s in %s" % (key, each))
         else:
             newdevice = Device(name, did, model)
             __getFirmWare(root, newdevice)
@@ -91,8 +91,8 @@ def findDevice(device, model):
 
 if __name__ == "__main__":
     for each in devices:
-        print each.name, each.DeviceId, each.modelNumber
-        print "  FW Code =", each.fwUpdateCode
-        print "  FW Driver = ", each.fwDriver
-        print "  Parameters = ", each.parameters
+        print(each.name, each.DeviceId, each.modelNumber)
+        print("  FW Code =", each.fwUpdateCode)
+        print("  FW Driver = ", each.fwDriver)
+        print("  Parameters = ", each.parameters)
             

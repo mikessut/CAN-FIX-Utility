@@ -113,9 +113,9 @@ class ParameterItem(TreeItem):
 # Debug print routine.
 def TreePrint(node, depth=0):
     for i in range(depth):
-        print "",
+        print("", end=' ')
     #print node, "<-", node.parent
-    print node, node.value
+    print(node, node.value)
     if node.children:
         for each in node.children:
             TreePrint(each, depth+1)    

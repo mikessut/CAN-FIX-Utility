@@ -28,14 +28,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     if args.print_canfix == True:
-        print "CANFIX Protocol Version " + canfix.version
-        print "Groups:"
+        print("CANFIX Protocol Version " + canfix.version)
+        print("Groups:")
         for each in canfix.groups:
-            print "  %s %d-%d" % (each["name"], each["startid"], each["endid"])
+            print("  %s %d-%d" % (each["name"], each["startid"], each["endid"]))
         
-        print "Parameters:"
+        print("Parameters:")
         for each in canfix.parameters:
-            print canfix.parameters[each]
+            print(canfix.parameters[each])
     else:
         import tests
         tests.run_tests()

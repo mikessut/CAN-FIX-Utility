@@ -78,7 +78,7 @@ class ModelData(QAbstractTableModel):
         return QVariant()
     
     def edit(self, index):
-        print "Edit Data Row %d" % index.row()
+        print("Edit Data Row %d" % index.row())
 
     def parameterAdd(self, p):
         ident = p.identifier*16 + p.index
