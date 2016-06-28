@@ -20,7 +20,9 @@
 import config
 import devices
 import sys
-import canbus
+import os
+import can
+import connection
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import canfix
@@ -35,22 +37,22 @@ import tableModel
 class CommThread(QThread):
     """Thread to handle the communication for the UI"""
     # We emit two signals.  One with the raw frame ...
-    newFrame = pyqtSignal(canbus.Frame)
+    newMessage = pyqtSignal(can.Message)
     # .. The other with a formatted string.
-    newFrameString = pyqtSignal('QString')
+    newMessageString = pyqtSignal('QString')
 
-    def __init__(self, can):
+    def __init__(self, conn):
         QThread.__init__(self)
-        self.can = can
+        self.conn = conn
 
     def run(self):
         self.getout = False
         while True:
             try:
-                frame = self.can.recvFrame()
+                msg = self.conn.recv()
                 #emit the signals
-                self.newFrame.emit(frame)
-                self.newFrameString.emit(str(frame))
+                self.newMessage.emit(msg)
+                self.newMessageString.emit(str(msg))
             except canbus.exceptions.DeviceTimeout:
                 pass
             finally:
@@ -64,19 +66,19 @@ class connectDialog(QDialog, Ui_ConnectDialog):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
-        ports = canbus.getSerialPortList()
-        for each in ports:
-            self.comboPort.addItem(each)
-        for each in canbus.adapterList:
-            self.comboAdapter.addItem(each.name)
+        for each in connection.valid_interfaces:
+            self.comboAdapter.addItem(each)
 
-    def adapterChange(self, x):
-        if canbus.adapterList[x].type == "serial":
-            self.stackConfig.setCurrentIndex(0)
-        elif canbus.adapterList[x].type == "network":
-            self.stackConfig.setCurrentIndex(1)
+
+    def interfaceChange(self, x):
+        interface = connection.valid_interfaces[x]
+        self.comboChannel.clear()
+        for each in connection.get_available_channels(interface):
+            self.comboChannel.addItem(each)
+        if interface in ['serial', 'usb2can']:
+            self.groupBitrate.setEnabled(True)
         else:
-            self.stackConfig.setCurrentIndex(2)
+            self.groupBitrate.setEnabled(False)
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -122,23 +124,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.popMenu.addAction(actionStatus)
 
         self.commThread = None
-        if args.adapter:
-            self.connect_auto(args)
+        if config.auto_connect:
+            self.connect_auto()
 
     # Generic Connection Function
     def __connect(self):
-        self.can.connect()
-        if self.can:
-            self.commThread = CommThread(self.can)
+        connection.initialize(str(self.interface), str(self.channel))
+        self.conn = connection.connect()
+        if self.conn:
+            self.commThread = CommThread(self.conn)
             self.commThread.start()
             self.statusbar.showMessage("Connected to %s" %
-                                        (self.can.adapter.name))
+                                        (self.interface))
             self.actionConnect.setDisabled(True)
             self.actionDisconnect.setEnabled(True)
             #self.commThread.newFrame.connect(self.updateFrame)
-            self.commThread.newFrame.connect(self.network.update)
+            self.commThread.newMessage.connect(self.network.update)
             #We give the network model access to the can connection
-            self.network.can = self.can
+            self.network.conn = self.conn
             # The network model is generic (not PyQt) so these tie the callbacks to the signals
             self.network.setCallback("parameterAdded", self.sigParameterAdded.emit)
             self.network.setCallback("nodeIdent", self.sigNodeIdent.emit)
@@ -150,30 +153,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return False
 
 
-    # Called on startup if we have --adapter=xxx in args
-    def connect_auto(self, args):
-        self.can = canbus.Connection(args.adapter)
-        if args.bitrate:
-            self.can.bitrate = args.bitrate
-        if args.ip_address:
-            self.can.ipadress = args.ip_address
-        if args.serial_port:
-            self.can.devcie = args.serial_port
+    # Called on startup if we have --interface=xxx in args
+    def connect_auto(self):
+        self.interface = config.interface
+        self.channel = config.channel
+        self.bitrate = config.bitrate
         return self.__connect()
 
     # GUI connect function
     def connect(self):
+        # TODO setup with existing configuration
         connectDia = connectDialog()
         x = connectDia.exec_()
         if x:
-            config = canbus.Config()
+            #config = canbus.Config()
             index = connectDia.comboAdapter.currentIndex()
-            self.statusbar.showMessage("Connecting to %s" % canbus.adapterList[index].name)
-            self.can = canbus.Connection(canbus.adapterList[index].shortname)
-            self.can.device = str(connectDia.comboPort.currentText())
-            self.can.ipaddress = str(connectDia.editAddress.text())
-            self.can.bitrate = 125 #TODO Change this to actually work
-            self.can.timeout = 0.25
+            self.interface = connection.valid_interfaces[index]
+            self.channel = connectDia.comboChannel.currentText()
+            self.bitrate = 125 #TODO Change this to actually work
+            self.statusbar.showMessage("Connecting to {}".format(self.interface))
+            #self.conn = connection.connect()
+            #self.can.device = str(connectDia.comboPort.currentText())
+            #self.can.ipaddress = str(connectDia.editAddress.text())
+            #self.can.timeout = 0.25
             return self.__connect()
         else:
             return False
@@ -182,7 +184,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.commThread:
             self.commThread.stop()
             self.commThread.wait()
-        self.can.disconnect()
+        if self.conn:
+            connection.disconnect(self.conn)
+            self.conn = None
         self.commThread = None
         self.actionConnect.setEnabled(True)
         self.actionDisconnect.setDisabled(True)
@@ -212,11 +216,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             #PFD Update
             pass
 
-    def trafficFrame(self, frame):
+    def trafficFrame(self, msg):
         if self.checkRaw.isChecked():
-            self.textTraffic.appendPlainText(str(frame))
+            self.textTraffic.appendPlainText(str(msg))
         else:
-            p = canfix.parseFrame(frame)
+            p = canfix.parseMessage(msg)
             self.textTraffic.appendPlainText(str(p))
 
     def dataEdit(self, index):
@@ -246,12 +250,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.popMenu.exec_(self.viewNetwork.mapToGlobal(point))
 
     def trafficStart(self):
-        self.commThread.newFrame.connect(self.trafficFrame)
+        self.commThread.newMessage.connect(self.trafficFrame)
         self.buttonStart.setDisabled(True)
         self.buttonStop.setEnabled(True)
 
     def trafficStop(self):
-        self.commThread.newFrame.disconnect(self.trafficFrame)
+        self.commThread.newMessage.disconnect(self.trafficFrame)
         self.buttonStop.setDisabled(True)
         self.buttonStart.setEnabled(True)
 
@@ -271,8 +275,8 @@ def run(args):
     mWindow.show()
     result = app.exec_()
     # DEBUG Only
-    print(mWindow.network)
-    sys.exit(result)
+    #print(mWindow.network)
+    os._exit(result)
 
 if __name__ == "__main__":
     run()

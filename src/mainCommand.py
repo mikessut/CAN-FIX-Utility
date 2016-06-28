@@ -26,27 +26,6 @@ import devices
 import canfix
 
 
-# def connect(args):
-#     global can
-#
-#     if can == None:
-#         print("Connect()")
-#         a = get_adapter(args)
-#         can = canbus.Connection(a)
-#         if args.ip_address:
-#             can.ipaddress = args.ip_address
-#         if args.serial_port:
-#             can.device = args.serial_port
-#         can.bitrate = int(args.bitrate)
-#         can.connect()
-#
-# def disconnect():
-#     global can
-#
-#     if can != None:
-#         can.disconnect()
-#         can = None
-
 def list_devices():
     print("Device Name [Device ID]")
     print("-----------------------")
@@ -81,7 +60,7 @@ def fwstatus(status):
     print(status)
 
 def load_firmware(conn, filename, node):
-    m = can.Message(arbitration_id=0x700, [node, 0])
+    m = can.Message(arbitration_id=0x700, data=[node, 0])
     conn.send(m)
     while True:
         try:

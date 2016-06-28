@@ -21,6 +21,7 @@
 # is made on the backend and it is shared among all parts of the program
 # that need a 'dedicated' connection.  Similar to the loopback in socketcan
 
+import config
 import threading
 import can
 try:
@@ -32,6 +33,20 @@ _connections = []
 _bus = None
 _busLock = threading.Lock()
 _recvThread = None
+
+valid_interfaces = sorted(can.interface.VALID_INTERFACES)
+print(valid_interfaces)
+
+def get_available_channels(interface):
+    if interface == "serial":
+        return config.portlist
+    elif "socketcan" in interface:
+        return config.config.get("can", "socketcan_channels").split(',')
+    elif interface == "kvaser":
+        return config.config.get("can", "kvaser_channels").split(',')
+    elif interface == "pcan":
+        return config.config.get("can", "pcan_channels").split(',')
+
 
 class Connection:
     """Represent a generic connection to a CANBus network"""
@@ -63,7 +78,9 @@ class RecvThread(threading.Thread):
 
 
 def sendMsg(msg):
-    with _buslock:
+    global _busLock
+    global _bus
+    with _busLock:
         _bus.send(msg)
 
 def initialize(interface, channel, **kwargs):

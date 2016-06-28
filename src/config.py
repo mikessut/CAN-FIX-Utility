@@ -23,7 +23,6 @@
 import glob
 import os
 import platform
-
 try:
     import configparser
 except:
@@ -35,6 +34,36 @@ except:
 DataPath = os.path.dirname(os.path.dirname(__file__)) + "/data/"
 #DataPath = "/home/someuser/CANFIX/Utility/data/"
 
+
+interface = None
+channel = None
+bitrate = None
+node = None
+
+def initialize(file, args):
+    global config
+    global interface
+    global channel
+    global bitrate
+    global node
+    global auto_connect
+    global valid_interfaces
+
+    config = configparser.RawConfigParser()
+    config.read(file)
+    # TODO Deal with command line arguments here
+    # Read CAN connection related data
+    interface = config.get("can", "interface")
+    channel = config.get("can", "channel")
+    try:
+        br = config.get("can", "bitrate")
+        bitrate = int(br)
+    except:
+        bitrate = 125000
+    node = int(config.get("can", "node"))
+    auto_connect = config.getboolean("can", "auto_connect")
+
+
 # The following is the configured communications (serial) ports
 # These are the defaults for most systems.  Others can simply be
 # added as strings to the portlist[] list.  These device names
@@ -43,41 +72,19 @@ DataPath = os.path.dirname(os.path.dirname(__file__)) + "/data/"
 # module will test each one to see if it really is a serial port.
 portlist = []
 
-interface = None
-channel = None
-bitrate = None
-node = None
-
-def initialize(file):
-    global config
-    global interface
-    global channel
-    
-    config = configparser.RawConfigParser()
-
-    print(file)
-
-    config.read(file)
-
-    interface = config.get("can", "interface")
-    channel = config.get("can", "channel")
-    #br = config.get("can", "bitrate")
-    #if br: bitrate = br
-    node = int(config.get("can", "node"))
-
-    system_name = platform.system()
-    if system_name == "Windows":
-        # Scan for available ports.
-        for i in range(256):
-            available.append(i)
-    elif system_name == "Darwin":
-        # Mac
-        portlist.extend(glob.glob('/dev/tty*'))
-        portlist.extend(glob.glob('/dev/cu*'))
-    else:
-        # Assume Linux or something else
-        portlist.extend(glob.glob('/dev/ttyACM*'))
-        portlist.extend(glob.glob('/dev/ttyUSB*'))
-        portlist.extend(glob.glob('/dev/ttyS*'))
-    # Example for manually adding device names.
-    #portlist.append('/dev/ttyXYZ123456789')
+system_name = platform.system()
+if system_name == "Windows":
+    # Scan for available ports.
+    for i in range(256):
+        available.append(i)
+elif system_name == "Darwin":
+    # Mac
+    portlist.extend(glob.glob('/dev/tty*'))
+    portlist.extend(glob.glob('/dev/cu*'))
+else:
+    # Assume Linux or something else
+    portlist.extend(glob.glob('/dev/ttyACM*'))
+    portlist.extend(glob.glob('/dev/ttyUSB*'))
+    portlist.extend(glob.glob('/dev/ttyS*'))
+# Example for manually adding device names.
+#portlist.append('/dev/ttyXYZ123456789')

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2014 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,10 @@
 
 import time
 import canfix
-import canbus
+import can
 import threading
 import devices
+import config
 
 
 class CFNode(object):
@@ -40,7 +41,7 @@ class CFNode(object):
         self.parameters = []
         self.configruation = []
         self.updated = time.time()
-    
+
     def updateParameter(self, par):
         self.updated = time.time()
         for i,each in enumerate(self.parameters):
@@ -50,7 +51,7 @@ class CFNode(object):
         else:
             self.parameters.append(par) #Add new parameter
             return None
-        
+
     def __str__(self):
         s = "%s 0x%02X\n" % (self.name, self.nodeID)
         s += "  Device ID %i\n" % (self.deviceID, )
@@ -68,21 +69,21 @@ class NetworkModel(object):
        of all the current nodes seen on the network"""
     def __init__(self):
         self.nodes = []
-        self.can = None
+        self.conn = None
         # Data Update Callback Functions
         self.parameterAdded = None   # function(canfix.Parameter)
         self.parameterChanged = None # function(canfix.Parameter)
         self.nodeAdded = None        # function(int) - Node ID
         self.nodeChanged = None      # function(int, int) - Old Node ID, New Node ID
         self.nodeIdent = None        # function(int, {}) - nodeid, {name, deviceid, model, version}
-    
+
     def __findNode(self, nodeid):
         """Find and return the node with the given ID"""
         for each in self.nodes:
             if each.nodeID == nodeid: return each
         return None
 
-    
+
     def __addNode(self, nodeid):
         node = CFNode(nodeid)
         self.nodes.append(node)
@@ -90,17 +91,17 @@ class NetworkModel(object):
             self.nodeAdded(nodeid)
         p = canfix.NodeSpecific()
         p.controlCode = 0x00 # Node Id Command
-        p.sendNode = self.can.srcNode
+        p.sendNode = int(config.node)
         p.destNode = nodeid
-        f = p.getFrame()
-        self.can.sendFrame(f)
+        m = p.getMessage()
+        self.conn.send(m)
         p.controlCode = 0x05 # Node Report Command
-        f = p.getFrame()
-        self.can.sendFrame(f)
+        m = p.getMessage()
+        self.conn.send(m)
         return node
-    
-    def update(self, frame):
-        p = canfix.parseFrame(frame)
+
+    def update(self, msg):
+        p = canfix.parseMessage(msg)
         if isinstance(p, canfix.Parameter):
             node = self.__findNode(p.node)
             if node == None: # Node not in list, add it
@@ -128,11 +129,11 @@ class NetworkModel(object):
                 if device:
                     node.name = device.name
                 if self.nodeIdent:
-                    self.nodeIdent(p.sendNode, {"name":node.name, "deviceid":node.deviceID, 
+                    self.nodeIdent(p.sendNode, {"name":node.name, "deviceid":node.deviceID,
                                                 "model":node.model, "version":node.version})
         elif isinstance(p, canfix.TwoWayMsg):
             pass
-        
+
     def setCallback(self, name, func):
         if name.lower() == "parameteradded":
             self.parameterAdded = func
@@ -144,7 +145,7 @@ class NetworkModel(object):
             self.nodeChanged = func
         elif name.lower() == "nodeident":
             self.nodeIdent = func
- 
+
 
     def __str__(self):
         s = ""

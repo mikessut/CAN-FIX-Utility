@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2014 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import time
-import canbus
+import can
 
 #Nodes in the network tree.  Not to be confused with CAN-FIX Nodes
 class TreeItem(object):
@@ -29,20 +29,20 @@ class TreeItem(object):
         self.parent = parent
         self.children= []
         self.value = None
-    
+
     def childAtRow(self, row):
         assert 0 <= row < len(self.children)
         return self.children[row]
-    
+
     def rowOfChild(self, child):
         for i, item in enumerate(self.children):
             if item == child:
                 return i
         return -1
-    
+
     def __len__(self):
         return len(self.children)
-    
+
     def __str__(self):
         return self.name
 
@@ -60,7 +60,7 @@ class FixItem(TreeItem):
         self.children.append(TreeItem("Parameters", self))
         self.children.append(TreeItem("Configuration", self))
         self.updated = time.time()
-    
+
     def getDeviceItem(self):
         return self.children[1]
     deviceItem = property(getDeviceItem)
@@ -73,7 +73,7 @@ class FixItem(TreeItem):
     def getParameterItem(self):
         return self.children[4]
     parameterItem = property(getParameterItem)
-    
+
     def __cmp__(self, other):
         if self.nodeID < other.nodeID:
             return -1
@@ -89,13 +89,13 @@ class ParameterItem(TreeItem):
         self.identifier = pid
         self.index = 0
         self.indexName = None
-    
+
     def __str__(self):
         if self.indexName:
             return "%s %s %i" % (self.name, self.indexName, self.index +1)
         else:
             return self.name
-    
+
     def __cmp__(self, other):
         if self.identifier < other.identifier:
             return -1
@@ -108,17 +108,17 @@ class ParameterItem(TreeItem):
                 elif self.index > other.index:
                     return 1
             return 0
-    
+
 
 # Debug print routine.
 def TreePrint(node, depth=0):
-    for i in range(depth):
-        print("", end=' ')
+    #for i in range(depth):
+    #    print("", end=' ')
     #print node, "<-", node.parent
     print(node, node.value)
     if node.children:
         for each in node.children:
-            TreePrint(each, depth+1)    
+            TreePrint(each, depth+1)
 
 class NetworkTreeModel(QAbstractItemModel):
     def __init__(self, parent=None):
@@ -128,9 +128,9 @@ class NetworkTreeModel(QAbstractItemModel):
         self.rows = 0
         self.cols = 2
         self.can = None
-        
+
      # The following functions are here for interface to the view.
-    
+
     def data(self, index, role):
         if role == Qt.TextAlignmentRole:
             return QVariant(int(Qt.AlignTop|Qt.AlignLeft))
@@ -154,16 +154,16 @@ class NetworkTreeModel(QAbstractItemModel):
         branch = self.nodeFromIndex(parent)
         assert branch is not None
         return self.createIndex(row, column, branch.childAtRow(row))
-    
+
     def rowCount(self, parent):
         node = self.nodeFromIndex(parent)
         if node is None:
             return 0
         return len(node)
-    
+
     def columnCount(self, parent):
         return self.cols
-    
+
     def parent(self, child):
         node = self.nodeFromIndex(child)
         if node is None:
@@ -177,12 +177,12 @@ class NetworkTreeModel(QAbstractItemModel):
         row = grandparent.rowOfChild(parent)
         assert row != -1
         return self.createIndex(row, 0, parent)
-    
+
     def nodeFromIndex(self, index):
         return index.internalPointer() \
             if index.isValid() else self.root
-        
-    # These functions are for controlling the information in the model    
+
+    # These functions are for controlling the information in the model
     # Most of these are called as slots from the main networkModel
     def findNodeID(self, nodeid):
         """returns the FixItem that has the matching node id"""
@@ -190,12 +190,12 @@ class NetworkTreeModel(QAbstractItemModel):
             if each.nodeID == nodeid:
                 return each
         return None
-    
+
     def nodeAdd(self, nodeid):
         n = FixItem("Unknown", nodeid, self.root)
         self.root.children.append(n)
         self.modelReset.emit()
-    
+
     def nodeIdent(self, nodeid, info):
         item = self.findNodeID(nodeid)
         item.name = info['name']
@@ -203,7 +203,7 @@ class NetworkTreeModel(QAbstractItemModel):
         item.modelItem.value = info['model']
         item.versionItem.value = info['version']
         #self.dataChanged.emit(self.createIndex(0,0,p), self.createIndex(1,1,p))
-        
+
     def parameterAdd(self, parameter):
         item = self.findNodeID(parameter.node)
         p = item.parameterItem
@@ -214,7 +214,7 @@ class NetworkTreeModel(QAbstractItemModel):
             newp.index = parameter.index
         p.children.append(newp)
         #self.dataChanged.emit(self.createIndex(0,0,p), self.createIndex(1,1,p))
-                
+
     def parameterChange(self, parameter):
         item = self.findNodeID(parameter.node)
         p = item.parameterItem
@@ -222,4 +222,3 @@ class NetworkTreeModel(QAbstractItemModel):
             if each == parameter:
                 each.value = parameter.valueStr(units=True)
                 self.dataChanged.emit(self.createIndex(i,1,each), self.createIndex(i,1,each))
-
