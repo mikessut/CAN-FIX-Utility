@@ -6,8 +6,7 @@ run: all
 	./canfix.py
 
 %_ui.py: %.ui
-	pyuic4 -o $@ $<
+	pyuic5 -o $@ $<
 
 clean:
 	rm $(UIFILES) *.pyc
-

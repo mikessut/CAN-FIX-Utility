@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2012 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -22,15 +22,16 @@ import config
 import devices
 import sys
 #import connection
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 from ui.firmware_ui import Ui_dialogFirmware
 import firmware
 
 class FirmwareThread(QThread):
     progress = pyqtSignal("float")
-    status = pyqtSignal(QString)
-    
+    status = pyqtSignal(str)
+
     def __init__(self, fw, node):
         QThread.__init__(self)
         self.fw = fw
@@ -38,16 +39,16 @@ class FirmwareThread(QThread):
         self.fw.setStatusCallback(self.setStatus)
         self.fw.setProgressCallback(self.setProgress)
         self.fw.setStopCallback(self.setZeroProgress)
-    
+
     def setStatus(self, status):
         self.status.emit(status)
-        
+
     def setProgress(self, progress):
         self.progress.emit(progress * 100.0)
-        
+
     def setZeroProgress(self):
         self.progress.emit(0.0)
-        
+
     def run(self):
         self.fw.download(self.node)
 
@@ -63,7 +64,7 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
         for each in devices.devices:
             self.comboDevice.addItem(each.name)
         self.can = can
-        
+
     def btnClick(self, btn):
         x = btn.text()
         if x == "Apply":
@@ -85,7 +86,7 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
             self.fwThread.status.connect(self.labelStatus.setText)
             self.fwThread.progress.connect(self.progressBar.setValue)
             self.fwThread.finished.connect(self.fwComplete)
-            
+
             self.fwThread.start()
             btn.setText("Stop")
         if x == "Stop":
@@ -93,11 +94,11 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
             btn.setText("Apply")
         if x == "Close":
             self.fw.stop()
-                    
+
     def fwComplete(self):
         #self.labelStatus.setText("We Done")
         pass
-        
+
     def btnFileClick(self):
         filename = QFileDialog.getOpenFileName(self, 'Open File', '.')
         self.editFile.setText(filename)

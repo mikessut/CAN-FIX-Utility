@@ -23,8 +23,9 @@ import sys
 import os
 import can
 import connection
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 import canfix
 from ui.main_ui import Ui_MainWindow
 from ui.connect_ui import Ui_ConnectDialog
@@ -98,7 +99,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.sigParameterChanged.connect(self.data.parameterChange)
         self.tableData.setModel(self.data)
         header = self.tableData.horizontalHeader()
-        header.setResizeMode(QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         self.netView = treeModel.NetworkTreeModel()
         self.sigNodeAdded.connect(self.netView.nodeAdd)

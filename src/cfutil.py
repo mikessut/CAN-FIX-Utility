@@ -66,7 +66,7 @@ connection.stop()
 
 if args.interactive == False:
     try:
-        from PyQt4.QtGui import *
+        from PyQt5.QtGui import *
     except ImportError:
         log.error("PyQt Not Found")
 
