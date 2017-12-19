@@ -1,21 +1,21 @@
-<device name = 'Airdata Computer' id='0xB3' model = '0x0A0B0C'>
+<device name = 'Airdata Computer' id='0x32' model = '0x0A0B0C'>
     <firmware_update code = '0xF722' driver = 'AT328'/>
     <parameters>
         <parameter id='0x182'/>
         <parameter id='0x183'/>
         <parameter id='0x184'/>
         <parameter id='0x186'/>
-        <parameter id='0x187'/>        
-        <parameter id='0x18D'/>        
-        <parameter id='0x18E'/>        
-        <parameter id='0x191'/>        
-        <parameter id='0x192'/>        
-        <parameter id='0x406'/>        
-        <parameter id='0x407'/>        
-        <parameter id='0x408'/>        
-        <parameter id='0x409'/>        
-        <parameter id='0x40A'/>        
-        <parameter id='0x40B'/>        
+        <parameter id='0x187'/>
+        <parameter id='0x18D'/>
+        <parameter id='0x18E'/>
+        <parameter id='0x191'/>
+        <parameter id='0x192'/>
+        <parameter id='0x406'/>
+        <parameter id='0x407'/>
+        <parameter id='0x408'/>
+        <parameter id='0x409'/>
+        <parameter id='0x40A'/>
+        <parameter id='0x40B'/>
     </parameters>
     <configuration>
         <attribute key='0x0001' name='Airspeed Min' type='UINT' multiplier='0.1' />
@@ -33,4 +33,3 @@
         <attribute key='0x000D' name='Vy' type='UINT' multiplier='0.1' />
     </configuration>
 </device>
-

@@ -19,6 +19,8 @@ with enough smarts to either read the canfix.xml or generated from it.
 Online device file and protocol file updates?  Maybe online updates.  Links to
 online help?
 
+Move to PyQt5 and Python3
+
 Firmware updating has some problems:
 
   Test Firmware download on real hardware.
