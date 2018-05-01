@@ -54,7 +54,7 @@ config.initialize(config_file, args)
 
 # Initialize Logger
 logging.config.fileConfig(log_config_file)
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 # Now we start doing our job
 import mainCommand

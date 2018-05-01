@@ -33,7 +33,9 @@ import fwDialog
 import networkModel
 import treeModel
 import tableModel
+import logging
 
+log = logging.getLogger("mainWindow")
 
 class CommThread(QThread):
     """Thread to handle the communication for the UI"""
@@ -91,6 +93,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, args):
         QMainWindow.__init__(self)
+        self.conn = None
         self.setupUi(self)
         self.network = networkModel.NetworkModel()
 
@@ -228,8 +231,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.data.edit(index)
 
     def networkClicked(self, index):
-        pass
-        #print index.parent().data().toString() + " " + index.data().toString()
+        #pass
+        #log.debug(index.parent().data().toString() + " " + index.data().toString())
+        log.debug(index.parent().data() + " " + index.data())
 
     def networkDblClicked(self, index):
         item = index.internalPointer()

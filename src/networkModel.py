@@ -28,6 +28,9 @@ import can
 import threading
 import devices
 import config
+import logging
+
+log = logging.getLogger("networkModel")
 
 
 class CFNode(object):

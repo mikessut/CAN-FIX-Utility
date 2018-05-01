@@ -23,19 +23,22 @@
 
 import config
 import threading
+import logging
 import can
 try:
     import queue
 except:
     import Queue as queue
 
+log = logging.getLogger("root.connection")
+
 _connections = []
 _bus = None
 _busLock = threading.Lock()
 _recvThread = None
 
-valid_interfaces = sorted(can.interface.VALID_INTERFACES)
-print(valid_interfaces)
+valid_interfaces = sorted(can.interfaces.VALID_INTERFACES)
+log.debug("valid interfaces = {}".format(valid_interfaces))
 
 def get_available_channels(interface):
     if interface == "serial":
@@ -46,6 +49,8 @@ def get_available_channels(interface):
         return config.config.get("can", "kvaser_channels").split(',')
     elif interface == "pcan":
         return config.config.get("can", "pcan_channels").split(',')
+    else:
+        return []
 
 
 class Connection:
