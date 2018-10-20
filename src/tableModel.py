@@ -28,13 +28,26 @@ class Parameter(object):
         self.value = value
         self.status = ""
 
-    def __cmp__(self, other):
-        if self.ident > other.ident:
-            return 1
-        elif self.ident < other.ident:
-            return -1
-        else:
-            return 0
+    def __eq__(self, other):
+        return self.ident == other.ident
+
+    def __ne__(self, other):
+        return self.ident != other.ident
+
+    def __lt__(self, other):
+        return self.ident < other.ident
+
+    def __le__(self, other):
+        return self.ident <= other.ident
+
+    def __gt__(self, other):
+        return self.ident > other.ident
+
+    def __ge__(self, other):
+        return self.ident >= other.ident
+
+
+
 
 class ModelData(QAbstractTableModel):
     def __init__(self):
