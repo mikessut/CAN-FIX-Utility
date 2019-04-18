@@ -8,8 +8,8 @@ Right now the dependencies for this project are...
 Python 2.7 - I have not tried it with older (or newer versions) but it'll
 probably work with 2.6.
 
-PyQt4 - The program will revert to an interactive command line program if
-PyQt4 is not available but the functionality is limited.
+PyQt5 - The program will revert to an interactive command line program if
+PyQt5 is not available but the functionality is limited.
 
 python-can - Used as the canbus interface.
 
