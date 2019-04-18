@@ -17,23 +17,23 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import config
-import devices
 import sys
 import os
 import can
-import connection
+import logging
+import canfix
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-import canfix
-from ui.main_ui import Ui_MainWindow
-from ui.connect_ui import Ui_ConnectDialog
-import fwDialog
-import networkModel
-import treeModel
-import tableModel
-import logging
+from . import config
+from . import devices
+from . import connection
+from .ui.main_ui import Ui_MainWindow
+from .ui.connect_ui import Ui_ConnectDialog
+from . import fwDialog
+from . import networkModel
+from . import treeModel
+from . import tableModel
 
 log = logging.getLogger("mainWindow")
 

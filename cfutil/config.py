@@ -31,7 +31,7 @@ except:
 # The DataPath is the location of our XML device definition and
 # protocol definition files.  It is simply a string of the absolute
 # path to the data directory.
-DataPath = os.path.dirname(os.path.dirname(__file__)) + "/data/"
+DataPath = os.path.dirname(os.path.dirname(__file__)) + "/cfutil/data/"
 #DataPath = "/home/someuser/CANFIX/Utility/data/"
 
 

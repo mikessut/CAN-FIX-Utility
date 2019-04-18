@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2012 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -21,9 +21,9 @@
 # These devices are all defined by XML files in config.DataPath/devices
 # There is one XML file per device.
 
-import config
 import os
 import xml.etree.ElementTree as ET
+import cfutil.config as config
 
 class Device:
     """Represents a single CAN-FIX device type"""
@@ -35,7 +35,7 @@ class Device:
         self.fwDriver = None
         self.parameters = []
         self.configuration = []
-                    
+
 def __getFirmWare(element, device):
     root = element.find("firmware_update")
     if root != None:
@@ -82,7 +82,7 @@ for each in dirlist:
             __getParameters(root, newdevice)
             __getConfiguration(root, newdevice)
             devices.append(newdevice)
-            
+
 def findDevice(device, model):
     for each in devices:
         if each.DeviceId == device and each.modelNumber == model:
@@ -95,4 +95,3 @@ if __name__ == "__main__":
         print("  FW Code =", each.fwUpdateCode)
         print("  FW Driver = ", each.fwDriver)
         print("  Parameters = ", each.parameters)
-            

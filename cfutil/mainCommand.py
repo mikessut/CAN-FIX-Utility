@@ -20,10 +20,10 @@
 # Module interprets the command line arguments and performs the job(s) given
 
 import can
-import config
-import connection
-import devices
 import canfix
+import cfutil.config as config
+import cfutil.connection as connection
+import cfutil.devices as devices
 
 
 def list_devices():

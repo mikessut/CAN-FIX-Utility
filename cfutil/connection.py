@@ -21,7 +21,6 @@
 # is made on the backend and it is shared among all parts of the program
 # that need a 'dedicated' connection.  Similar to the loopback in socketcan
 
-import config
 import threading
 import logging
 import can
@@ -29,6 +28,7 @@ try:
     import queue
 except:
     import Queue as queue
+import cfutil.config as config
 
 log = logging.getLogger("root.connection")
 

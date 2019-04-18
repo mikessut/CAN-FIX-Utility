@@ -26,8 +26,8 @@ import time
 import canfix
 import can
 import threading
-import devices
-import config
+from . import devices
+from . import config
 import logging
 
 log = logging.getLogger("networkModel")

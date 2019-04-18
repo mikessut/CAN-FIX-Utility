@@ -17,16 +17,16 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import config
 #import canfix
-import devices
 import sys
 #import connection
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from ui.firmware_ui import Ui_dialogFirmware
-import firmware
+from .ui.firmware_ui import Ui_dialogFirmware
+from . import config
+from . import devices
+from . import firmware
 
 class FirmwareThread(QThread):
     progress = pyqtSignal("float")
