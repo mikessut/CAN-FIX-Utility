@@ -83,7 +83,7 @@ def load_firmware(conn, filename, node):
 
 def run(args):
     try:
-        conn = connection.connect()
+        conn = connection.canbus.get_connection()
         if args.list_devices == True:
             list_devices()
         if args.firmware_file or args.firmware_node:
@@ -98,7 +98,7 @@ def run(args):
 
 
     finally:
-        connection.disconnect(conn)
+        connection.canbus.free_connection(conn)
 
 if __name__ == "__main__":
     run(None)

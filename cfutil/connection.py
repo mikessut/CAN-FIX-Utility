@@ -30,12 +30,7 @@ except:
     import Queue as queue
 import cfutil.config as config
 
-log = logging.getLogger("root.connection")
-
-_connections = []
-_bus = None
-_busLock = threading.Lock()
-_recvThread = None
+log = logging.getLogger(__name__)
 
 valid_interfaces = sorted(can.interfaces.VALID_INTERFACES)
 log.debug("valid interfaces = {}".format(valid_interfaces))
@@ -55,61 +50,77 @@ def get_available_channels(interface):
 
 class Connection:
     """Represent a generic connection to a CANBus network"""
-    def __init__(self):
+    def __init__(self, sendFunction=None):
         self.recvQueue = queue.Queue()
+        self.__sendFunction = sendFunction
 
     def send(self, msg):
-        sendMsg(msg)
+        self.__sendFunction(msg)
 
     def recv(self, block = True, timeout = None):
         return self.recvQueue.get(block, timeout = timeout)
 
 
-class RecvThread(threading.Thread):
+class CANBus(threading.Thread):
     def __init__(self):
-        super(RecvThread, self).__init__()
+        super(CANBus, self).__init__()
         self.getout = False
+        self.daemon = True
+        self.__connections = []
+        self.__bus = None
+        self.__connected = threading.Event()
+        self.__connectedCallback = None
+        self.__disconnectedCallback = None
+        self.__newMessageCallback = None
+
 
     def run(self):
         while self.getout == False:
-            msg = _bus.recv(timeout = 1.0)
-            if msg:
-                #print(msg)
-                for each in _connections:
-                    each.recvQueue.put(msg)
+            connect_flag = self.__connected.wait(1.0)
+            if connect_flag:
+                msg = self.__bus.recv(timeout = 1.0)
+                if msg:
+                    #print(msg)
+                    for each in self.__connections:
+                        each.recvQueue.put(msg)
+                    if self.__newMessageCallback != None:
+                        self.__newMessageCallback(msg)
+
+    def send(self, msg):
+        self.__bus.send(msg)
+
+    def connect(self, channel, interface, **kwargs):
+        try:
+            self.__bus = can.ThreadSafeBus(channel, bustype = interface, **kwargs)
+        except Exception as e:
+            log.error(e)
+        if self.__connectCallback is not None:
+            self.__connectCallback()
+        self.__connected.set()
+
+    def disconnect(self):
+        self.__bus.shutdown()
+        if self.__disconnectCallback is not None:
+            self.__connectCallback()
+        self.__disconnected.clear()
+
+    def get_connected(self):
+        return self.__connected.isSet()
+    connected = property(get_connected)
+
+    def connect_wait(self, timeout=None):
+        return self.__connected.wait(timeout)
+
+    def get_connection(self):
+        c = Connection(self.send)
+        self.__connections.append(c)
+        return c
+
+    def free_connection(self, c):
+        self.__connections.remove(c)
 
     def stop(self):
         self.getout = True
 
-
-def sendMsg(msg):
-    global _busLock
-    global _bus
-    with _busLock:
-        _bus.send(msg)
-
-def initialize(interface, channel, **kwargs):
-    global _bus
-    global _recvThread
-    _bus = can.interface.Bus(channel, bustype = interface, **kwargs)
-    _recvThread = RecvThread()
-    _recvThread.start()
-
-
-def stop():
-    _recvThread.stop()
-    if _recvThread.is_alive():
-        _recvThread.join(1.0)
-    #if _recvThread.is_alive():
-    #    raise plugin.PluginFail
-    _bus.shutdown()
-    _connections = []
-
-
-def connect():
-    conn = Connection()
-    _connections.append(conn)
-    return conn
-
-def disconnect(conn):
-    _connections.remove(conn)
+canbus = CANBus()
+canbus.start()

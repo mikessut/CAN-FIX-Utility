@@ -22,8 +22,11 @@
 # There is one XML file per device.
 
 import os
+import logging
 import xml.etree.ElementTree as ET
 import cfutil.config as config
+
+log = logging.getLogger(__name__)
 
 class Device:
     """Represents a single CAN-FIX device type"""
@@ -61,14 +64,14 @@ def __getConfiguration(element, device):
 devices = []
 
 dirlist = os.listdir(config.DataPath + "devices")
-print("Loading Devices")
+log.debug("Loading Devices")
 
 for each in dirlist:
     if each[-4:] == ".xml":
         tree = ET.parse(config.DataPath + "devices/" + each)
         root = tree.getroot()
         if root.tag != "device":
-            print("No device defined in", each)
+            log.warning("No device defined in", each)
             continue
         try:
             name = root.attrib['name']

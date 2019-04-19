@@ -60,9 +60,9 @@ def main():
     from . import mainCommand
     from . import connection
 
-    connection.initialize(config.interface, config.channel)
+    connection.canbus.connect(config.channel, config.interface)
     mainCommand.run(args)
-    connection.stop()
+    # connection.canbus.stop()
 
     if args.interactive == False:
         try:
