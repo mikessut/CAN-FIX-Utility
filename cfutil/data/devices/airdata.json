@@ -1,6 +1,6 @@
 {
-  "name":"Airdata Computer",
-  "id":"0x32",
+  "name":"Airdata Test Node",
+  "type":"0x32",
   "model":"0x0A0B0C",
   "version":"0x01",
   "firmware_code":"0xF22",

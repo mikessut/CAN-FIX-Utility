@@ -80,10 +80,12 @@ class NetworkModel(object):
         self.nodeChanged = None      # function(int, int) - Old Node ID, New Node ID
         self.nodeIdent = None        # function(int, {}) - nodeid, {name, deviceid, model, version}
 
-    def __findNode(self, nodeid):
+    def __findNode(self, nodeid, create=True):
         """Find and return the node with the given ID"""
         for each in self.nodes:
             if each.nodeID == nodeid: return each
+        if create:
+            return self.__addNode(nodeid)
         return None
 
 
@@ -109,8 +111,6 @@ class NetworkModel(object):
         p = canfix.parseMessage(msg)
         if isinstance(p, canfix.Parameter):
             node = self.__findNode(p.node)
-            if node == None: # Node not in list, add it
-                node = self.__addNode(p.node)
             assert node
             result = node.updateParameter(p)
             if result != None:
@@ -121,10 +121,10 @@ class NetworkModel(object):
                     self.parameterAdded(p)
         elif isinstance(p, canfix.NodeAlarm):
             pass
+        elif isinstance(p, canfix.NodeStatus):
+            node = p.sendNode
         elif isinstance(p, canfix.NodeIdentification):
             node = self.__findNode(p.sendNode)
-            if node == None:
-                node = self.__addNode(p.sendNode)
             assert node
             node.deviceID = p.device
             node.version = p.fwrev

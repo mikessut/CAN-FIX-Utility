@@ -1,0 +1,37 @@
+{
+  "name":"Engine Data Test Node",
+  "type":"0x40",
+  "model":"0x0A0B0F",
+  "version":"0x01",
+  "firmware_code":"0xF22",
+  "firmware_driver":"AT328",
+  "parameters":
+    [
+      "0x200",
+      "0x21A",
+      "0x21C",
+      "0x21E",
+      "0x220",
+      "0x222",
+      "0x226",
+      "0x227",
+      "0x406",
+      "0x500",
+      "0x502",
+      "0x512",
+      "0x50E",
+      "0x520"
+    ],
+  "configuration":
+  [
+    {
+      "key":"0x0001",
+      "name":"Update Rate",
+      "type":"UINT",
+      "units":"mS",
+      "min":50,
+      "max":2000,
+      "multipier":"1"
+    }
+  ]
+}

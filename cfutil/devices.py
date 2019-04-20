@@ -30,9 +30,9 @@ log = logging.getLogger(__name__)
 
 class Device:
     """Represents a single CAN-FIX device type"""
-    def __init__(self, name, id, model, version):
+    def __init__(self, name, dtype, model, version):
         self.name = name
-        self.deviceId = int(id, 0)
+        self.deviceType = int(dtype, 0)
         self.modelNumber = int(model, 0)
         self.version = int(version, 0)
         self.fwUpdateCode = None
@@ -41,7 +41,7 @@ class Device:
         self.configuration = []
 
     def __str__(self):
-        return "{} id={}, model={}, version={}".format(self.name, self.deviceId, self.modelNumber, self.version)
+        return "{} type={}, model={}, version={}".format(self.name, self.deviceType, self.modelNumber, self.version)
 
 devices = []
 
@@ -52,14 +52,14 @@ for filename in dirlist:
     if filename[-5:] == ".json":
         with open(config.DataPath + "devices/" + filename) as json_file:
             d = json.load(json_file)
-        try: # These must exist
+        try: # These are required
             name = d["name"]
-            did = d["id"]
+            dtype = d["type"]
             model = d["model"]
             version = d["version"]
         except KeyError as e:
             log.warn("Problem with device file {}:{}".format(config.DataPath + "devices/" + filename, e))
-        newdevice = Device(name, did, model, version)
+        newdevice = Device(name, dtype, model, version)
         newdevice.fwUpdateCode = d.get("firmware_code")
         newdevice.fwDriver = d.get("firmware_driver")
         # newdevice.parameters = []
@@ -70,13 +70,6 @@ for filename in dirlist:
 
 def findDevice(device, model, version):
     for each in devices:
-        if each.deviceId == device and each.modelNumber == model and each.version == version:
+        if each.deviceType == device and each.modelNumber == model and each.version == version:
             return each
     return None
-
-if __name__ == "__main__":
-    for each in devices:
-        print(each.name, each.deviceId, each.modelNumber)
-        print("  FW Code =", each.fwUpdateCode)
-        print("  FW Driver = ", each.fwDriver)
-        print("  Parameters = ", each.parameters)

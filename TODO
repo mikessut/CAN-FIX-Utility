@@ -1,25 +1,27 @@
 Parameters that were disabled would be grayed out.  Node report commands can be
 sent when the node is expanded to get all the information.
 
-Node Configuration Dialog
+Node Configuration Dialog and features
 
-Change background color of data table if data is old and remove if it gets too old.
+Sorting on the tree view isn't working
+
+Dynamically remove nodes and/or parameters that are no longer being sent.
+
+Enable / Disable parameters
+
+Write to file from traffic tab
 
 Add Connection status to the status bar.  Something like a blinking green light
 or frame counter.
-
-Allow multiple devices to be defined in one .xml file?
 
 Add Quality, Failure and Annunciate Flags to Data Table View
 
 Protocol Help Reference, parameter definitions frame definitions etc.  Basically
 the specification but in a help type format.  Probably HTML viewer of some kind
-with enough smarts to either read the canfix.xml or generated from it.
+with enough smarts to either read the canfix.json or generated from it.
 
 Online device file and protocol file updates?  Maybe online updates.  Links to
 online help?
-
-Move to PyQt5 and Python3
 
 Firmware updating has some problems:
 
