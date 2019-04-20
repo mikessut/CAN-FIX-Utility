@@ -23,78 +23,60 @@
 
 import os
 import logging
-import xml.etree.ElementTree as ET
+import json
 import cfutil.config as config
 
 log = logging.getLogger(__name__)
 
 class Device:
     """Represents a single CAN-FIX device type"""
-    def __init__(self, name, id, model):
+    def __init__(self, name, id, model, version):
         self.name = name
-        self.DeviceId = int(id, 0)
+        self.deviceId = int(id, 0)
         self.modelNumber = int(model, 0)
+        self.version = int(version, 0)
         self.fwUpdateCode = None
         self.fwDriver = None
         self.parameters = []
         self.configuration = []
 
-def __getFirmWare(element, device):
-    root = element.find("firmware_update")
-    if root != None:
-        try:
-            code = root.attrib['code']
-            driver = root.attrib['driver']
-        except KeyError as key:
-            print("Unable to find Firmware Code or Driver for", device.name)
-        else:
-            device.fwUpdateCode = int(code, 0)
-            device.fwDriver = driver
-
-
-def __getParameters(element, device):
-    root = element.find("parameters")
-    for child in root:
-        if child.tag == 'parameter':
-            device.parameters.append(child.attrib['id'])
-
-def __getConfiguration(element, device):
-    pass
+    def __str__(self):
+        return "{} id={}, model={}, version={}".format(self.name, self.deviceId, self.modelNumber, self.version)
 
 devices = []
 
 dirlist = os.listdir(config.DataPath + "devices")
 log.debug("Loading Devices")
 
-for each in dirlist:
-    if each[-4:] == ".xml":
-        tree = ET.parse(config.DataPath + "devices/" + each)
-        root = tree.getroot()
-        if root.tag != "device":
-            log.warning("No device defined in", each)
-            continue
-        try:
-            name = root.attrib['name']
-            did = root.attrib['id']
-            model = root.attrib['model']
-        except KeyError as key:
-            print("Unable to find %s in %s" % (key, each))
-        else:
-            newdevice = Device(name, did, model)
-            __getFirmWare(root, newdevice)
-            __getParameters(root, newdevice)
-            __getConfiguration(root, newdevice)
-            devices.append(newdevice)
+for filename in dirlist:
+    if filename[-5:] == ".json":
+        with open(config.DataPath + "devices/" + filename) as json_file:
+            d = json.load(json_file)
+        try: # These must exist
+            name = d["name"]
+            did = d["id"]
+            model = d["model"]
+            version = d["version"]
+        except KeyError as e:
+            log.warn("Problem with device file {}:{}".format(config.DataPath + "devices/" + filename, e))
+        newdevice = Device(name, did, model, version)
+        newdevice.fwUpdateCode = d.get("firmware_code")
+        newdevice.fwDriver = d.get("firmware_driver")
+        # newdevice.parameters = []
+        # newdevice.configuration = []
 
-def findDevice(device, model):
+        devices.append(newdevice)
+        log.info(str(newdevice))
+
+def findDevice(device, model, version):
     for each in devices:
-        if each.DeviceId == device and each.modelNumber == model:
+        if each.deviceId == device and each.modelNumber == model and each.version == version:
             return each
     return None
 
 if __name__ == "__main__":
     for each in devices:
-        print(each.name, each.DeviceId, each.modelNumber)
+        print(each.name, each.deviceId, each.modelNumber)
         print("  FW Code =", each.fwUpdateCode)
         print("  FW Driver = ", each.fwDriver)
         print("  Parameters = ", each.parameters)

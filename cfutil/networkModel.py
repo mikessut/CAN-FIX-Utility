@@ -129,7 +129,7 @@ class NetworkModel(object):
             node.deviceID = p.device
             node.version = p.fwrev
             node.model = p.model
-            device = devices.findDevice(node.deviceID, node.model)
+            device = devices.findDevice(node.deviceID, node.model, node.version)
             if device:
                 node.name = device.name
             if self.nodeIdent:
