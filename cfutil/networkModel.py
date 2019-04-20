@@ -26,12 +26,13 @@ import time
 import canfix
 import can
 import threading
+import logging
 from . import devices
 from . import config
-import logging
-
+from . import connection
 log = logging.getLogger("networkModel")
 
+canbus = connection.canbus
 
 class CFNode(object):
     """This class represents a CAN-FIX Node on the network"""
@@ -49,11 +50,10 @@ class CFNode(object):
         self.updated = time.time()
         for i,each in enumerate(self.parameters):
             if each == par:
-                each = par
+                self.parameters[i] = par
                 return i # returning the index indicates change
-        else:
-            self.parameters.append(par) #Add new parameter
-            return None
+        self.parameters.append(par) #Add new parameter
+        return None
 
     def __str__(self):
         s = "%s 0x%02X\n" % (self.name, self.nodeID)
@@ -92,15 +92,17 @@ class NetworkModel(object):
         self.nodes.append(node)
         if self.nodeAdded:
             self.nodeAdded(nodeid)
-        p = canfix.NodeSpecific()
-        p.controlCode = 0x00 # Node Id Command
+        p = canfix.NodeIdentification()
         p.sendNode = int(config.node)
         p.destNode = nodeid
         m = p.getMessage()
-        self.conn.send(m)
-        p.controlCode = 0x05 # Node Report Command
+        canbus.send(m)
+
+        p = canfix.NodeReport()
+        p.sendNode = int(config.node)
+        p.destNode = nodeid
         m = p.getMessage()
-        self.conn.send(m)
+        canbus.send(m)
         return node
 
     def update(self, msg):
@@ -119,21 +121,20 @@ class NetworkModel(object):
                     self.parameterAdded(p)
         elif isinstance(p, canfix.NodeAlarm):
             pass
-        elif isinstance(p, canfix.NodeSpecific):
+        elif isinstance(p, canfix.NodeIdentification):
             node = self.__findNode(p.sendNode)
             if node == None:
                 node = self.__addNode(p.sendNode)
             assert node
-            if p.controlCode == 0: # Node ID
-                node.deviceID = p.data[1]
-                node.version = p.data[2]
-                node.model = p.data[3] | p.data[4]<<8 | p.data[5]<<16
-                device = devices.findDevice(node.deviceID, node.model)
-                if device:
-                    node.name = device.name
-                if self.nodeIdent:
-                    self.nodeIdent(p.sendNode, {"name":node.name, "deviceid":node.deviceID,
-                                                "model":node.model, "version":node.version})
+            node.deviceID = p.device
+            node.version = p.fwrev
+            node.model = p.model
+            device = devices.findDevice(node.deviceID, node.model)
+            if device:
+                node.name = device.name
+            if self.nodeIdent:
+                self.nodeIdent(p.sendNode, {"name":node.name, "deviceid":node.deviceID,
+                                            "model":node.model, "version":node.version})
         elif isinstance(p, canfix.TwoWayMsg):
             pass
 

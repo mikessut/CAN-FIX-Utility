@@ -69,40 +69,49 @@ class CANBus(threading.Thread):
         self.__connections = []
         self.__bus = None
         self.__connected = threading.Event()
-        self.__connectedCallback = None
-        self.__disconnectedCallback = None
-        self.__newMessageCallback = None
+        self.connectedCallback = None
+        self.disconnectedCallback = None
+        self.recvMessageCallback = None
+        self.sendMessageCallback = None
 
 
     def run(self):
         while self.getout == False:
             connect_flag = self.__connected.wait(1.0)
             if connect_flag:
-                msg = self.__bus.recv(timeout = 1.0)
+                try:
+                    msg = self.__bus.recv(timeout = 1.0)
+                except Exception as e:
+                    log.error(e)
                 if msg:
                     #print(msg)
                     for each in self.__connections:
                         each.recvQueue.put(msg)
-                    if self.__newMessageCallback != None:
-                        self.__newMessageCallback(msg)
+                    if self.recvMessageCallback != None:
+                        self.recvMessageCallback(msg)
 
     def send(self, msg):
         self.__bus.send(msg)
+        if self.sendMessageCallback != None:
+            self.sendMessageCallback(msg)
 
-    def connect(self, channel, interface, **kwargs):
+
+    def connect(self, interface, channel, **kwargs):
         try:
             self.__bus = can.ThreadSafeBus(channel, bustype = interface, **kwargs)
+            self.channel = channel
+            self.interface = interface
         except Exception as e:
             log.error(e)
-        if self.__connectCallback is not None:
-            self.__connectCallback()
+        if self.connectedCallback is not None:
+            self.connectedCallback()
         self.__connected.set()
 
     def disconnect(self):
         self.__bus.shutdown()
-        if self.__disconnectCallback is not None:
-            self.__connectCallback()
-        self.__disconnected.clear()
+        if self.disconnectedCallback is not None:
+            self.disconnectedCallback()
+        self.__connected.clear()
 
     def get_connected(self):
         return self.__connected.isSet()

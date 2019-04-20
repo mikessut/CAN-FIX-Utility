@@ -60,7 +60,7 @@ def main():
     from . import mainCommand
     from . import connection
 
-    connection.canbus.connect(config.channel, config.interface)
+    connection.canbus.connect(config.interface, config.channel)
     mainCommand.run(args)
     # connection.canbus.stop()
 

@@ -96,19 +96,23 @@ class ParameterItem(TreeItem):
         else:
             return self.name
 
-    def __cmp__(self, other):
-        if self.identifier < other.identifier:
-            return -1
-        elif self.identifier > other.identifier:
-            return 1
-        else:
-            if self.indexName:
-                if self.index < other.index:
-                    return -1
-                elif self.index > other.index:
-                    return 1
-            return 0
+    def __eq__(self, other):
+        return (self.identifier*16 + self.index) == (other.identifier*16 + self.index)
 
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __lt__(self, other):
+        return (self.identifier*16 + self.index) < (other.identifier*16 + self.index)
+
+    def __le__(self, other):
+        return (self.identifier*16 + self.index) <= (other.identifier*16 + self.index)
+
+    def __gt__(self, other):
+        return (self.identifier*16 + self.index) > (other.identifier*16 + self.index)
+
+    def __ge__(self, other):
+        return (self.identifier*16 + self.index) >= (other.identifier*16 + self.index)
 
 # Debug print routine.
 def TreePrint(node, depth=0):

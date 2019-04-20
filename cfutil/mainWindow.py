@@ -35,35 +35,8 @@ from . import networkModel
 from . import treeModel
 from . import tableModel
 
-log = logging.getLogger("mainWindow")
-
-class CommThread(QThread):
-    """Thread to handle the communication for the UI"""
-    # We emit two signals.  One with the raw frame ...
-    newMessage = pyqtSignal(can.Message)
-    # .. The other with a formatted string.
-    newMessageString = pyqtSignal('QString')
-
-    def __init__(self, conn):
-        QThread.__init__(self)
-        self.conn = conn
-
-    def run(self):
-        self.getout = False
-        while True:
-            try:
-                msg = self.conn.recv()
-                #emit the signals
-                self.newMessage.emit(msg)
-                self.newMessageString.emit(str(msg))
-            except canbus.exceptions.DeviceTimeout:
-                pass
-            finally:
-                if self.getout:
-                    break
-
-    def stop(self):
-        self.getout = True
+log = logging.getLogger(__name__)
+canbus = connection.canbus
 
 class connectDialog(QDialog, Ui_ConnectDialog):
     def __init__(self):
@@ -90,6 +63,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     sigParameterChanged = pyqtSignal(canfix.Parameter, name="parameterChanged")
     sigNodeAdded = pyqtSignal(int, name="nodeAdded")
     sigNodeIdent = pyqtSignal(int, dict, name="nodeAdded")
+    recvMessage = pyqtSignal(can.Message)
+    sendMessage = pyqtSignal(can.Message)
+    canbusConnected = pyqtSignal()
+    canbusDisconnected = pyqtSignal()
+
 
     def __init__(self, args):
         QMainWindow.__init__(self)
@@ -127,42 +105,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.popMenu.addSeparator()
         self.popMenu.addAction(actionStatus)
 
-        self.commThread = None
-        if config.auto_connect:
-            self.connect_auto()
+        # Take the callbacks from the canbus object and turn them into signals
+        canbus.recvMessageCallback = self.recvMessage.emit
+        canbus.sendMessageCallback = self.sendMessage.emit
+        canbus.connectedCallback = self.canbusConnected.emit
+        canbus.disconnectedCallback = self.canbusDisconnected.emit
+        # ...Then connect them to stuff
+        self.recvMessage.connect(self.network.update)
+
+        # The network model is generic (not PyQt) so these tie the callbacks to the signals
+        self.network.setCallback("parameterAdded", self.sigParameterAdded.emit)
+        self.network.setCallback("nodeIdent", self.sigNodeIdent.emit)
+        self.network.setCallback("parameterChanged", self.sigParameterChanged.emit)
+        self.network.setCallback("nodeAdded", self.sigNodeAdded.emit)
+
+        self.canbusConnected.connect(self.connectedSlot)
+        self.canbusDisconnected.connect(self.disconnectedSlot)
+
+        if canbus.connected:
+            self.connectedSlot()
+        else:
+            self.disconnectedSlot()
 
     # Generic Connection Function
     def __connect(self):
-        connection.initialize(str(self.interface), str(self.channel))
-        self.conn = connection.connect()
-        if self.conn:
-            self.commThread = CommThread(self.conn)
-            self.commThread.start()
-            self.statusbar.showMessage("Connected to %s" %
-                                        (self.interface))
-            self.actionConnect.setDisabled(True)
-            self.actionDisconnect.setEnabled(True)
-            #self.commThread.newFrame.connect(self.updateFrame)
-            self.commThread.newMessage.connect(self.network.update)
-            #We give the network model access to the can connection
-            self.network.conn = self.conn
-            # The network model is generic (not PyQt) so these tie the callbacks to the signals
-            self.network.setCallback("parameterAdded", self.sigParameterAdded.emit)
-            self.network.setCallback("nodeIdent", self.sigNodeIdent.emit)
-            self.network.setCallback("parameterChanged", self.sigParameterChanged.emit)
-            self.network.setCallback("nodeAdded", self.sigNodeAdded.emit)
-            return True
-        else:
-            self.statusbar.showMessage("Failed to connect to %s" % config.device)
+        if canbus.connected:
+            log.error("Already connected to {}".format(canbus.interface))
             return False
-
-
-    # Called on startup if we have --interface=xxx in args
-    def connect_auto(self):
-        self.interface = config.interface
-        self.channel = config.channel
-        self.bitrate = config.bitrate
-        return self.__connect()
+        try:
+            canbus.connect(str(self.interface), str(self.channel))
+            #self.commThread.newFrame.connect(self.updateFrame)
+            return True
+        except:
+            self.statusbar.showMessage("Failed to connect to {}:{}".format(self.interface, self.channel))
+            return False
 
     # GUI connect function
     def connect(self):
@@ -170,30 +146,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         connectDia = connectDialog()
         x = connectDia.exec_()
         if x:
-            #config = canbus.Config()
             index = connectDia.comboAdapter.currentIndex()
             self.interface = connection.valid_interfaces[index]
             self.channel = connectDia.comboChannel.currentText()
             self.bitrate = 125 #TODO Change this to actually work
-            self.statusbar.showMessage("Connecting to {}".format(self.interface))
-            #self.conn = connection.connect()
-            #self.can.device = str(connectDia.comboPort.currentText())
-            #self.can.ipaddress = str(connectDia.editAddress.text())
-            #self.can.timeout = 0.25
             return self.__connect()
         else:
             return False
 
     def disconnect(self):
-        if self.commThread:
-            self.commThread.stop()
-            self.commThread.wait()
-        if self.conn:
-            connection.disconnect(self.conn)
-            self.conn = None
-        self.commThread = None
-        self.actionConnect.setEnabled(True)
-        self.actionDisconnect.setDisabled(True)
+        canbus.disconnect()
+
 
     def loadFirmware(self):
         if not self.commThread or not self.commThread.isRunning():
@@ -227,11 +190,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             p = canfix.parseMessage(msg)
             self.textTraffic.appendPlainText(str(p))
 
+
+    def connectedSlot(self):
+        self.actionConnect.setDisabled(True)
+        self.actionDisconnect.setEnabled(True)
+        self.statusbar.showMessage("Connected to {}:{}".format(canbus.interface, canbus.channel))
+
+
+    def disconnectedSlot(self):
+        self.actionConnect.setEnabled(True)
+        self.actionDisconnect.setDisabled(True)
+        self.statusbar.showMessage("Disconnected")
+
     def dataEdit(self, index):
         self.data.edit(index)
 
     def networkClicked(self, index):
-        #pass
         #log.debug(index.parent().data().toString() + " " + index.data().toString())
         log.debug(index.parent().data() + " " + index.data())
 
@@ -255,12 +229,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.popMenu.exec_(self.viewNetwork.mapToGlobal(point))
 
     def trafficStart(self):
-        self.commThread.newMessage.connect(self.trafficFrame)
+        self.recvMessage.connect(self.trafficFrame)
+        self.sendMessage.connect(self.trafficFrame)
         self.buttonStart.setDisabled(True)
         self.buttonStop.setEnabled(True)
 
     def trafficStop(self):
-        self.commThread.newMessage.disconnect(self.trafficFrame)
+        self.recvMessage.disconnect(self.trafficFrame)
+        self.sendMessage.disconnect(self.trafficFrame)
         self.buttonStop.setDisabled(True)
         self.buttonStart.setEnabled(True)
 
