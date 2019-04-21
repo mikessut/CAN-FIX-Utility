@@ -63,6 +63,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     sigParameterChanged = pyqtSignal(canfix.Parameter, name="parameterChanged")
     sigParameterDeleted = pyqtSignal(canfix.Parameter, name="parameterDelted")
     sigNodeAdded = pyqtSignal(int, name="nodeAdded")
+    sigNodeDeleted = pyqtSignal(int, name="nodeDeleted")
     sigNodeIdent = pyqtSignal(int, dict, name="nodeAdded")
     recvMessage = pyqtSignal(can.Message)
     sendMessage = pyqtSignal(can.Message)
@@ -86,6 +87,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.netView = treeModel.NetworkTreeModel()
         self.sigNodeAdded.connect(self.netView.nodeAdd)
+        self.sigNodeDeleted.connect(self.netView.nodeDelete)
         self.sigNodeIdent.connect(self.netView.nodeIdent)
         self.sigParameterAdded.connect(self.netView.parameterAdd)
         self.sigParameterChanged.connect(self.netView.parameterChange)
@@ -121,6 +123,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.network.parameterDeleted = self.sigParameterDeleted.emit
         self.network.nodeIdent = self.sigNodeIdent.emit
         self.network.nodeAdded = self.sigNodeAdded.emit
+        self.network.nodeDeleted = self.sigNodeDeleted.emit
 
         self.canbusConnected.connect(self.connectedSlot)
         self.canbusDisconnected.connect(self.disconnectedSlot)

@@ -74,13 +74,25 @@ class FixItem(TreeItem):
         return self.children[4]
     parameterItem = property(getParameterItem)
 
-    def __cmp__(self, other):
-        if self.nodeID < other.nodeID:
-            return -1
-        elif self.nodeID > other.nodeID:
-            return 1
-        else:
-            return 0
+
+    def __eq__(self, other):
+        return self.nodeID == other.nodeID
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __lt__(self, other):
+        return self.nodeID < other.nodeID
+
+    def __le__(self, other):
+        return self.nodeID <= other.nodeID
+
+    def __gt__(self, other):
+        return self.nodeID > other.nodeID
+
+    def __ge__(self, other):
+        return self.nodeID >= other.nodeID
+
 
 class ParameterItem(TreeItem):
     """Represents a CAN-FIX Parameter"""
@@ -97,22 +109,22 @@ class ParameterItem(TreeItem):
             return self.name
 
     def __eq__(self, other):
-        return (self.identifier*16 + self.index) == (other.identifier*16 + self.index)
+        return (self.identifier*16 + self.index) == (other.identifier*16 + other.index)
 
     def __ne__(self, other):
         return not (self == other)
 
     def __lt__(self, other):
-        return (self.identifier*16 + self.index) < (other.identifier*16 + self.index)
+        return (self.identifier*16 + self.index) < (other.identifier*16 + other.index)
 
     def __le__(self, other):
-        return (self.identifier*16 + self.index) <= (other.identifier*16 + self.index)
+        return (self.identifier*16 + self.index) <= (other.identifier*16 + other.index)
 
     def __gt__(self, other):
-        return (self.identifier*16 + self.index) > (other.identifier*16 + self.index)
+        return (self.identifier*16 + self.index) > (other.identifier*16 + other.index)
 
     def __ge__(self, other):
-        return (self.identifier*16 + self.index) >= (other.identifier*16 + self.index)
+        return (self.identifier*16 + self.index) >= (other.identifier*16 + other.index)
 
 # Debug print routine.
 def TreePrint(node, depth=0):
@@ -208,6 +220,12 @@ class NetworkTreeModel(QAbstractItemModel):
         item.versionItem.value = info['version']
         #self.dataChanged.emit(self.createIndex(0,0,p), self.createIndex(1,1,p))
 
+    def nodeDelete(self, nodeid):
+        item = self.findNodeID(nodeid)
+        self.root.children.remove(item)
+        self.modelReset.emit()
+
+
     def parameterAdd(self, parameter):
         item = self.findNodeID(parameter.node)
         p = item.parameterItem
@@ -217,6 +235,7 @@ class NetworkTreeModel(QAbstractItemModel):
             newp.indexName = parameter.indexName
             newp.index = parameter.index
         p.children.append(newp)
+        p.children.sort()
         #self.dataChanged.emit(self.createIndex(0,0,p), self.createIndex(1,1,p))
 
     def parameterChange(self, parameter):

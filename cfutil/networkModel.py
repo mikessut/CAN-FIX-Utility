@@ -104,7 +104,7 @@ class NetworkModel(object):
             for p in node.parameters:
                 self.parameterDeleted(p)
         if self.nodeDeleted is not None:
-            self.nodeDeleted(nodeid)
+            self.nodeDeleted(node.nodeID)
         self.nodes.remove(node)
 
     def __addNode(self, nodeid):
@@ -171,7 +171,6 @@ class NetworkModel(object):
     def maintenance(self):
         for node in self.nodes:
             if node.stale:
-                print("Delete Node {}".format(node.name))
                 self.__deleteNode(node)
             else:
                 if time.time() - node.updated > 2.0:

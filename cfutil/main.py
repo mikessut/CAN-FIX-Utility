@@ -72,3 +72,5 @@ def main():
 
         from . import mainWindow
         mainWindow.run(args)
+        connection.canbus.stop()
+        connection.canbus.join()

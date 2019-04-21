@@ -107,7 +107,6 @@ class ModelData(QAbstractTableModel):
         self.dataChanged.emit(self.index(0,1),self.index(self.rowCount(), 2))
 
     def parameterDelete(self, p):
-        print("delete {}".format(p))
         ident = p.identifier*16 + p.index
         self.pindex.remove(self.plist[ident])
         del self.plist[ident]
