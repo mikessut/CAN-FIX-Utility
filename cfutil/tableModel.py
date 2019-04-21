@@ -17,8 +17,11 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import logging
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+
+log = logging.getLogger(__name__)
 
 class Parameter(object):
     def __init__(self, ident, name, value):
@@ -44,8 +47,6 @@ class Parameter(object):
 
     def __ge__(self, other):
         return self.ident >= other.ident
-
-
 
 
 class ModelData(QAbstractTableModel):
@@ -94,15 +95,20 @@ class ModelData(QAbstractTableModel):
 
     def parameterAdd(self, p):
         ident = p.identifier*16 + p.index
-        self.plist[ident] = Parameter(ident, p.fullName, p.valueStr)
-
-        self.pindex.append(self.plist[ident])
-        self.pindex.sort()
-        self.modelReset.emit()
+        if ident in self.plist:
+            log.warn("Duplicate parameter {} Detected".format(p.name))
+        else:
+            self.plist[ident] = Parameter(ident, p.fullName, p.valueStr)
+            self.pindex.append(self.plist[ident])
+            self.pindex.sort()
+            self.modelReset.emit()
 
     def parameterChange(self, p):
         ident = p.identifier*16 + p.index
-        self.plist[ident].value = p.valueStr()
+        try:
+            self.plist[ident].value = p.valueStr()
+        except KeyError: # If we can't find it, add it
+            self.parameterAdd(p)
         #TODO At some point make this update only the row that was changed.
         self.dataChanged.emit(self.index(0,1),self.index(self.rowCount(), 2))
 

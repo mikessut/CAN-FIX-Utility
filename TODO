@@ -3,8 +3,6 @@ sent when the node is expanded to get all the information.
 
 Node Configuration Dialog and features
 
-Dynamically remove nodes and/or parameters that are no longer being sent.
-
 Enable / Disable parameters
 
 Write to file from traffic tab
