@@ -105,3 +105,10 @@ class ModelData(QAbstractTableModel):
         self.plist[ident].value = p.valueStr()
         #TODO At some point make this update only the row that was changed.
         self.dataChanged.emit(self.index(0,1),self.index(self.rowCount(), 2))
+
+    def parameterDelete(self, p):
+        print("delete {}".format(p))
+        ident = p.identifier*16 + p.index
+        self.pindex.remove(self.plist[ident])
+        del self.plist[ident]
+        self.modelReset.emit()

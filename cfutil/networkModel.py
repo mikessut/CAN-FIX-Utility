@@ -44,15 +44,21 @@ class CFNode(object):
         self.version = 0x00
         self.parameters = []
         self.configruation = []
+        self.stale = False # Flag to help indicate
         self.updated = time.time()
 
-    def updateParameter(self, par):
+    def update(self):
         self.updated = time.time()
+        self.stale = False
+
+    def updateParameter(self, par):
+        self.update()
         for i,each in enumerate(self.parameters):
             if each == par:
                 self.parameters[i] = par
                 return i # returning the index indicates change
         self.parameters.append(par) #Add new parameter
+        #self.parameters.sort()
         return None
 
     def __str__(self):
@@ -66,6 +72,7 @@ class CFNode(object):
         s += "\n  Last Update " + str(time.time()-self.updated) + "\n"
         return s
 
+
 class NetworkModel(object):
     """This class represents a CAN-FIX network.  It contains
        network specific information, configuration and a list
@@ -76,9 +83,13 @@ class NetworkModel(object):
         # Data Update Callback Functions
         self.parameterAdded = None   # function(canfix.Parameter)
         self.parameterChanged = None # function(canfix.Parameter)
+        self.parameterDeleted = None # function(canfix.Parameter)
         self.nodeAdded = None        # function(int) - Node ID
         self.nodeChanged = None      # function(int, int) - Old Node ID, New Node ID
+        self.nodeDeleted = None      # function(int) - Node ID
         self.nodeIdent = None        # function(int, {}) - nodeid, {name, deviceid, model, version}
+        self.maintTimer = TimerThread(2.0, self.maintenance)
+        self.maintTimer.start()
 
     def __findNode(self, nodeid, create=True):
         """Find and return the node with the given ID"""
@@ -88,11 +99,18 @@ class NetworkModel(object):
             return self.__addNode(nodeid)
         return None
 
+    def __deleteNode(self, node):
+        if self.parameterDeleted is not None:
+            for p in node.parameters:
+                self.parameterDeleted(p)
+        if self.nodeDeleted is not None:
+            self.nodeDeleted(nodeid)
+        self.nodes.remove(node)
 
     def __addNode(self, nodeid):
         node = CFNode(nodeid)
         self.nodes.append(node)
-        if self.nodeAdded:
+        if self.nodeAdded is not None:
             self.nodeAdded(nodeid)
         p = canfix.NodeIdentification()
         p.sendNode = int(config.node)
@@ -109,15 +127,16 @@ class NetworkModel(object):
 
     def update(self, msg):
         p = canfix.parseMessage(msg)
+        node = None
         if isinstance(p, canfix.Parameter):
             node = self.__findNode(p.node)
             assert node
             result = node.updateParameter(p)
             if result != None:
-                if self.parameterChanged:
+                if self.parameterChanged is not None:
                     self.parameterChanged(p)
             else:
-                if self.parameterAdded:
+                if self.parameterAdded is not None:
                     self.parameterAdded(p)
         elif isinstance(p, canfix.NodeAlarm):
             pass
@@ -138,17 +157,8 @@ class NetworkModel(object):
         elif isinstance(p, canfix.TwoWayMsg):
             pass
 
-    def setCallback(self, name, func):
-        if name.lower() == "parameteradded":
-            self.parameterAdded = func
-        elif name.lower() == "parameterchanged":
-            self.parameterChanged = func
-        elif name.lower() == "nodeadded":
-            self.nodeAdded = func
-        elif name.lower() == "nodechanged":
-            self.nodeChanged = func
-        elif name.lower() == "nodeident":
-            self.nodeIdent = func
+        if node is not None:
+            node.update()
 
 
     def __str__(self):
@@ -156,3 +166,38 @@ class NetworkModel(object):
         for each in self.nodes:
             s += str(each)
         return s
+
+
+    def maintenance(self):
+        for node in self.nodes:
+            if node.stale:
+                print("Delete Node {}".format(node.name))
+                self.__deleteNode(node)
+            else:
+                if time.time() - node.updated > 2.0:
+                    node.stale = True
+                    p = canfix.NodeIdentification()
+                    p.sendNode = int(config.node)
+                    p.destNode = node.nodeID
+                    m = p.getMessage()
+                    canbus.send(m)
+
+                    p = canfix.NodeReport()
+                    p.sendNode = int(config.node)
+                    p.destNode = node.nodeID
+                    m = p.getMessage()
+                    canbus.send(m)
+
+# Kinda like the built in threading.Timer except this one is recurring and
+# is a daemon thread so it'll die with the rest of the application
+class TimerThread(threading.Thread):
+    def __init__(self, interval, function):
+        super(TimerThread, self).__init__()
+        self.daemon = True
+        self.interval = interval
+        self.function = function
+
+    def run(self):
+        while True:
+            time.sleep(self.interval)
+            self.function()

@@ -61,6 +61,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # Signals
     sigParameterAdded = pyqtSignal(canfix.Parameter, name="parameterAdded")
     sigParameterChanged = pyqtSignal(canfix.Parameter, name="parameterChanged")
+    sigParameterDeleted = pyqtSignal(canfix.Parameter, name="parameterDelted")
     sigNodeAdded = pyqtSignal(int, name="nodeAdded")
     sigNodeIdent = pyqtSignal(int, dict, name="nodeAdded")
     recvMessage = pyqtSignal(can.Message)
@@ -78,6 +79,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.data = tableModel.ModelData()
         self.sigParameterAdded.connect(self.data.parameterAdd)
         self.sigParameterChanged.connect(self.data.parameterChange)
+        self.sigParameterDeleted.connect(self.data.parameterDelete)
         self.tableData.setModel(self.data)
         header = self.tableData.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
@@ -114,10 +116,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.recvMessage.connect(self.network.update)
 
         # The network model is generic (not PyQt) so these tie the callbacks to the signals
-        self.network.setCallback("parameterAdded", self.sigParameterAdded.emit)
-        self.network.setCallback("nodeIdent", self.sigNodeIdent.emit)
-        self.network.setCallback("parameterChanged", self.sigParameterChanged.emit)
-        self.network.setCallback("nodeAdded", self.sigNodeAdded.emit)
+        self.network.parameterAdded = self.sigParameterAdded.emit
+        self.network.parameterChanged = self.sigParameterChanged.emit
+        self.network.parameterDeleted = self.sigParameterDeleted.emit
+        self.network.nodeIdent = self.sigNodeIdent.emit
+        self.network.nodeAdded = self.sigNodeAdded.emit
 
         self.canbusConnected.connect(self.connectedSlot)
         self.canbusDisconnected.connect(self.disconnectedSlot)
