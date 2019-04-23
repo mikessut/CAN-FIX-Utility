@@ -21,43 +21,40 @@ import can
 import string
 import argparse
 
-class FirmwareError(Exception):
-    """Base class for exceptions in this module"""
-    pass
+from . import common as fw
 
-
-def Firmware(driver, filename, can):
+def Firmware(driver, filename):
     if driver == "AT328":
         from . import AT328
-        return AT328.Driver(filename, can)
+        return AT328.Driver(filename)
     elif driver == "DUMMY":
         from . import DUMMY
-        return DUMMY.Driver(filename, can)
+        return DUMMY.Driver(filename)
     else:
-        raise FirmwareError("No such device")
+        raise fw.FirmwareError("No such device")
 
-def config():
-    parser = argparse.ArgumentParser(description='CANFIX Firmware Downloader 1.0')
-    parser.add_argument('--filename', '-f', nargs=1, help='Intel Hex File to Download', required=True)
-    parser.add_argument('--port', '-p', nargs=1, help='Serial Port to find CANBus interface')
-    parser.add_argument('--node', '-n', type=int, nargs=1, help='CAN-FIX Node number of device')
-    args = parser.parse_args()
-    args = vars(args)
-    output = {}
-    if args['port'] != None:
-        output["portname"]= args['port'][0]
-    else:
-        output["portname"] = ""
-
-    output["filename"] = args['filename'][0]
-    output["node"] = args['node'][0]
-
-    return output
-
-
-#***** MAIN ROUTINE *****
-def main():
-    exit()
-
-if __name__ == '__main__':
-    main()
+# def config():
+#     parser = argparse.ArgumentParser(description='CANFIX Firmware Downloader 1.0')
+#     parser.add_argument('--filename', '-f', nargs=1, help='Intel Hex File to Download', required=True)
+#     parser.add_argument('--port', '-p', nargs=1, help='Serial Port to find CANBus interface')
+#     parser.add_argument('--node', '-n', type=int, nargs=1, help='CAN-FIX Node number of device')
+#     args = parser.parse_args()
+#     args = vars(args)
+#     output = {}
+#     if args['port'] != None:
+#         output["portname"]= args['port'][0]
+#     else:
+#         output["portname"] = ""
+#
+#     output["filename"] = args['filename'][0]
+#     output["node"] = args['node'][0]
+#
+#     return output
+#
+#
+# #***** MAIN ROUTINE *****
+# def main():
+#     exit()
+#
+# if __name__ == '__main__':
+#     main()

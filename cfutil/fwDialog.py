@@ -17,9 +17,9 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#import canfix
 import sys
-#import connection
+import logging
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -28,14 +28,15 @@ from . import config
 from . import devices
 from . import firmware
 
+log = logging.getLogger(__name__)
+
 class FirmwareThread(QThread):
     progress = pyqtSignal("float")
     status = pyqtSignal(str)
 
-    def __init__(self, fw, node):
+    def __init__(self, fw):
         QThread.__init__(self)
         self.fw = fw
-        self.node = node
         self.fw.setStatusCallback(self.setStatus)
         self.fw.setProgressCallback(self.setProgress)
         self.fw.setStopCallback(self.setZeroProgress)
@@ -50,7 +51,10 @@ class FirmwareThread(QThread):
         self.progress.emit(0.0)
 
     def run(self):
-        self.fw.download(self.node)
+        try:
+            self.fw.start_download()
+        except Exception as e:
+            log.warn(e)
 
 
 class dialogFirmware(QDialog, Ui_dialogFirmware):
@@ -58,23 +62,28 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
         QDialog.__init__(self)
         self.setupUi(self)
         self.settings = QSettings()
-        # Check config and set the file, node and device to last used
-        self.editFile.setText(self.settings.value("firmware/filename").toString())
-        self.spinNode.setValue(self.settings.value("firmware/node", 1).toInt()[0])
-        for each in devices.devices:
-            self.comboDevice.addItem(each.name)
+        self.netmodel = netmodel
         self.can = can
+        # Check config and set the file, node and device to last used
+        try:
+            self.editFile.setText(self.settings.value("firmware/filename"))
+        except:
+            pass
+        #self.spinNode.setValue(self.settings.value("firmware/node", 1).toInt()[0])
+        for each in self.netmodel.nodes:
+            self.comboNode.addItem("[{}] {}".format(each.nodeID, each.name))
 
     def btnClick(self, btn):
         x = btn.text()
-        if x == "Apply":
-            driver = devices.devices[self.comboDevice.currentIndex()].fwDriver
-            node = self.spinNode.value()
+        if x == "&Apply":
+            node = self.netmodel.nodes[self.comboNode.currentIndex()]
+            driver = node.device.fwDriver
+            #node = self.spinNode.value()
             self.settings.setValue("firmware/filename", self.editFile.text())
-            self.settings.setValue("firmware/node", node)
-            self.settings.setValue("firmware/driver", driver)
+            #self.settings.setValue("firmware/node", node)
+            #self.settings.setValue("firmware/driver", driver)
             try:
-                self.fw = firmware.Firmware(driver, self.editFile.text(), self.can)
+                self.fw = firmware.Firmware(driver, self.editFile.text())
             except IOError:
                 qm = QMessageBox()
                 qm.setText("Firmware File Not Found")
@@ -82,17 +91,21 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
                 qm.setIcon(QMessageBox.Warning)
                 qm.exec_()
                 return
-            self.fwThread = FirmwareThread(self.fw, node)
+            self.fw.srcNode = config.node
+            self.fw.destNode = node.nodeID
+            self.fw.device = node.device
+            self.fw.can = self.can
+            self.fwThread = FirmwareThread(self.fw)
             self.fwThread.status.connect(self.labelStatus.setText)
             self.fwThread.progress.connect(self.progressBar.setValue)
             self.fwThread.finished.connect(self.fwComplete)
 
             self.fwThread.start()
             btn.setText("Stop")
-        if x == "Stop":
+        if x == "&Stop":
             self.fw.stop()
-            btn.setText("Apply")
-        if x == "Close":
+            btn.setText("&Apply")
+        if x == "&Close":
             self.fw.stop()
 
     def fwComplete(self):
@@ -100,5 +113,5 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
         pass
 
     def btnFileClick(self):
-        filename = QFileDialog.getOpenFileName(self, 'Open File', '.')
-        self.editFile.setText(filename)
+        res = QFileDialog.getOpenFileName(self, 'Open File', '.')
+        self.editFile.setText(res[0])

@@ -4,7 +4,7 @@
   "model":"0x0A0B0F",
   "version":"0x01",
   "firmware_code":"0xF22",
-  "firmware_driver":"AT328",
+  "firmware_driver":"DUMMY",
   "parameters":
     [
       "0x200",

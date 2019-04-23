@@ -47,6 +47,11 @@ def get_available_channels(interface):
     else:
         return []
 
+class NotConnected(Exception):
+    pass
+
+class Timeout(Exception):
+    pass
 
 class Connection:
     """Represent a generic connection to a CANBus network"""
@@ -58,7 +63,10 @@ class Connection:
         self.__sendFunction(msg)
 
     def recv(self, block = True, timeout = None):
-        return self.recvQueue.get(block, timeout = timeout)
+        try:
+            return self.recvQueue.get(block, timeout = timeout)
+        except queue.Empty:
+            raise Timeout()
 
 
 class CANBus(threading.Thread):
@@ -90,6 +98,7 @@ class CANBus(threading.Thread):
                     if self.recvMessageCallback != None:
                         self.recvMessageCallback(msg)
 
+    # TODO: raise not connected error
     def send(self, msg):
         self.__bus.send(msg)
         if self.sendMessageCallback != None:

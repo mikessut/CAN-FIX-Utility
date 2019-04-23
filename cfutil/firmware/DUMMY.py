@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2013 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -21,28 +21,28 @@
 
 from intelhex import IntelHex
 from . import crc
-import canbus
-from .fwBase import FirmwareBase
+from .common import FirmwareBase
 import time
 
 class Driver(FirmwareBase):
-    def __init__(self, filename, can):
+    def __init__(self, filename):
         FirmwareBase.__init__(self)
+
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)
-        self.can = can
-        
+
         cs = crc.crc16()
         for each in range(self.__ih.minaddr(), self.__ih.maxaddr()+1):
             cs.addByte(self.__ih[each])
         self.__size = self.__ih.maxaddr()+1
         self.__checksum = cs.getResult()
 
+
     def download(self, node):
         progress = 0.0
         self.sendStatus("Starting Download to Node " + str(node))
         while True:
-            if self.kill==True: 
+            if self.kill==True:
                 self.sendProgress(0.0)
                 self.sendStatus("Download Stopped")
                 return

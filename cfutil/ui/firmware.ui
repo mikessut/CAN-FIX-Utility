@@ -40,37 +40,7 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="labelNode">
-       <property name="text">
-        <string>&amp;Node</string>
-       </property>
-       <property name="buddy">
-        <cstring>spinNode</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QSpinBox" name="spinNode">
-       <property name="maximum">
-        <number>255</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="labelDevice">
-       <property name="text">
-        <string>&amp;Device</string>
-       </property>
-       <property name="buddy">
-        <cstring>comboDevice</cstring>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="comboDevice"/>
-     </item>
-     <item row="1" column="2">
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -82,6 +52,19 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelDevice">
+       <property name="text">
+        <string>Node</string>
+       </property>
+       <property name="buddy">
+        <cstring>comboNode</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QComboBox" name="comboNode"/>
      </item>
     </layout>
    </item>
@@ -142,27 +125,10 @@
   <tabstop>buttonBox</tabstop>
   <tabstop>editFile</tabstop>
   <tabstop>btnFile</tabstop>
-  <tabstop>spinNode</tabstop>
-  <tabstop>comboDevice</tabstop>
+  <tabstop>comboNode</tabstop>
  </tabstops>
  <resources/>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>clicked(QAbstractButton*)</signal>
-   <receiver>dialogFirmware</receiver>
-   <slot>btnClick(QAbstractButton*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>141</x>
-     <y>277</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>155</x>
-     <y>0</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
@@ -192,6 +158,22 @@
     <hint type="destinationlabel">
      <x>269</x>
      <y>-19</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>dialogFirmware</receiver>
+   <slot>btnClick(QAbstractButton*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>141</x>
+     <y>277</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>0</y>
     </hint>
    </hints>
   </connection>

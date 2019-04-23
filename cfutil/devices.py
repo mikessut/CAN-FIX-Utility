@@ -60,7 +60,7 @@ for filename in dirlist:
         except KeyError as e:
             log.warn("Problem with device file {}:{}".format(config.DataPath + "devices/" + filename, e))
         newdevice = Device(name, dtype, model, version)
-        newdevice.fwUpdateCode = d.get("firmware_code")
+        newdevice.fwUpdateCode = int(d.get("firmware_code"),0)
         newdevice.fwDriver = d.get("firmware_driver")
         # newdevice.parameters = []
         # newdevice.configuration = []

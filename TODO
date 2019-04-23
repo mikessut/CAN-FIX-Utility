@@ -10,6 +10,9 @@ Write to file from traffic tab
 Add Connection status to the status bar.  Something like a blinking green light
 or frame counter.
 
+Connect dialog box needs to pre-set itself to the lasted used or configured
+settings
+
 Add Quality, Failure and Annunciate Flags to Data Table View
 
 Protocol Help Reference, parameter definitions frame definitions etc.  Basically
@@ -23,13 +26,4 @@ Firmware updating has some problems:
 
   Test Firmware download on real hardware.
 
-  Need to use the actual FW Code for each device type.  Right now it's hard
-  coded in the __TryChannel function in FirmwwareBase class.  Also the FWDialog
-  should try to figure out what kind of device is at the specified node.  The
-  node  number is given so it should be able to ascertain from the node info and
-  the EDS  files what the device type is.  If none is found then ask...
-
-  Also need to test channel busyness
-
-  There's too much code duplication in the firmware drivers.  They should be
-  dumber and the firmware base class should do more of the work.
+  Firmware download for 'unknown' devices

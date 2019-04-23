@@ -42,6 +42,7 @@ class CFNode(object):
         self.deviceID = 0x00
         self.model = 0x000000
         self.version = 0x00
+        self.device = None
         self.parameters = []
         self.configruation = []
         self.stale = False # Flag to help indicate
@@ -151,6 +152,7 @@ class NetworkModel(object):
             device = devices.findDevice(node.deviceID, node.model, node.version)
             if device:
                 node.name = device.name
+                node.device = device
             if self.nodeIdent:
                 self.nodeIdent(p.sendNode, {"name":node.name, "deviceid":node.deviceID,
                                             "model":node.model, "version":node.version})
