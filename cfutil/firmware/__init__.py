@@ -21,7 +21,8 @@ import can
 import string
 import argparse
 
-from . import common as fw
+#from . import common as fw
+from .common import *
 
 def Firmware(driver, filename):
     if driver == "AT328":
@@ -31,7 +32,7 @@ def Firmware(driver, filename):
         from . import DUMMY
         return DUMMY.Driver(filename)
     else:
-        raise fw.FirmwareError("No such device")
+        raise FirmwareError("No such device")
 
 # def config():
 #     parser = argparse.ArgumentParser(description='CANFIX Firmware Downloader 1.0')

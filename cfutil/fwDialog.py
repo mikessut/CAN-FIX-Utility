@@ -53,8 +53,10 @@ class FirmwareThread(QThread):
     def run(self):
         try:
             self.fw.start_download()
+        except firmware.FirmwareError as e:
+            self.setStatus(str(e))
         except Exception as e:
-            log.warn(e)
+            raise
 
 
 class dialogFirmware(QDialog, Ui_dialogFirmware):
@@ -72,6 +74,7 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
         #self.spinNode.setValue(self.settings.value("firmware/node", 1).toInt()[0])
         for each in self.netmodel.nodes:
             self.comboNode.addItem("[{}] {}".format(each.nodeID, each.name))
+        self.labelStatus.setText("")
 
     def btnClick(self, btn):
         x = btn.text()
@@ -110,6 +113,8 @@ class dialogFirmware(QDialog, Ui_dialogFirmware):
 
     def fwComplete(self):
         #self.labelStatus.setText("We Done")
+        b = self.buttonBox.buttons()
+        b[1].setText("&Apply")
         pass
 
     def btnFileClick(self):

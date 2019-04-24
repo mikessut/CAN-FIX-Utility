@@ -38,9 +38,9 @@ class Driver(FirmwareBase):
         self.__checksum = cs.getResult()
 
 
-    def download(self, node):
+    def download(self):
         progress = 0.0
-        self.sendStatus("Starting Download to Node " + str(node))
+        self.sendStatus("Starting Download to Node " + str(self.destNode))
         while True:
             if self.kill==True:
                 self.sendProgress(0.0)
@@ -51,4 +51,4 @@ class Driver(FirmwareBase):
             progress = progress + 0.01
             if progress > 1: break
         self.sendProgress(1.0)
-        self.sendStatus("Download Finished")
+        self.sendStatus("Download Successful")
