@@ -102,6 +102,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         actionDisable = QAction('Disable', self)
         actionFirmware = QAction('Firmware', self)
 
+        actionConfigure.triggered.connect(self.nodeConfigure)
+
         self.popMenu = QMenu(self)
         self.popMenu.addAction(actionConfigure)
         self.popMenu.addAction(actionEnable)
@@ -127,6 +129,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.canbusConnected.connect(self.connectedSlot)
         self.canbusDisconnected.connect(self.disconnectedSlot)
+        self.sigNodeIdent.connect(self.nodeIdentSlot)
 
         if canbus.connected:
             self.connectedSlot()
@@ -207,6 +210,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionDisconnect.setDisabled(True)
         self.statusbar.showMessage("Disconnected")
 
+    def nodeIdentSlot(self, int, d):
+        self.viewNetwork.resizeColumnToContents(0)
+
     def dataEdit(self, index):
         self.data.edit(index)
 
@@ -223,7 +229,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #print "Edit *", index.data().toString()
 
     def networkExpanded(self, index):
-        #print "Expand ->", index.data().toString()
+        # item = index.internalPointer()
+        # print("Expand -> {}".format(item.name))
         self.viewNetwork.resizeColumnToContents(0)
 
     def networkCollapsed(self, index):
@@ -231,6 +238,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.viewNetwork.resizeColumnToContents(0)
 
     def networkContextMenu(self, point):
+        i = self.viewNetwork.indexAt(point)
+        print(i.internalPointer().parent)
         self.popMenu.exec_(self.viewNetwork.mapToGlobal(point))
 
     def trafficStart(self):
@@ -244,6 +253,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.sendMessage.disconnect(self.trafficFrame)
         self.buttonStop.setDisabled(True)
         self.buttonStart.setEnabled(True)
+
+    def nodeConfigure(self):
+        print("Configure")
 
 
 def getout():

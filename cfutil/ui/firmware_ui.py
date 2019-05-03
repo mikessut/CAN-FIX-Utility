@@ -59,10 +59,9 @@ class Ui_dialogFirmware(object):
         self.labelDevice.setBuddy(self.comboNode)
 
         self.retranslateUi(dialogFirmware)
-        self.buttonBox.clicked['QAbstractButton*'].connect(dialogFirmware.btnClick)
-        self.btnFile.clicked.connect(dialogFirmware.btnFileClick)
-        self.buttonBox.accepted.connect(dialogFirmware.accept)
         self.buttonBox.rejected.connect(dialogFirmware.reject)
+        self.btnFile.clicked.connect(dialogFirmware.btnFileClick)
+        self.buttonBox.clicked['QAbstractButton*'].connect(dialogFirmware.btnClick)
         QtCore.QMetaObject.connectSlotsByName(dialogFirmware)
         dialogFirmware.setTabOrder(self.buttonBox, self.editFile)
         dialogFirmware.setTabOrder(self.editFile, self.btnFile)

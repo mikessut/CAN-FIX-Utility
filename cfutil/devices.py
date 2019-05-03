@@ -62,8 +62,8 @@ for filename in dirlist:
         newdevice = Device(name, dtype, model, version)
         newdevice.fwUpdateCode = int(d.get("firmware_code"),0)
         newdevice.fwDriver = d.get("firmware_driver")
-        # newdevice.parameters = []
-        # newdevice.configuration = []
+        newdevice.parameters = d.get("parameters", [])
+        newdevice.configuration = d.get("configuration", [])
 
         devices.append(newdevice)
         log.info(str(newdevice))

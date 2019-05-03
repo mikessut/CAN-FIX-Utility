@@ -31,7 +31,7 @@
       "units":"mS",
       "min":50,
       "max":2000,
-      "multipier":"1"
+      "multiplier":"10"
     }
   ]
 }
