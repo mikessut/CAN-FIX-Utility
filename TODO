@@ -1,5 +1,10 @@
 Parameters that were disabled would be grayed out.  Node report commands can be
-sent when the node is expanded to get all the information.
+sent when the node is expanded to get all the information.  This would only
+work on nodes with a proper EDS file as there is no mechanism to poll a device
+for the enabled status of a parameter.
+
+The program crashes if the initial CANBus is not available.  It really should
+just start up disconnected.
 
 Node Configuration Dialog and features
 
@@ -10,7 +15,7 @@ Write to file from traffic tab
 Add Connection status to the status bar.  Something like a blinking green light
 or frame counter.
 
-Connect dialog box needs to pre-set itself to the lasted used or configured
+Connect dialog box needs to pre-set itself to the last used or configured
 settings
 
 Add Quality, Failure and Annunciate Flags to Data Table View

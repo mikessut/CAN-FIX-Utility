@@ -64,16 +64,22 @@ class FixItem(TreeItem):
     def getDeviceItem(self):
         return self.children[1]
     deviceItem = property(getDeviceItem)
+
     def getModelItem(self):
         return self.children[2]
     modelItem = property(getModelItem)
+
     def getVersionItem(self):
         return self.children[3]
     versionItem = property(getVersionItem)
+
     def getParameterItem(self):
         return self.children[4]
     parameterItem = property(getParameterItem)
 
+    def getConfigRoot(self):
+        return self.children[5]
+    configRoot = property(getConfigRoot)
 
     def __eq__(self, other):
         return self.nodeID == other.nodeID
@@ -126,6 +132,36 @@ class ParameterItem(TreeItem):
     def __ge__(self, other):
         return (self.identifier*16 + self.index) >= (other.identifier*16 + other.index)
 
+
+class ConfigItem(TreeItem):
+    """Represents a CAN-FIX Parameter"""
+    def __init__(self, name, key, value, parent=None):
+        super(ConfigItem, self).__init__(name, parent)
+        self.key = key
+        self.value = value
+
+    def __str__(self):
+        return "%i %s" % (self.key, self.name)
+
+    def __eq__(self, other):
+        return self.key == other.key
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __lt__(self, other):
+        return self.key < other.key
+
+    def __le__(self, other):
+        return self.key <= other.key
+
+    def __gt__(self, other):
+        return self.key > other.key
+
+    def __ge__(self, other):
+        return self.key >= other.key
+
+
 # Debug print routine.
 def TreePrint(node, depth=0):
     #for i in range(depth):
@@ -135,6 +171,7 @@ def TreePrint(node, depth=0):
     if node.children:
         for each in node.children:
             TreePrint(each, depth+1)
+
 
 class NetworkTreeModel(QAbstractItemModel):
     def __init__(self, parent=None):
@@ -245,3 +282,18 @@ class NetworkTreeModel(QAbstractItemModel):
             if each == parameter:
                 each.value = parameter.valueStr(units=True)
                 self.dataChanged.emit(self.createIndex(i,1,each), self.createIndex(i,1,each))
+
+    def configAdd(self, nodeid, cfg):
+        item = self.findNodeID(nodeid)
+        c = item.configRoot
+        if cfg['units']:
+            v = "{} {}".format(cfg['value'],cfg['units'])
+        else:
+            v = cfg['value']
+        newc = ConfigItem(cfg['name'], int(cfg['key']), v, c)
+        c.children.append(newc)
+        c.children.sort()
+
+    def configChange(self, nodeid, cfg):
+        print("Change Configuration...")
+        print(cfg)

@@ -25,13 +25,13 @@
   "configuration":
   [
     {
-      "key":"0x0001",
+      "key":1,
       "name":"Update Rate",
       "type":"UINT",
       "units":"mS",
       "min":50,
       "max":2000,
-      "multiplier":"10"
+      "multiplier":1
     }
   ]
 }

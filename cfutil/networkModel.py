@@ -34,6 +34,21 @@ log = logging.getLogger("networkModel")
 
 canbus = connection.canbus
 
+
+class ConfigItem(object):
+    def __init__(self):
+        self.key = None
+        self.name = ""
+        self.datatype = ""
+        self.units = ""
+        self.value = None
+
+    def getDict(self):
+        return {'key':self.key, 'name':self.name, 'type':self.datatype, 'units':self.units, 'value':self.value}
+
+    dict = property(getDict)
+
+
 class CFNode(object):
     """This class represents a CAN-FIX Node on the network"""
     def __init__(self, nodeID=None):
@@ -44,7 +59,7 @@ class CFNode(object):
         self.version = 0x00
         self.device = None
         self.parameters = []
-        self.configruation = []
+        self.configuration = []
         self.stale = False # Flag to help indicate
         self.updated = time.time()
 
@@ -89,6 +104,9 @@ class NetworkModel(object):
         self.nodeChanged = None      # function(int, int) - Old Node ID, New Node ID
         self.nodeDeleted = None      # function(int) - Node ID
         self.nodeIdent = None        # function(int, {}) - nodeid, {name, deviceid, model, version}
+        self.configAdded = None      # function(int, {}) - nodeid, {key, name, type, units, value}
+        self.configChanged = None    # function(int, {}) - nodeid, {key, name, type, units, value}
+        self.configDeleted = None    # function(int, int) - nodeid, key
         self.maintTimer = TimerThread(2.0, self.maintenance)
         self.maintTimer.start()
 
@@ -162,6 +180,49 @@ class NetworkModel(object):
         if node is not None:
             node.update()
 
+    def readConfiguration(self, node):
+        can = canbus.get_connection()
+        for c in node.device.configuration:
+            #print(c)
+            multiplier = c.get("multiplier", 1.0)
+            msg = canfix.NodeConfigurationQuery(key=c["key"], datatype=c["type"], multiplier=multiplier)
+            msg.sendNode = config.node
+            msg.destNode = node.nodeID
+            #print(msg.msg)
+            can.send(msg.msg)
+            start = time.time()
+            while(True):
+                try:
+                    res = can.recv(timeout=1.0)
+                except connection.Timeout:
+                    res = None #None = timeout
+                    break
+                if res.arbitration_id == 1760 + node.nodeID and res.data[0] == 0x0A and res.data[1] == config.node:
+                    break # We've found our response
+                elif time.time() - start > 1.0:
+                    res = None # None = timeout
+                    break
+            if res is None:
+                log.error("Timeout while waiting for configuration data")
+            else:
+                msg.msg = res
+                if msg.error:
+                    log.error("Error reading configuration for {}".format(c['name']))
+                else:
+                    msg.datatype = c['type']
+                    #msg.multiplier = c['multiplier']
+                    cfi = ConfigItem()
+                    cfi.key = c['key']
+                    cfi.name = c['name']
+                    cfi.datatype = c['type']
+                    cfi.units = c['units']
+                    cfi.value = msg.value
+                    node.configuration.append(cfi)
+                    if self.configAdded is not None:
+                        self.configAdded(node.nodeID, cfi.dict)
+        canbus.free_connection(can)
+
+
 
     def __str__(self):
         s = ""
@@ -188,6 +249,8 @@ class NetworkModel(object):
                     p.destNode = node.nodeID
                     m = p.getMessage()
                     canbus.send(m)
+            if node.device is not None and node.configuration == []:
+                self.readConfiguration(node)
 
 # Kinda like the built in threading.Timer except this one is recurring and
 # is a daemon thread so it'll die with the rest of the application

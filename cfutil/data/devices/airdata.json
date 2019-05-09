@@ -26,82 +26,82 @@
   "configuration":
   [
     {
-      "key":"0x0001",
+      "key":1,
       "name":"Airspeed Min",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x0002",
+      "key":2,
       "name":"Airspeed Max",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x0003",
+      "key":3,
       "name":"V1",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x0004",
+      "key":4,
       "name":"V2",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x0005",
+      "key":5,
       "name":"Vne",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x0006",
+      "key":6,
       "name":"Vfe",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x0007",
+      "key":7,
       "name":"Vmc",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x0008",
+      "key":8,
       "name":"Va",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x0009",
+      "key":9,
       "name":"Vno",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x000A",
+      "key":10,
       "name":"Vs",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x000B",
+      "key":11,
       "name":"Vs0",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x000C",
+      "key":12,
       "name":"Vx",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     },
     {
-      "key":"0x000D",
+      "key":13,
       "name":"Vy",
       "type":"UINT",
-      "multipier":"0.1"
+      "multipier":0.1
     }
   ]
 }

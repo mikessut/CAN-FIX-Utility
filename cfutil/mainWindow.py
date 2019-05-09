@@ -59,12 +59,15 @@ class connectDialog(QDialog, Ui_ConnectDialog):
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     # Signals
-    sigParameterAdded = pyqtSignal(canfix.Parameter, name="parameterAdded")
-    sigParameterChanged = pyqtSignal(canfix.Parameter, name="parameterChanged")
-    sigParameterDeleted = pyqtSignal(canfix.Parameter, name="parameterDelted")
-    sigNodeAdded = pyqtSignal(int, name="nodeAdded")
-    sigNodeDeleted = pyqtSignal(int, name="nodeDeleted")
-    sigNodeIdent = pyqtSignal(int, dict, name="nodeAdded")
+    parameterAdded = pyqtSignal(canfix.Parameter, name="parameterAdded")
+    parameterChanged = pyqtSignal(canfix.Parameter, name="parameterChanged")
+    parameterDeleted = pyqtSignal(canfix.Parameter, name="parameterDeleted")
+    configAdded = pyqtSignal(int, dict, name="configAdded")
+    configChanged = pyqtSignal(int, dict, name="configChanged")
+    configDeleted = pyqtSignal(int, int, name="configDeleted")
+    nodeAdded = pyqtSignal(int, name="nodeAdded")
+    nodeDeleted = pyqtSignal(int, name="nodeDeleted")
+    nodeIdent = pyqtSignal(int, dict, name="nodeAdded")
     recvMessage = pyqtSignal(can.Message)
     sendMessage = pyqtSignal(can.Message)
     canbusConnected = pyqtSignal()
@@ -78,19 +81,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.network = networkModel.NetworkModel()
 
         self.data = tableModel.ModelData()
-        self.sigParameterAdded.connect(self.data.parameterAdd)
-        self.sigParameterChanged.connect(self.data.parameterChange)
-        self.sigParameterDeleted.connect(self.data.parameterDelete)
+        self.parameterAdded.connect(self.data.parameterAdd)
+        self.parameterChanged.connect(self.data.parameterChange)
+        self.parameterDeleted.connect(self.data.parameterDelete)
         self.tableData.setModel(self.data)
         header = self.tableData.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
         self.netView = treeModel.NetworkTreeModel()
-        self.sigNodeAdded.connect(self.netView.nodeAdd)
-        self.sigNodeDeleted.connect(self.netView.nodeDelete)
-        self.sigNodeIdent.connect(self.netView.nodeIdent)
-        self.sigParameterAdded.connect(self.netView.parameterAdd)
-        self.sigParameterChanged.connect(self.netView.parameterChange)
+        self.nodeAdded.connect(self.netView.nodeAdd)
+        self.nodeDeleted.connect(self.netView.nodeDelete)
+        self.nodeIdent.connect(self.netView.nodeIdent)
+        self.parameterAdded.connect(self.netView.parameterAdd)
+        self.parameterChanged.connect(self.netView.parameterChange)
+        self.configAdded.connect(self.netView.configAdd)
+        self.configChanged.connect(self.netView.configChange)
         self.viewNetwork.setModel(self.netView)
         self.viewNetwork.setContextMenuPolicy(Qt.CustomContextMenu)
 
@@ -120,16 +125,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.recvMessage.connect(self.network.update)
 
         # The network model is generic (not PyQt) so these tie the callbacks to the signals
-        self.network.parameterAdded = self.sigParameterAdded.emit
-        self.network.parameterChanged = self.sigParameterChanged.emit
-        self.network.parameterDeleted = self.sigParameterDeleted.emit
-        self.network.nodeIdent = self.sigNodeIdent.emit
-        self.network.nodeAdded = self.sigNodeAdded.emit
-        self.network.nodeDeleted = self.sigNodeDeleted.emit
+        self.network.parameterAdded = self.parameterAdded.emit
+        self.network.parameterChanged = self.parameterChanged.emit
+        self.network.parameterDeleted = self.parameterDeleted.emit
+        self.network.configAdded = self.configAdded.emit
+        self.network.configChanged = self.configChanged.emit
+        self.network.configDeleted = self.configDeleted.emit
+        self.network.nodeIdent = self.nodeIdent.emit
+        self.network.nodeAdded = self.nodeAdded.emit
+        self.network.nodeDeleted = self.nodeDeleted.emit
 
         self.canbusConnected.connect(self.connectedSlot)
         self.canbusDisconnected.connect(self.disconnectedSlot)
-        self.sigNodeIdent.connect(self.nodeIdentSlot)
+        self.nodeIdent.connect(self.nodeIdentSlot)
 
         if canbus.connected:
             self.connectedSlot()
