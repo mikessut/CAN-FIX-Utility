@@ -18,8 +18,8 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 # This module exposes a list of all the devices that we know how to talk to.
-# These devices are all defined by XML files in config.DataPath/devices
-# There is one XML file per device.
+# These devices are all defined by JSON files in config.DataPath/devices
+# There is one JSON file per device.
 
 import os
 import logging
@@ -48,6 +48,17 @@ devices = []
 dirlist = os.listdir(config.DataPath + "devices")
 log.debug("Loading Devices")
 
+
+def getParameterList(pl):
+    l = []
+    for p in pl:
+        if(type(p) == str):
+            l.append(int(p, 0))
+        else:
+            l.append(int(p))
+    l.sort()
+    return l
+
 for filename in dirlist:
     if filename[-5:] == ".json":
         with open(config.DataPath + "devices/" + filename) as json_file:
@@ -62,7 +73,8 @@ for filename in dirlist:
         newdevice = Device(name, dtype, model, version)
         newdevice.fwUpdateCode = int(d.get("firmware_code"),0)
         newdevice.fwDriver = d.get("firmware_driver")
-        newdevice.parameters = d.get("parameters", [])
+        newdevice.parameters = getParameterList(d.get("parameters", []))
+        # TODO: Sanitize configuration list
         newdevice.configuration = d.get("configuration", [])
 
         devices.append(newdevice)

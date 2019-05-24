@@ -28,80 +28,93 @@
     {
       "key":1,
       "name":"Airspeed Min",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":2,
       "name":"Airspeed Max",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":3,
       "name":"V1",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":4,
       "name":"V2",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":5,
       "name":"Vne",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":6,
       "name":"Vfe",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":7,
       "name":"Vmc",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":8,
       "name":"Va",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":9,
       "name":"Vno",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":10,
       "name":"Vs",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":11,
       "name":"Vs0",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":12,
       "name":"Vx",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     },
     {
       "key":13,
       "name":"Vy",
+      "units":"knots",
       "type":"UINT",
-      "multipier":0.1
+      "multiplier":0.1
     }
   ]
 }

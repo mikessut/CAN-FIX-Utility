@@ -135,10 +135,23 @@ class ParameterItem(TreeItem):
 
 class ConfigItem(TreeItem):
     """Represents a CAN-FIX Parameter"""
-    def __init__(self, name, key, value, parent=None):
+    def __init__(self, nodeid, name, key, value, units="", parent=None):
         super(ConfigItem, self).__init__(name, parent)
+        self.nodeid = nodeid
         self.key = key
-        self.value = value
+        self.__value = value
+        self.units = units
+
+    def getValue(self):
+        if self.units:
+            return "{} {}".format(self.__value, self.units)
+        else:
+            return self.__value
+
+    def setValue(self, value):
+        self.__value = value
+
+    value = property(getValue, setValue)
 
     def __str__(self):
         return "%i %s" % (self.key, self.name)
@@ -160,17 +173,6 @@ class ConfigItem(TreeItem):
 
     def __ge__(self, other):
         return self.key >= other.key
-
-
-# Debug print routine.
-def TreePrint(node, depth=0):
-    #for i in range(depth):
-    #    print("", end=' ')
-    #print node, "<-", node.parent
-    print(node, node.value)
-    if node.children:
-        for each in node.children:
-            TreePrint(each, depth+1)
 
 
 class NetworkTreeModel(QAbstractItemModel):
@@ -262,7 +264,6 @@ class NetworkTreeModel(QAbstractItemModel):
         self.root.children.remove(item)
         self.modelReset.emit()
 
-
     def parameterAdd(self, parameter):
         item = self.findNodeID(parameter.node)
         p = item.parameterItem
@@ -286,13 +287,11 @@ class NetworkTreeModel(QAbstractItemModel):
     def configAdd(self, nodeid, cfg):
         item = self.findNodeID(nodeid)
         c = item.configRoot
-        if cfg['units']:
-            v = "{} {}".format(cfg['value'],cfg['units'])
-        else:
-            v = cfg['value']
-        newc = ConfigItem(cfg['name'], int(cfg['key']), v, c)
+        newc = ConfigItem(nodeid, cfg['name'], int(cfg['key']), cfg['value'], cfg['units'], c)
         c.children.append(newc)
         c.children.sort()
+        self.modelReset.emit()
+
 
     def configChange(self, nodeid, cfg):
         print("Change Configuration...")

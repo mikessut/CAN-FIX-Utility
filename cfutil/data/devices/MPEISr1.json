@@ -1,23 +1,10 @@
 {
-  "name":"Engine Data Test Node",
+  "name":"MakerPlane Engine Information System",
   "type":"0x40",
-  "model":"0x0A0B0F",
+  "model":"0x000001",
   "version":"0x01",
   "firmware_code":"0xF22",
-  "firmware_driver":"DUMMY",
-  "node_errors":
-    [
-      {
-        "description":"Temperature Out of Range"
-      },
-      {
-        "description":"Voltage Out of Range"
-      }
-    ],
-  "status":
-    [
-      {"0x0100":""}
-    ],
+  "firmware_driver":"ATMEL8",
   "parameters":
     [
       "0x200",

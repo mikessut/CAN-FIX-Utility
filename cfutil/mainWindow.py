@@ -31,6 +31,7 @@ from . import connection
 from .ui.main_ui import Ui_MainWindow
 from .ui.connect_ui import Ui_ConnectDialog
 from . import fwDialog
+from . import configDialog
 from . import networkModel
 from . import treeModel
 from . import tableModel
@@ -226,12 +227,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def networkClicked(self, index):
         #log.debug(index.parent().data().toString() + " " + index.data().toString())
-        log.debug(index.parent().data() + " " + index.data())
+        #log.debug(index.parent().data() + " " + index.data())
+        pass
 
     def networkDblClicked(self, index):
         item = index.internalPointer()
         if isinstance(item, treeModel.FixItem):
-            print("Edit Node", item.nodeID)
+            print("Edit Node", str(item.nodeID))
+        elif isinstance(item, treeModel.ConfigItem):
+            diaConfig = configDialog.dialogConfig(self.network, item.nodeid, item.key)
+            x = diaConfig.exec_()
         else:
             print(type(item))
         #print "Edit *", index.data().toString()

@@ -36,17 +36,44 @@ canbus = connection.canbus
 
 
 class ConfigItem(object):
-    def __init__(self):
-        self.key = None
-        self.name = ""
-        self.datatype = ""
-        self.units = ""
+    def __init__(self, c):
+        """c is the individual config dictionary from the device file"""
         self.value = None
+        self.__dict = c
 
+    def getKey(self):
+        return self.__dict['key']
+    key = property(getKey)
+
+    def getName(self):
+        return self.__dict['name']
+    name = property(getName)
+
+    def getDataType(self):
+        return self.__dict['type']
+    datatype = property(getDataType)
+
+    def getUnits(self):
+        return self.__dict.get('units', '')
+    units = property(getUnits)
+
+    def getMultiplier(self):
+        return self.__dict.get('multiplier', 1.0)
+    multiplier = property(getMultiplier)
+
+    # Retrives a copy of the dictionary along with the value
     def getDict(self):
-        return {'key':self.key, 'name':self.name, 'type':self.datatype, 'units':self.units, 'value':self.value}
-
+        d = self.__dict.copy()
+        d['value'] = self.value
+        return d
     dict = property(getDict)
+
+    # Make us look like a dictionary
+    def get(self, key, default=None):
+        return self.__dict.get(key, default)
+
+    def __str__(self):
+        return "{} {} {} {} {}*{}".format(self.key, self.name, self.datatype, self.value, self.units, self.multiplier)
 
 
 class CFNode(object):
@@ -206,22 +233,21 @@ class NetworkModel(object):
                 log.error("Timeout while waiting for configuration data")
             else:
                 msg.msg = res
+                msg.datatype = c['type']
+                cfi = ConfigItem(c)
+                # cfi.key = c['key']
+                # cfi.name = c['name']
+                # cfi.datatype = c['type']
+                # cfi.units = c.get('units', None)
                 if msg.error:
                     log.error("Error reading configuration for {}".format(c['name']))
+                    cfi.value = "$error$"
                 else:
-                    msg.datatype = c['type']
-                    #msg.multiplier = c['multiplier']
-                    cfi = ConfigItem()
-                    cfi.key = c['key']
-                    cfi.name = c['name']
-                    cfi.datatype = c['type']
-                    cfi.units = c['units']
                     cfi.value = msg.value
-                    node.configuration.append(cfi)
-                    if self.configAdded is not None:
-                        self.configAdded(node.nodeID, cfi.dict)
+                node.configuration.append(cfi)
+                if self.configAdded is not None:
+                    self.configAdded(node.nodeID, cfi.dict)
         canbus.free_connection(can)
-
 
 
     def __str__(self):

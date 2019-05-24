@@ -31,16 +31,60 @@ from . import firmware
 log = logging.getLogger(__name__)
 
 
+def getConfigItemWidget(c, parent):
+    """This function takes a configuration item from the networkModel and
+       determines the type of widget that is needed to edit it"""
+    generic_types = {"SINT":(-128, 127),
+                     "USINT":(0, 255),
+                     "INT":(-32768, 32767),
+                     "UINT":(0, 65535),
+                     "DINT":(-2147483648, 2147483647),
+                     "UDINT":(0, 4294967296)
+                     }
+    if c.datatype in generic_types:
+        t = generic_types[c.datatype]
+        if c.multiplier >= 1.0:
+            w = QSpinBox(parent)
+        else:
+            w = QDoubleSpinBox(parent)
+
+
+        w.setMinimum(c.get("min", t[0]))
+        w.setMaximum(c.get("max", t[1]))
+        w.setSingleStep(c.multiplier)
+        w.setValue(c.value)
+        return w
+
 
 class dialogConfig(QDialog, Ui_dialogConfig):
-    def __init__(self):
+    def __init__(self, netmodel, nodeid, key):
         QDialog.__init__(self)
         self.setupUi(self)
-        self.labelNode.setText("Node")
+        # So hitting enter doesn't send the value or close the box
+        Btn = self.buttonBox.button(QDialogButtonBox.Apply);
+        Btn.setAutoDefault(False);
+        Btn.setDefault(False);
+        Btn = self.buttonBox.button(QDialogButtonBox.Close);
+        Btn.setAutoDefault(False);
+        Btn.setDefault(False);
+
+        for node in netmodel.nodes:
+            if node.nodeID == nodeid:
+                self.node = node
+                break
+        for c in node.configuration:
+            if c.key == key:
+                self.configItem = c
+                break
+        self.labelConfig.setText(str(self.configItem.name))
+        self.widget = getConfigItemWidget(self.configItem, self.scrollAreaWidgetContents)
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.widget)
+        if c.units is not None:
+            l = QLabel(self.scrollAreaWidgetContents)
+            l.setText(c.units)
+            self.formLayout.setWidget(0, QFormLayout.FieldRole, l)
+
 
     def btnClick(self, btn):
-        x = btn.text()
-        if x == "&Apply":
-            print("Apply")
-        # if x == "&Close":
-        #     print("We outta here")
+        if btn == self.buttonBox.button(QDialogButtonBox.Apply):
+            self.configItem.value = self.widget.value()
