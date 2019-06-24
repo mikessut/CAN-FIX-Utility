@@ -39,13 +39,13 @@ from . import tableModel
 log = logging.getLogger(__name__)
 canbus = connection.canbus
 
+
 class connectDialog(QDialog, Ui_ConnectDialog):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
         for each in connection.valid_interfaces:
             self.comboAdapter.addItem(each)
-
 
     def interfaceChange(self, x):
         interface = connection.valid_interfaces[x]
@@ -73,7 +73,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     sendMessage = pyqtSignal(can.Message)
     canbusConnected = pyqtSignal()
     canbusDisconnected = pyqtSignal()
-
 
     def __init__(self, args):
         QMainWindow.__init__(self)
@@ -207,12 +206,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             p = canfix.parseMessage(msg)
             self.textTraffic.appendPlainText(str(p))
 
-
     def connectedSlot(self):
         self.actionConnect.setDisabled(True)
         self.actionDisconnect.setEnabled(True)
         self.statusbar.showMessage("Connected to {}:{}".format(canbus.interface, canbus.channel))
-
 
     def disconnectedSlot(self):
         self.actionConnect.setEnabled(True)

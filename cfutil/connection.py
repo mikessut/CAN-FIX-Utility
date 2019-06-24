@@ -35,6 +35,7 @@ log = logging.getLogger(__name__)
 valid_interfaces = sorted(can.interfaces.VALID_INTERFACES)
 log.debug("valid interfaces = {}".format(valid_interfaces))
 
+
 def get_available_channels(interface):
     if interface == "serial":
         return config.portlist
@@ -47,11 +48,14 @@ def get_available_channels(interface):
     else:
         return []
 
+
 class NotConnected(Exception):
     pass
 
+
 class Timeout(Exception):
     pass
+
 
 class Connection:
     """Represent a generic connection to a CANBus network"""
@@ -62,9 +66,9 @@ class Connection:
     def send(self, msg):
         self.__sendFunction(msg)
 
-    def recv(self, block = True, timeout = None):
+    def recv(self, block=True, timeout=None):
         try:
-            return self.recvQueue.get(block, timeout = timeout)
+            return self.recvQueue.get(block, timeout=timeout)
         except queue.Empty:
             raise Timeout()
 
@@ -82,9 +86,8 @@ class CANBus(threading.Thread):
         self.recvMessageCallback = None
         self.sendMessageCallback = None
 
-
     def run(self):
-        while self.getout == False:
+        while self.getout is False:
             connect_flag = self.__connected.wait(1.0)
             if connect_flag:
                 try:
@@ -104,19 +107,22 @@ class CANBus(threading.Thread):
         if self.sendMessageCallback != None:
             self.sendMessageCallback(msg)
 
-
     def connect(self, interface, channel, **kwargs):
         try:
-            self.__bus = can.ThreadSafeBus(channel, bustype = interface, **kwargs)
+            self.__bus = can.ThreadSafeBus(channel, bustype=interface, **kwargs)
             self.channel = channel
             self.interface = interface
         except Exception as e:
             log.error(e)
+            raise e
         if self.connectedCallback is not None:
             self.connectedCallback()
+        #if error is None:
         self.__connected.set()
 
     def disconnect(self):
+        if not self.connected:
+            return
         self.__bus.shutdown()
         if self.disconnectedCallback is not None:
             self.disconnectedCallback()

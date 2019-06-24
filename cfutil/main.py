@@ -60,7 +60,10 @@ def main():
     from . import mainCommand
     from . import connection
 
-    connection.canbus.connect(config.interface, config.channel)
+    try:
+        connection.canbus.connect(config.interface, config.channel)
+    except:
+        print("Failed to connect to {} - {}".format(config.interface, config.channel))
     result = mainCommand.run(args)
     # We don't run the GUI if mainCommand.run() executed some command or we
     # were in interactive mode.
