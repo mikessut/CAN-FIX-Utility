@@ -1,37 +1,1702 @@
 {
-  "name":"MakerPlane Engine Information System",
-  "type":"0x40",
-  "model":"0x000001",
-  "version":"0x01",
-  "firmware_code":"0xF22",
-  "firmware_driver":"ATMEL8",
-  "parameters":
-    [
-      "0x200",
-      "0x21A",
-      "0x21C",
-      "0x21E",
-      "0x220",
-      "0x222",
-      "0x226",
-      "0x227",
-      "0x406",
-      "0x500",
-      "0x502",
-      "0x512",
-      "0x50E",
-      "0x520"
-    ],
-  "configuration":
-  [
+  "name": "MakerPlane Engine Information System",
+  "type": "0x40",
+  "model": "0x000001",
+  "version": "0x01",
+  "firmware_code": "0xF22",
+  "firmware_driver": "ATMEL8",
+  "parameters": [
+    540,
+    541,
+    542,
+    543,
+    544,
+    545,
+    546,
+    547,
+    548,
+    549,
+    550,
+    551,
+    552,
+    553,
+    1292,
+    1293,
+    1294,
+    1295,
+    1296,
+    1297,
+    1298,
+    1299,
+    1300,
+    1301,
+    1302,
+    1303,
+    1304,
+    1305,
+    1306,
+    1307,
+    1308,
+    1309,
+    1411,
+    1030,
+    1284,
+    1285,
+    1286,
+    1287,
+    1288,
+    1289,
+    1290,
+    1291,
+    1310,
+    1311,
+    1312,
+    1313,
+    1314,
+    1315,
+    512,
+    513,
+    514,
+    515,
+    538,
+    539,
+    1280,
+    1281,
+    1282,
+    1283
+  ],
+  "configuration": [
     {
-      "key":1,
-      "name":"Update Rate",
-      "type":"UINT",
-      "units":"mS",
-      "min":50,
-      "max":2000,
-      "multiplier":10
+      "key": 0,
+      "name": "Engine Number",
+      "type": "SHORT",
+      "min": 1,
+      "max": 2
+    },
+    {
+      "key": 1,
+      "name": "Cylinder Count",
+      "type": "SHORT",
+      "min": 1,
+      "max": 6
+    },
+    {
+      "key": 2,
+      "name": "Resistor Input 1 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4"
+      }
+    },
+    {
+      "key": 3,
+      "name": "Resistor Input 1 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 4,
+      "name": "Resistor Input 1 Raw Input 1",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 5,
+      "name": "Resistor Input 1 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 6,
+      "name": "Resistor Input 1 Raw Input 2",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 7,
+      "name": "Resistor Input 1 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 8,
+      "name": "Resistor Input 1 Raw Input 3",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 9,
+      "name": "Resistor Input 1 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 10,
+      "name": "Resistor Input 1 Raw Input 4",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 11,
+      "name": "Resistor Input 1 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 12,
+      "name": "Resistor Input 1 Raw Input 5",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 13,
+      "name": "Resistor Input 1 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 14,
+      "name": "Resistor Input 1 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 15,
+      "name": "Resistor Input 1 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 16,
+      "name": "Resistor Input 1 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 17,
+      "name": "Resistor Input 1 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 18,
+      "name": "Resistor Input 1 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 19,
+      "name": "Resistor Input 1 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 20,
+      "name": "Resistor Input 2 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4"
+      }
+    },
+    {
+      "key": 21,
+      "name": "Resistor Input 2 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 22,
+      "name": "Resistor Input 2 Raw Input 1",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 23,
+      "name": "Resistor Input 2 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 24,
+      "name": "Resistor Input 2 Raw Input 2",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 25,
+      "name": "Resistor Input 2 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 26,
+      "name": "Resistor Input 2 Raw Input 3",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 27,
+      "name": "Resistor Input 2 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 28,
+      "name": "Resistor Input 2 Raw Input 4",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 29,
+      "name": "Resistor Input 2 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 30,
+      "name": "Resistor Input 2 Raw Input 5",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 31,
+      "name": "Resistor Input 2 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 32,
+      "name": "Resistor Input 2 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 33,
+      "name": "Resistor Input 2 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 34,
+      "name": "Resistor Input 2 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 35,
+      "name": "Resistor Input 2 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 36,
+      "name": "Resistor Input 2 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 37,
+      "name": "Resistor Input 2 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 38,
+      "name": "Resistor Input 3 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4"
+      }
+    },
+    {
+      "key": 39,
+      "name": "Resistor Input 3 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 40,
+      "name": "Resistor Input 3 Raw Input 1",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 41,
+      "name": "Resistor Input 3 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 42,
+      "name": "Resistor Input 3 Raw Input 2",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 43,
+      "name": "Resistor Input 3 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 44,
+      "name": "Resistor Input 3 Raw Input 3",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 45,
+      "name": "Resistor Input 3 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 46,
+      "name": "Resistor Input 3 Raw Input 4",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 47,
+      "name": "Resistor Input 3 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 48,
+      "name": "Resistor Input 3 Raw Input 5",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 49,
+      "name": "Resistor Input 3 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 50,
+      "name": "Resistor Input 3 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 51,
+      "name": "Resistor Input 3 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 52,
+      "name": "Resistor Input 3 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 53,
+      "name": "Resistor Input 3 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 54,
+      "name": "Resistor Input 3 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 55,
+      "name": "Resistor Input 3 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 56,
+      "name": "Resistor Input 4 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4"
+      }
+    },
+    {
+      "key": 57,
+      "name": "Resistor Input 4 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 58,
+      "name": "Resistor Input 4 Raw Input 1",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 59,
+      "name": "Resistor Input 4 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 60,
+      "name": "Resistor Input 4 Raw Input 2",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 61,
+      "name": "Resistor Input 4 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 62,
+      "name": "Resistor Input 4 Raw Input 3",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 63,
+      "name": "Resistor Input 4 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 64,
+      "name": "Resistor Input 4 Raw Input 4",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 65,
+      "name": "Resistor Input 4 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 66,
+      "name": "Resistor Input 4 Raw Input 5",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 67,
+      "name": "Resistor Input 4 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 68,
+      "name": "Resistor Input 4 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 69,
+      "name": "Resistor Input 4 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 70,
+      "name": "Resistor Input 4 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 71,
+      "name": "Resistor Input 4 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 72,
+      "name": "Resistor Input 4 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 73,
+      "name": "Resistor Input 4 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 74,
+      "name": "Resistor Input 5 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4"
+      }
+    },
+    {
+      "key": 75,
+      "name": "Resistor Input 5 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 76,
+      "name": "Resistor Input 5 Raw Input 1",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 77,
+      "name": "Resistor Input 5 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 78,
+      "name": "Resistor Input 5 Raw Input 2",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 79,
+      "name": "Resistor Input 5 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 80,
+      "name": "Resistor Input 5 Raw Input 3",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 81,
+      "name": "Resistor Input 5 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 82,
+      "name": "Resistor Input 5 Raw Input 4",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 83,
+      "name": "Resistor Input 5 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 84,
+      "name": "Resistor Input 5 Raw Input 5",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "key": 85,
+      "name": "Resistor Input 5 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 86,
+      "name": "Resistor Input 5 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 87,
+      "name": "Resistor Input 5 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 88,
+      "name": "Resistor Input 5 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 89,
+      "name": "Resistor Input 5 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 90,
+      "name": "Resistor Input 5 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 91,
+      "name": "Resistor Input 5 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 92,
+      "name": "Voltage Input 1 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4",
+        "0x50E0": "Electrical Bus Voltage 1",
+        "0x50E1": "Electrical Bus Voltage 2",
+        "0x5120": "Electrical Bus Current 1",
+        "0x5121": "Electrical Bus Current 2",
+        "0x5160": "Alternator Voltage 1",
+        "0x5161": "Alternator Voltage 2",
+        "0x51A0": "Alternator Current 1",
+        "0x51A1": "Alternator Current 2"
+      }
+    },
+    {
+      "key": 93,
+      "name": "Voltage Input 1 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 94,
+      "name": "Voltage Input 1 Raw Input 1",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 95,
+      "name": "Voltage Input 1 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 96,
+      "name": "Voltage Input 1 Raw Input 2",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 97,
+      "name": "Voltage Input 1 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 98,
+      "name": "Voltage Input 1 Raw Input 3",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 99,
+      "name": "Voltage Input 1 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 100,
+      "name": "Voltage Input 1 Raw Input 4",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 101,
+      "name": "Voltage Input 1 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 102,
+      "name": "Voltage Input 1 Raw Input 5",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 103,
+      "name": "Voltage Input 1 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 104,
+      "name": "Voltage Input 1 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 105,
+      "name": "Voltage Input 1 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 106,
+      "name": "Voltage Input 1 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 107,
+      "name": "Voltage Input 1 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 108,
+      "name": "Voltage Input 1 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 109,
+      "name": "Voltage Input 1 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 110,
+      "name": "Voltage Input 2 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4",
+        "0x50E0": "Electrical Bus Voltage 1",
+        "0x50E1": "Electrical Bus Voltage 2",
+        "0x5120": "Electrical Bus Current 1",
+        "0x5121": "Electrical Bus Current 2",
+        "0x5160": "Alternator Voltage 1",
+        "0x5161": "Alternator Voltage 2",
+        "0x51A0": "Alternator Current 1",
+        "0x51A1": "Alternator Current 2"
+      }
+    },
+    {
+      "key": 111,
+      "name": "Voltage Input 2 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 112,
+      "name": "Voltage Input 2 Raw Input 1",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 113,
+      "name": "Voltage Input 2 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 114,
+      "name": "Voltage Input 2 Raw Input 2",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 115,
+      "name": "Voltage Input 2 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 116,
+      "name": "Voltage Input 2 Raw Input 3",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 117,
+      "name": "Voltage Input 2 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 118,
+      "name": "Voltage Input 2 Raw Input 4",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 119,
+      "name": "Voltage Input 2 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 120,
+      "name": "Voltage Input 2 Raw Input 5",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 121,
+      "name": "Voltage Input 2 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 122,
+      "name": "Voltage Input 2 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 123,
+      "name": "Voltage Input 2 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 124,
+      "name": "Voltage Input 2 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 125,
+      "name": "Voltage Input 2 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 126,
+      "name": "Voltage Input 2 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 127,
+      "name": "Voltage Input 2 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 128,
+      "name": "Voltage Input 3 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4",
+        "0x50E0": "Electrical Bus Voltage 1",
+        "0x50E1": "Electrical Bus Voltage 2",
+        "0x5120": "Electrical Bus Current 1",
+        "0x5121": "Electrical Bus Current 2",
+        "0x5160": "Alternator Voltage 1",
+        "0x5161": "Alternator Voltage 2",
+        "0x51A0": "Alternator Current 1",
+        "0x51A1": "Alternator Current 2"
+      }
+    },
+    {
+      "key": 129,
+      "name": "Voltage Input 3 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 130,
+      "name": "Voltage Input 3 Raw Input 1",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 131,
+      "name": "Voltage Input 3 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 132,
+      "name": "Voltage Input 3 Raw Input 2",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 133,
+      "name": "Voltage Input 3 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 134,
+      "name": "Voltage Input 3 Raw Input 3",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 135,
+      "name": "Voltage Input 3 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 136,
+      "name": "Voltage Input 3 Raw Input 4",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 137,
+      "name": "Voltage Input 3 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 138,
+      "name": "Voltage Input 3 Raw Input 5",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 139,
+      "name": "Voltage Input 3 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 140,
+      "name": "Voltage Input 3 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 141,
+      "name": "Voltage Input 3 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 142,
+      "name": "Voltage Input 3 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 143,
+      "name": "Voltage Input 3 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 144,
+      "name": "Voltage Input 3 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 145,
+      "name": "Voltage Input 3 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 146,
+      "name": "Voltage Input 4 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4",
+        "0x50E0": "Electrical Bus Voltage 1",
+        "0x50E1": "Electrical Bus Voltage 2",
+        "0x5120": "Electrical Bus Current 1",
+        "0x5121": "Electrical Bus Current 2",
+        "0x5160": "Alternator Voltage 1",
+        "0x5161": "Alternator Voltage 2",
+        "0x51A0": "Alternator Current 1",
+        "0x51A1": "Alternator Current 2"
+      }
+    },
+    {
+      "key": 147,
+      "name": "Voltage Input 4 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 148,
+      "name": "Voltage Input 4 Raw Input 1",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 149,
+      "name": "Voltage Input 4 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 150,
+      "name": "Voltage Input 4 Raw Input 2",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 151,
+      "name": "Voltage Input 4 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 152,
+      "name": "Voltage Input 4 Raw Input 3",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 153,
+      "name": "Voltage Input 4 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 154,
+      "name": "Voltage Input 4 Raw Input 4",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 155,
+      "name": "Voltage Input 4 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 156,
+      "name": "Voltage Input 4 Raw Input 5",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 157,
+      "name": "Voltage Input 4 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 158,
+      "name": "Voltage Input 4 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 159,
+      "name": "Voltage Input 4 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 160,
+      "name": "Voltage Input 4 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 161,
+      "name": "Voltage Input 4 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 162,
+      "name": "Voltage Input 4 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 163,
+      "name": "Voltage Input 4 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 164,
+      "name": "Voltage Input 5 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4",
+        "0x50E0": "Electrical Bus Voltage 1",
+        "0x50E1": "Electrical Bus Voltage 2",
+        "0x5120": "Electrical Bus Current 1",
+        "0x5121": "Electrical Bus Current 2",
+        "0x5160": "Alternator Voltage 1",
+        "0x5161": "Alternator Voltage 2",
+        "0x51A0": "Alternator Current 1",
+        "0x51A1": "Alternator Current 2"
+      }
+    },
+    {
+      "key": 165,
+      "name": "Voltage Input 5 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 166,
+      "name": "Voltage Input 5 Raw Input 1",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 167,
+      "name": "Voltage Input 5 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 168,
+      "name": "Voltage Input 5 Raw Input 2",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 169,
+      "name": "Voltage Input 5 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 170,
+      "name": "Voltage Input 5 Raw Input 3",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 171,
+      "name": "Voltage Input 5 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 172,
+      "name": "Voltage Input 5 Raw Input 4",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 173,
+      "name": "Voltage Input 5 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 174,
+      "name": "Voltage Input 5 Raw Input 5",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 175,
+      "name": "Voltage Input 5 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 176,
+      "name": "Voltage Input 5 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 177,
+      "name": "Voltage Input 5 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 178,
+      "name": "Voltage Input 5 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 179,
+      "name": "Voltage Input 5 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 180,
+      "name": "Voltage Input 5 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 181,
+      "name": "Voltage Input 5 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 182,
+      "name": "Voltage Input 6 ID",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21E0": "Manifold Pressure",
+        "0x2200": "Oil Pressure",
+        "0x21C0": "Fuel Pressure",
+        "0x2220": "Oil Temperature",
+        "0x2240": "Coolant Temperature",
+        "0x50C0": "Carburetor Temperature",
+        "0x5830": "Cabin Temperature",
+        "0x4060": "Outside Air Temperature",
+        "0x2260": "Fuel Quantity Tank 1",
+        "0x2261": "Fuel Quantity Tank 2",
+        "0x2262": "Fuel Quantity Tank 3",
+        "0x2263": "Fuel Quantity Tank 4",
+        "0x50E0": "Electrical Bus Voltage 1",
+        "0x50E1": "Electrical Bus Voltage 2",
+        "0x5120": "Electrical Bus Current 1",
+        "0x5121": "Electrical Bus Current 2",
+        "0x5160": "Alternator Voltage 1",
+        "0x5161": "Alternator Voltage 2",
+        "0x51A0": "Alternator Current 1",
+        "0x51A1": "Alternator Current 2"
+      }
+    },
+    {
+      "key": 183,
+      "name": "Voltage Input 6 Index",
+      "type": "UINT"
+    },
+    {
+      "key": 184,
+      "name": "Voltage Input 6 Raw Input 1",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 185,
+      "name": "Voltage Input 6 Scaled Value 1",
+      "type": "UINT"
+    },
+    {
+      "key": 186,
+      "name": "Voltage Input 6 Raw Input 2",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 187,
+      "name": "Voltage Input 6 Scaled Value 2",
+      "type": "UINT"
+    },
+    {
+      "key": 188,
+      "name": "Voltage Input 6 Raw Input 3",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 189,
+      "name": "Voltage Input 6 Scaled Value 3",
+      "type": "UINT"
+    },
+    {
+      "key": 190,
+      "name": "Voltage Input 6 Raw Input 4",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 191,
+      "name": "Voltage Input 6 Scaled Value 4",
+      "type": "UINT"
+    },
+    {
+      "key": 192,
+      "name": "Voltage Input 6 Raw Input 5",
+      "type": "UINT",
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 193,
+      "name": "Voltage Input 6 Scaled Value 5",
+      "type": "UINT"
+    },
+    {
+      "key": 194,
+      "name": "Voltage Input 6 Min",
+      "type": "UINT"
+    },
+    {
+      "key": 195,
+      "name": "Voltage Input 6 Max",
+      "type": "UINT"
+    },
+    {
+      "key": 196,
+      "name": "Voltage Input 6 Low Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 197,
+      "name": "Voltage Input 6 Low Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 198,
+      "name": "Voltage Input 6 High Warning",
+      "type": "UINT"
+    },
+    {
+      "key": 199,
+      "name": "Voltage Input 6 High Alarm",
+      "type": "UINT"
+    },
+    {
+      "key": 200,
+      "name": "Tach Input 1",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x2000": "Engine RPM",
+        "0x2020": "Prop RPM"
+      }
+    },
+    {
+      "key": 201,
+      "name": "Tach Input 1 Calibration",
+      "type": "UINT",
+      "units": "pulses/rev"
+    },
+    {
+      "key": 202,
+      "name": "Voltage Input 1 Min",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 203,
+      "name": "Voltage Input 1 Max",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 204,
+      "name": "Voltage Input 1 Low Warning",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 205,
+      "name": "Voltage Input 1 Low Alarm",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 206,
+      "name": "Voltage Input 1 High Warning",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 207,
+      "name": "Voltage Input 1 High Alarm",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 208,
+      "name": "Voltage Input 1 Low Restriction 1",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 209,
+      "name": "Voltage Input 1 High Restriction 1",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 210,
+      "name": "Voltage Input 1 Low Restriction 2",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 211,
+      "name": "Voltage Input 1 High Restriction 2",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 212,
+      "name": "Tach Input 2",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x2000": "Engine RPM",
+        "0x2020": "Prop RPM"
+      }
+    },
+    {
+      "key": 213,
+      "name": "Tach Input 2 Calibration",
+      "type": "UINT",
+      "units": "pulses/rev"
+    },
+    {
+      "key": 214,
+      "name": "Voltage Input 2 Min",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 215,
+      "name": "Voltage Input 2 Max",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 216,
+      "name": "Voltage Input 2 Low Warning",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 217,
+      "name": "Voltage Input 2 Low Alarm",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 218,
+      "name": "Voltage Input 2 High Warning",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 219,
+      "name": "Voltage Input 2 High Alarm",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 220,
+      "name": "Voltage Input 2 Low Restriction 1",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 221,
+      "name": "Voltage Input 2 High Restriction 1",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 222,
+      "name": "Voltage Input 2 Low Restriction 2",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 223,
+      "name": "Voltage Input 2 High Restriction 2",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 224,
+      "name": "Flow Input 1",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21A0": "Fuel Flow",
+        "0x21A1": "Fuel Return Flow"
+      }
+    },
+    {
+      "key": 225,
+      "name": "Fuel Input 1 Calibration",
+      "type": "UINT",
+      "units": "pulses/gal"
+    },
+    {
+      "key": 226,
+      "name": "Voltage Input 1 Min",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 227,
+      "name": "Voltage Input 1 Max",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 228,
+      "name": "Voltage Input 1 Low Warning",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 229,
+      "name": "Voltage Input 1 Low Alarm",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 230,
+      "name": "Voltage Input 1 High Warning",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 231,
+      "name": "Voltage Input 1 High Alarm",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 232,
+      "name": "Flow Input 2",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "0x21A0": "Fuel Flow",
+        "0x21A1": "Fuel Return Flow"
+      }
+    },
+    {
+      "key": 233,
+      "name": "Fuel Input 2 Calibration",
+      "type": "UINT",
+      "units": "pulses/gal"
+    },
+    {
+      "key": 234,
+      "name": "Voltage Input 2 Min",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 235,
+      "name": "Voltage Input 2 Max",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 236,
+      "name": "Voltage Input 2 Low Warning",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 237,
+      "name": "Voltage Input 2 Low Alarm",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 238,
+      "name": "Voltage Input 2 High Warning",
+      "type": "UINT",
+      "units": "gal/hr"
+    },
+    {
+      "key": 239,
+      "name": "Voltage Input 2 High Alarm",
+      "type": "UINT",
+      "units": "gal/hr"
+    }
+  ],
+  "status": [
+    {
+      "parameter": 256,
+      "name": "Resistor Input 1 Raw Input",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "parameter": 257,
+      "name": "Resistor Input 2 Raw Input",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "parameter": 258,
+      "name": "Resistor Input 3 Raw Input",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "parameter": 259,
+      "name": "Resistor Input 4 Raw Input",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "parameter": 260,
+      "name": "Resistor Input 5 Raw Input",
+      "type": "UINT",
+      "units": "Ohms"
+    },
+    {
+      "parameter": 261,
+      "name": "Voltage Input 1 Raw Input",
+      "type": "UINT",
+      "multiplier": 0.001,
+      "units": "Volts"
+    },
+    {
+      "parameter": 262,
+      "name": "Voltage Input 2 Raw Input",
+      "type": "UINT",
+      "multiplier": 0.001,
+      "units": "Volts"
+    },
+    {
+      "parameter": 263,
+      "name": "Voltage Input 3 Raw Input",
+      "type": "UINT",
+      "multiplier": 0.001,
+      "units": "Volts"
+    },
+    {
+      "parameter": 264,
+      "name": "Voltage Input 4 Raw Input",
+      "type": "UINT",
+      "multiplier": 0.001,
+      "units": "Volts"
+    },
+    {
+      "parameter": 265,
+      "name": "Voltage Input 5 Raw Input",
+      "type": "UINT",
+      "multiplier": 0.001,
+      "units": "Volts"
+    },
+    {
+      "parameter": 266,
+      "name": "Voltage Input 6 Raw Input",
+      "type": "UINT",
+      "multiplier": 0.001,
+      "units": "Volts"
     }
   ]
 }

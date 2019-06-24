@@ -18,15 +18,15 @@
 
 import argparse
 import logging
+import can
 import logging.config
 import cfutil.config as config
 
 def main():
     parser = argparse.ArgumentParser(description='CAN-FIX Configuration Utility Program')
     parser.add_argument('--interactive', '-i', action='store_true', help='Run in interactive mode')
-    l=['socketcan', 'serial', 'kvaser', 'pcan', 'usb2can']
-    # for each in canbus.adapterList:
-    #     l.append(each.shortname)
+    l = sorted(can.interfaces.VALID_INTERFACES)
+    #l=['socketcan', 'serial', 'kvaser', 'pcan', 'usb2can']
     parser.add_argument('--interface', choices=l, help='CANBus Connection Interface Name')
     parser.add_argument('--channel', help='CANBus Channel or Device file')
     parser.add_argument('--bitrate', default=125, type=int, help='CANBus Bitrate')
@@ -61,10 +61,10 @@ def main():
     from . import connection
 
     connection.canbus.connect(config.interface, config.channel)
-    mainCommand.run(args)
-    # connection.canbus.stop()
-
-    if args.interactive == False:
+    result = mainCommand.run(args)
+    # We don't run the GUI if mainCommand.run() executed some command or we
+    # were in interactive mode.
+    if args.interactive is False and not result:
         try:
             import PyQt5.QtGui
         except ImportError:
@@ -72,5 +72,5 @@ def main():
 
         from . import mainWindow
         mainWindow.run(args)
-        connection.canbus.stop()
-        connection.canbus.join()
+    connection.canbus.stop()
+    connection.canbus.join()

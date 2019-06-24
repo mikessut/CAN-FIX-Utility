@@ -62,6 +62,7 @@ def getParameterList(pl):
 for filename in dirlist:
     if filename[-5:] == ".json":
         with open(config.DataPath + "devices/" + filename) as json_file:
+            log.debug("Loading device file {}".format(filename))
             d = json.load(json_file)
         try: # These are required
             name = d["name"]

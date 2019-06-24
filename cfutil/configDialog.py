@@ -48,7 +48,6 @@ def getConfigItemWidget(c, parent):
         else:
             w = QDoubleSpinBox(parent)
 
-
         w.setMinimum(c.get("min", t[0]))
         w.setMaximum(c.get("max", t[1]))
         w.setSingleStep(c.multiplier)

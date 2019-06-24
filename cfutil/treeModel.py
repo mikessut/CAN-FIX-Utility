@@ -287,12 +287,15 @@ class NetworkTreeModel(QAbstractItemModel):
     def configAdd(self, nodeid, cfg):
         item = self.findNodeID(nodeid)
         c = item.configRoot
-        newc = ConfigItem(nodeid, cfg['name'], int(cfg['key']), cfg['value'], cfg['units'], c)
+        newc = ConfigItem(nodeid, cfg['name'], int(cfg['key']), cfg['value'], cfg.get('units', ''), c)
         c.children.append(newc)
         c.children.sort()
-        self.modelReset.emit()
-
 
     def configChange(self, nodeid, cfg):
-        print("Change Configuration...")
-        print(cfg)
+        item = self.findNodeID(nodeid)
+        c = item.configRoot
+        for i, each in enumerate(c.children):
+            if each.key == cfg['key']:
+                each.value = cfg['value']
+                self.dataChanged.emit(self.createIndex(i,1,each), self.createIndex(i,1,each))
+                break

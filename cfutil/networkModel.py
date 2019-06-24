@@ -38,8 +38,9 @@ canbus = connection.canbus
 class ConfigItem(object):
     def __init__(self, c):
         """c is the individual config dictionary from the device file"""
-        self.value = None
+        self.__value = None
         self.__dict = c
+        self.changeFunction = None
 
     def getKey(self):
         return self.__dict['key']
@@ -60,6 +61,17 @@ class ConfigItem(object):
     def getMultiplier(self):
         return self.__dict.get('multiplier', 1.0)
     multiplier = property(getMultiplier)
+
+    def setValue(self, value):
+        if value != self.__value:
+            self.__value = value;
+            if self.changeFunction is not None:
+                self.changeFunction(value)
+
+    def getValue(self):
+        return self.__value
+
+    value = property(getValue, setValue)
 
     # Retrives a copy of the dictionary along with the value
     def getDict(self):
@@ -207,6 +219,44 @@ class NetworkModel(object):
         if node is not None:
             node.update()
 
+    # We assign this function to our config objuects so they can have proper
+    # access to our callback function
+    def configChangeLink(self, nodeID, cfg):
+        def f(value):
+            if self.configChanged is not None:
+                self.configChanged(nodeID, cfg.getDict())
+            can = canbus.get_connection()
+            msg = canfix.NodeConfigurationSet(key=cfg.get("key"), datatype=cfg.get("type"), multiplier=cfg.get("multiplier"))
+            msg.sendNode = config.node
+            msg.destNode = nodeID
+            msg.value = value
+            can.send(msg.msg)
+            start = time.time()
+            while(True):
+                try:
+                    res = can.recv(timeout=1.0)
+                except connection.Timeout:
+                    res = None #None = timeout
+                    break
+                if res.arbitration_id == 1760 + nodeID and res.data[0] == 0x09 and res.data[1] == config.node:
+                    break # We've found our response
+                elif time.time() - start > 1.0:
+                    res = None # None = timeout
+                    break
+            if res is None:
+                log.error("Timeout while waiting for configuration data")
+            else:
+                msg.msg = res
+
+                if msg.errorCode:
+                    log.error("Error reading configuration for {}".format(cfg.get('name')))
+                    cfg.value = "$error$"
+                else:
+                    cfg.value = value
+            canbus.free_connection(can)
+        return f
+
+
     def readConfiguration(self, node):
         can = canbus.get_connection()
         for c in node.device.configuration:
@@ -244,6 +294,7 @@ class NetworkModel(object):
                     cfi.value = "$error$"
                 else:
                     cfi.value = msg.value
+                cfi.changeFunction = self.configChangeLink(node.nodeID, cfi)
                 node.configuration.append(cfi)
                 if self.configAdded is not None:
                     self.configAdded(node.nodeID, cfi.dict)

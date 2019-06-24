@@ -30,7 +30,7 @@ def list_devices():
     print("Device Name [Device ID]")
     print("-----------------------")
     for each in devices.devices:
-        print(each.name, '[' + hex(each.DeviceId) + ']')
+        print(each.name, '[' + hex(each.deviceType) + ']')
 
 def listen(conn, msg_count, raw):
     count = 0
@@ -82,10 +82,12 @@ def load_firmware(conn, filename, node):
     fw.download(node)
 
 def run(args):
+    cmdrun = False
     try:
         conn = connection.canbus.get_connection()
         if args.list_devices == True:
             list_devices()
+            cmdrun = True
         if args.firmware_file or args.firmware_node:
             import firmware
             if args.firmware_file == None:
@@ -93,12 +95,13 @@ def run(args):
             if args.firmware_node == None:
                 args.firmware_node = int(input("Enter Node Number:"))
             load_firmware(args.firmware_file, args.firmware_node)
+            cmdrun = True
         if args.listen == True:
             listen(conn, args.frame_count, args.raw)
-
-
+            cmdrun = True
     finally:
         connection.canbus.free_connection(conn)
+        return cmdrun
 
 if __name__ == "__main__":
     run(None)

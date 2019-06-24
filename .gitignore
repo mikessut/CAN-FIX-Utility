@@ -7,6 +7,7 @@
 doc/_*
 .ropeproject/*
 .directory
+.kdev?
 
 ### Python template
 # Byte-compiled / optimized / DLL files
