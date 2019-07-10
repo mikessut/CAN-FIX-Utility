@@ -3,9 +3,6 @@ sent when the node is expanded to get all the information.  This would only
 work on nodes with a proper EDS file as there is no mechanism to poll a device
 for the enabled status of a parameter.
 
-The program crashes if the initial CANBus is not available.  It really should
-just start up disconnected.
-
 Node Configuration Dialog and features
 
 Enable / Disable parameters
@@ -26,6 +23,8 @@ with enough smarts to either read the canfix.json or generated from it.
 
 Online device file and protocol file updates?  Maybe online updates.  Links to
 online help?
+
+Save and restore configuration to nodes.  Probably use json.
 
 Firmware updating has some problems:
 

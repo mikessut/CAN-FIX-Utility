@@ -40,27 +40,23 @@ class ConfigItem(object):
         """c is the individual config dictionary from the device file"""
         self.__value = None
         self.__dict = c
+        try:
+            self.name = c['name']
+            self.key = c['key']
+            self.datatype = c['type']
+            self.units = c.get('units', '')
+            self.multiplier = c.get('multiplier', 1.0)
+            self.input = c.get('input', None)
+            self.selections = c.get('selections', None)
+        except KeyError:
+            log.error("Required data missing from EDS file:{}".format(e))
         self.changeFunction = None
+        # Run through the selections and convert string values to int
+        if self.selections is not None:
+            for each in self.selections:
+                if isinstance(self.selections[each], str):
+                    self.selections[each] = int(self.selections[each], 0)
 
-    def getKey(self):
-        return self.__dict['key']
-    key = property(getKey)
-
-    def getName(self):
-        return self.__dict['name']
-    name = property(getName)
-
-    def getDataType(self):
-        return self.__dict['type']
-    datatype = property(getDataType)
-
-    def getUnits(self):
-        return self.__dict.get('units', '')
-    units = property(getUnits)
-
-    def getMultiplier(self):
-        return self.__dict.get('multiplier', 1.0)
-    multiplier = property(getMultiplier)
 
     def setValue(self, value):
         if value != self.__value:
@@ -69,7 +65,13 @@ class ConfigItem(object):
                 self.changeFunction(value)
 
     def getValue(self):
-        return self.__value
+        if self.selections is not None:
+            for each in self.selections:
+                if self.selections[each] == self.__value:
+                    return each
+            return "Unknown"
+        else:
+            return self.__value
 
     value = property(getValue, setValue)
 
@@ -199,7 +201,8 @@ class NetworkModel(object):
         elif isinstance(p, canfix.NodeAlarm):
             pass
         elif isinstance(p, canfix.NodeStatus):
-            node = p.sendNode
+            pass
+            # node = p.sendNode
         elif isinstance(p, canfix.NodeIdentification):
             node = self.__findNode(p.sendNode)
             assert node
@@ -226,7 +229,7 @@ class NetworkModel(object):
             if self.configChanged is not None:
                 self.configChanged(nodeID, cfg.getDict())
             can = canbus.get_connection()
-            msg = canfix.NodeConfigurationSet(key=cfg.get("key"), datatype=cfg.get("type"), multiplier=cfg.get("multiplier"))
+            msg = canfix.NodeConfigurationSet(key=cfg.key, datatype=cfg.datatype, multiplier=cfg.multiplier)
             msg.sendNode = config.node
             msg.destNode = nodeID
             msg.value = value

@@ -45,6 +45,39 @@
       "min":50,
       "max":2000,
       "multiplier":10
+    },
+    {
+      "key":2,
+      "name":"Mode",
+      "type":"UINT",
+      "input": "listbox",
+      "selections": {
+        "Run": 0,
+        "Config": 1,
+        "Debug": 2
+      }
+    },
+    {
+      "key":3,
+      "name":"Float Test",
+      "type":"FLOAT",
+      "units":"psi",
+      "min":0,
+      "max":2000,
+      "multiplier":0.1
+    },
+    {
+      "key":4,
+      "name":"Bitfield Test",
+      "type":"BYTE",
+      "input": "bitfield",
+      "selections": {
+        "Low Warning": 0,
+        "Low Alarm": 1,
+        "High Warning": 2,
+        "High Alarm": 3
+      }
+
     }
   ]
 }

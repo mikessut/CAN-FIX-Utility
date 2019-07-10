@@ -31,6 +31,22 @@ from . import firmware
 log = logging.getLogger(__name__)
 
 
+class configListBox(QComboBox):
+    def __init__(self, selections, value=None):
+        QComboBox.__init__(self)
+
+        for each in selections:
+            x = selections[each]
+            self.addItem(each, selections[each])
+        for x in range(self.count()):
+            if self.itemText(x) == value:
+                self.setCurrentIndex(x)
+
+    def value(self):
+        return self.itemData(self.currentIndex())
+        #return self.__value
+
+
 def getConfigItemWidget(c, parent):
     """This function takes a configuration item from the networkModel and
        determines the type of widget that is needed to edit it"""
@@ -39,9 +55,15 @@ def getConfigItemWidget(c, parent):
                      "INT":(-32768, 32767),
                      "UINT":(0, 65535),
                      "DINT":(-2147483648, 2147483647),
-                     "UDINT":(0, 4294967296)
+                     "UDINT":(0, 4294967296),
+                     "FLOAT":(-10E32, 10E32)
                      }
-    if c.datatype in generic_types:
+    if c.input is not None:
+        if c.input == "listbox":
+            w = configListBox(c.selections, c.value)
+
+
+    elif c.datatype in generic_types:
         t = generic_types[c.datatype]
         if c.multiplier >= 1.0:
             w = QSpinBox(parent)
@@ -52,7 +74,9 @@ def getConfigItemWidget(c, parent):
         w.setMaximum(c.get("max", t[1]))
         w.setSingleStep(c.multiplier)
         w.setValue(c.value)
-        return w
+    else:
+        w = None
+    return w
 
 
 class dialogConfig(QDialog, Ui_dialogConfig):

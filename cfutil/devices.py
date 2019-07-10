@@ -24,6 +24,7 @@
 import os
 import logging
 import json
+from collections import OrderedDict
 import cfutil.config as config
 
 log = logging.getLogger(__name__)
@@ -63,7 +64,7 @@ for filename in dirlist:
     if filename[-5:] == ".json":
         with open(config.DataPath + "devices/" + filename) as json_file:
             log.debug("Loading device file {}".format(filename))
-            d = json.load(json_file)
+            d = json.load(json_file, object_pairs_hook=OrderedDict)
         try: # These are required
             name = d["name"]
             dtype = d["type"]
