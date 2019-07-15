@@ -32,6 +32,7 @@ from .ui.main_ui import Ui_MainWindow
 from .ui.connect_ui import Ui_ConnectDialog
 from . import fwDialog
 from . import configDialog
+from . import configSaveDialog
 from . import networkModel
 from . import treeModel
 from . import tableModel
@@ -225,6 +226,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def networkClicked(self, index):
         #log.debug(index.parent().data().toString() + " " + index.data().toString())
         #log.debug(index.parent().data() + " " + index.data())
+        #print(index)
         pass
 
     def networkDblClicked(self, index):
@@ -249,7 +251,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def networkContextMenu(self, point):
         i = self.viewNetwork.indexAt(point)
-        print(i.internalPointer().parent)
+        #print(i.internalPointer().parent)
+        print(i.internalPointer())
         self.popMenu.exec_(self.viewNetwork.mapToGlobal(point))
 
     def trafficStart(self):
@@ -267,6 +270,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def nodeConfigure(self):
         print("Configure")
 
+    # This method recurses up the tree until it finds the root FIX Item
+    def findFixIndex(self, index):
+        if isinstance(index.internalPointer(), treeModel.FixItem):
+            return index
+        else:
+            return self.findFixIndex(index.parent())
+
+    def saveConfiguration(self):
+        x = self.viewNetwork.selectedIndexes()
+        if len(x) > 0:
+            index = self.findFixIndex(x[0])
+            node = index.internalPointer()
+            db = configSaveDialog.dialogConfigSave(self.network, node.nodeID)
+        else:
+            db = configSaveDialog.dialogConfigSave(self.network, 0)
+
+        db.exec()
+
+    def loadConfiguration(self):
+        x = self.viewNetwork.selectedIndexes()
+        if len(x) > 0:
+            index = self.findFixIndex(x[0])
+            node = index.internalPointer()
+            db = configSaveDialog.dialogConfigSave(self.network, node.nodeID, boxtype="LOAD")
+        else:
+            db = configSaveDialog.dialogConfigSave(self.network, 0, boxtype="LOAD")
+
+        db.exec()
 
 def getout():
     global mWindow
@@ -278,6 +309,7 @@ def run(args):
     app = QApplication(sys.argv)
     app.setOrganizationName("PetraSoft")
     app.setApplicationName("CAN-FIX Utility")
+    app.setWindowIcon(QIcon("cfutil/ui/res/logo_6464.png"))
     mWindow = MainWindow(args)
     app.aboutToQuit.connect(getout)
     mWindow.show()

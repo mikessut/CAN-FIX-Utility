@@ -104,9 +104,16 @@ class Ui_MainWindow(object):
         self.actionExit.setObjectName("actionExit")
         self.actionLoad_Firmware = QtWidgets.QAction(MainWindow)
         self.actionLoad_Firmware.setObjectName("actionLoad_Firmware")
+        self.actionSave_Node_Configuration = QtWidgets.QAction(MainWindow)
+        self.actionSave_Node_Configuration.setObjectName("actionSave_Node_Configuration")
+        self.actionLoad_Node_Configuration = QtWidgets.QAction(MainWindow)
+        self.actionLoad_Node_Configuration.setObjectName("actionLoad_Node_Configuration")
         self.menuComm.addAction(self.actionConnect)
         self.menuComm.addAction(self.actionDisconnect)
         self.menuFile.addAction(self.actionExit)
+        self.menu_Tools.addAction(self.actionSave_Node_Configuration)
+        self.menu_Tools.addAction(self.actionLoad_Node_Configuration)
+        self.menu_Tools.addSeparator()
         self.menu_Tools.addAction(self.actionLoad_Firmware)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuComm.menuAction())
@@ -127,6 +134,8 @@ class Ui_MainWindow(object):
         self.viewNetwork.doubleClicked['QModelIndex'].connect(MainWindow.networkDblClicked)
         self.viewNetwork.customContextMenuRequested['QPoint'].connect(MainWindow.networkContextMenu)
         self.viewNetwork.collapsed['QModelIndex'].connect(MainWindow.networkCollapsed)
+        self.actionSave_Node_Configuration.triggered.connect(MainWindow.saveConfiguration)
+        self.actionLoad_Node_Configuration.triggered.connect(MainWindow.loadConfiguration)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -155,4 +164,6 @@ class Ui_MainWindow(object):
         self.actionExit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
         self.actionLoad_Firmware.setText(_translate("MainWindow", "Load &Firmware"))
         self.actionLoad_Firmware.setShortcut(_translate("MainWindow", "Ctrl+Alt+F"))
+        self.actionSave_Node_Configuration.setText(_translate("MainWindow", "Save Node Configuration"))
+        self.actionLoad_Node_Configuration.setText(_translate("MainWindow", "Load Node Configuration"))
 

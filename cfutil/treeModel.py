@@ -144,7 +144,7 @@ class ConfigItem(TreeItem):
 
     def getValue(self):
         if self.units:
-            return "{} {}".format(self.__value, self.units)
+            return "{:g} {}".format(self.__value, self.units)
         else:
             return self.__value
 

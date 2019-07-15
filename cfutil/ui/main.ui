@@ -151,6 +151,9 @@
     <property name="title">
      <string>&amp;Tools</string>
     </property>
+    <addaction name="actionSave_Node_Configuration"/>
+    <addaction name="actionLoad_Node_Configuration"/>
+    <addaction name="separator"/>
     <addaction name="actionLoad_Firmware"/>
    </widget>
    <addaction name="menuFile"/>
@@ -211,6 +214,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+F</string>
+   </property>
+  </action>
+  <action name="actionSave_Node_Configuration">
+   <property name="text">
+    <string>Save Node Configuration</string>
+   </property>
+  </action>
+  <action name="actionLoad_Node_Configuration">
+   <property name="text">
+    <string>Load Node Configuration</string>
    </property>
   </action>
  </widget>
@@ -424,6 +437,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSave_Node_Configuration</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>saveConfiguration()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>269</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoad_Node_Configuration</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadConfiguration()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>269</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>connect()</slot>
@@ -437,5 +482,7 @@
   <slot>networkDblClicked(QModelIndex)</slot>
   <slot>networkContextMenu(QPoint)</slot>
   <slot>networkCollapsed(QModelIndex)</slot>
+  <slot>saveConfiguration()</slot>
+  <slot>loadConfiguration()</slot>
  </slots>
 </ui>

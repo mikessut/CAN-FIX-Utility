@@ -50,13 +50,13 @@ class configListBox(QComboBox):
 def getConfigItemWidget(c, parent):
     """This function takes a configuration item from the networkModel and
        determines the type of widget that is needed to edit it"""
-    generic_types = {"SINT":(-128, 127),
-                     "USINT":(0, 255),
+    generic_types = {"SHORT":(-128, 127),
+                     "USHORT":(0, 255),
                      "INT":(-32768, 32767),
                      "UINT":(0, 65535),
                      "DINT":(-2147483648, 2147483647),
                      "UDINT":(0, 4294967296),
-                     "FLOAT":(-10E32, 10E32)
+                     "FLOAT":(-2147483648, 2147483647)
                      }
     if c.input is not None:
         if c.input == "listbox":
