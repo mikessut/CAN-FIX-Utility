@@ -285,7 +285,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             db = configSaveDialog.dialogConfigSave(self.network, node.nodeID)
         else:
             db = configSaveDialog.dialogConfigSave(self.network, 0)
-
         db.exec()
 
     def loadConfiguration(self):
@@ -296,7 +295,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             db = configSaveDialog.dialogConfigSave(self.network, node.nodeID, boxtype="LOAD")
         else:
             db = configSaveDialog.dialogConfigSave(self.network, 0, boxtype="LOAD")
-
         db.exec()
 
 def getout():

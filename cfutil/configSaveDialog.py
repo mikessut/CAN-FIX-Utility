@@ -29,11 +29,10 @@ from PyQt5.QtWidgets import *
 from .ui.configSave_ui import Ui_ConfigSaveDialog
 #from . import config
 from . import devices
+from . import configStore
 #from . import firmware
 
 log = logging.getLogger(__name__)
-
-
 
 
 class dialogConfigSave(QDialog, Ui_ConfigSaveDialog):
@@ -41,13 +40,21 @@ class dialogConfigSave(QDialog, Ui_ConfigSaveDialog):
         QDialog.__init__(self)
         self.setupUi(self)
         self.netmodel = netmodel
-        #self.nodeid = nodeid
-        # self.device = None
-        # self.model = None
-        # self.version = None
+
         # So hitting enter doesn't send the value or close the box
         self.saveButton = self.buttonBox.button(QDialogButtonBox.Save)
-        self.saveButton.setEnabled(False)
+        #self.saveButton.setEnabled(False)
+        self.applyButton = self.buttonBox.button(QDialogButtonBox.Apply)
+        self.applyButton.setEnabled(False)
+        if boxtype=="SAVE":
+            self.applyButton.hide()
+        else:
+            self.saveButton.hide()
+            self.spinBoxStart.hide()
+            self.spinBoxLast.hide()
+            self.labelStart.hide()
+            self.labelLast.hide()
+
         self.cancelButton = self.buttonBox.button(QDialogButtonBox.Cancel)
         self.closeButton = self.buttonBox.button(QDialogButtonBox.Close)
 
@@ -59,19 +66,17 @@ class dialogConfigSave(QDialog, Ui_ConfigSaveDialog):
         self.spinBoxNode.setValue(nodeid)
 
         self.labelStatus.hide()
+        self.labelStatus.setText('')
         self.progressBar.hide()
+        self.progressBar.setValue(0)
 
         if boxtype == "SAVE":
             self.setWindowTitle("Save Node Configuration")
         else:
             self.setWindowTitle("Load Node Configuration")
 
-        # self.widget = getConfigItemWidget(self.configItem, self.scrollAreaWidgetContents)
-        # self.formLayout.setWidget(0, QFormLayout.LabelRole, self.widget)
-        # if c.units is not None:
-        #     l = QLabel(self.scrollAreaWidgetContents)
-        #     l.setText(c.units)
-        #     self.formLayout.setWidget(0, QFormLayout.FieldRole, l)
+        self.labelStatus.setText("")
+
 
     # This function looks through the network model and if it can find
     # a node it populates the dialog with the proper information
@@ -109,13 +114,69 @@ class dialogConfigSave(QDialog, Ui_ConfigSaveDialog):
 
     def btnClick(self, btn):
         if btn == self.buttonBox.button(QDialogButtonBox.Save):
-            self.cancelButton.show()
-            self.closeButton.hide()
+            self.btnSaveClick()
+
         if btn == self.buttonBox.button(QDialogButtonBox.Cancel):
+            self.cancelButton.setEnabled(False)
+            self.store.stop()
+            self.saveButton.setEnabled(True)
+            self.cancelButton.setEnabled(True)
             self.cancelButton.hide()
             self.closeButton.show()
         if btn == self.buttonBox.button(QDialogButtonBox.Close):
             self.close()
+
+    def tryFile(self, mode):
+        try:
+            file = open(self.lineEditFileName.text(), mode)
+            return file
+        except FileNotFoundError:
+            dia = QMessageBox()
+            if mode == 'x':
+                dia.setText("Unable to Create File")
+            else:
+                dia.setText("Unable to Open File")
+            dia.setIcon(QMessageBox.Critical)
+            dia.setInformativeText(self.lineEditFileName.text())
+            dia.setStandardButtons(QMessageBox.Ok)
+            x = dia.exec_()
+            return None
+
+    def finished(self, result):
+        if result:
+            self.file.close()
+        self.cancelButton.hide()
+        self.closeButton.show()
+        self.saveButton.setEnabled(True)
+        self.progressBar.hide()
+
+
+    def btnSaveClick(self):
+        try:
+            self.file = self.tryFile('x')
+        except FileExistsError:
+            dia = QMessageBox()
+            dia.setText("File Exists")
+            dia.setIcon(QMessageBox.Warning)
+            dia.setInformativeText("Do you want to overwrite this file?")
+            dia.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+            x = dia.exec_()
+            if x == QMessageBox.Yes:
+                self.file = open(self.lineEditFileName.text(), 'w')
+
+        if self.file is not None:
+            self.cancelButton.show()
+            self.closeButton.hide()
+            self.store = configStore.ConfigSave(self.spinBoxNode.value(), "")
+            self.store.file = self.file
+            self.saveButton.setEnabled(False)
+            self.store.status.connect(self.labelStatus.setText)
+            self.labelStatus.show()
+            self.store.percent.connect(self.progressBar.setValue)
+            self.store.finished.connect(self.finished)
+            self.progressBar.show()
+            self.store.start()
+
 
 
     def btnFileClick(self):

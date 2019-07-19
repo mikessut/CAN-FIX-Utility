@@ -31,7 +31,14 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QSpinBox" name="spinBoxNode"/>
+      <widget class="QSpinBox" name="spinBoxNode">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>255</number>
+       </property>
+      </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_2">
@@ -76,24 +83,32 @@
       </widget>
      </item>
      <item row="6" column="0">
-      <widget class="QLabel" name="label_9">
+      <widget class="QLabel" name="labelStart">
        <property name="text">
         <string>Start Configuration Key:</string>
        </property>
       </widget>
      </item>
      <item row="6" column="1">
-      <widget class="QSpinBox" name="spinBoxStart"/>
+      <widget class="QSpinBox" name="spinBoxStart">
+       <property name="maximum">
+        <number>65535</number>
+       </property>
+      </widget>
      </item>
      <item row="7" column="0">
-      <widget class="QLabel" name="label_10">
+      <widget class="QLabel" name="labelLast">
        <property name="text">
         <string>Last Configuration Key:</string>
        </property>
       </widget>
      </item>
      <item row="7" column="1">
-      <widget class="QSpinBox" name="spinBoxLast"/>
+      <widget class="QSpinBox" name="spinBoxLast">
+       <property name="maximum">
+        <number>65535</number>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -128,7 +143,7 @@
    <item>
     <widget class="QProgressBar" name="progressBar">
      <property name="value">
-      <number>24</number>
+      <number>0</number>
      </property>
     </widget>
    </item>
@@ -151,7 +166,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Close|QDialogButtonBox::Save</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Close|QDialogButtonBox::Save</set>
      </property>
     </widget>
    </item>

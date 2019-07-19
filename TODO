@@ -24,7 +24,8 @@ with enough smarts to either read the canfix.json or generated from it.
 Online device file and protocol file updates?  Maybe online updates.  Links to
 online help?
 
-Save and restore configuration to nodes.  Probably use json.
+Save and restore configuration to nodes.  Probably use json.  Also add a
+"Save Entire Network Configuration" menu item.
 
 Firmware updating has some problems:
 
