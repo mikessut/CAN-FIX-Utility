@@ -19,12 +19,12 @@ software that will be able to communicate with other devices without need to pay
 for specifications or licenses.  It also encourages collaboration in the
 development and improvement of the protocols themselves.
 
-CAN-FIX is the CAN Bus implementation of the FIX philosophy.  A full description
-of CAN-FIX is beyond the scope of this manual.  For details on the CAN-FIX
+CAN-FiX is the CAN Bus implementation of the FIX philosophy.  A full description
+of CAN-FiX is beyond the scope of this manual.  For details on the CAN-FiX
 protocol itself can be found in the official specification.
 
 This manual describes the operation of CFUtil which is a generic utility for
-configuring, monitoriing and troubleshooting a CAN-FIX network.
+configuring, monitoriing and troubleshooting a CAN-FiX network.
 
 General Description
 -------------------

@@ -9,6 +9,7 @@ CAN-FIX Utility Manual
 
    intro
    development
+   firmware_file
 
 
 

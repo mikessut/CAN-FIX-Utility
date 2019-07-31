@@ -45,9 +45,9 @@ source_suffix = '.rst'
 master_doc = 'toc'
 
 # General information about the project.
-project = u'FIX Gateway'
-copyright = u'2017, Phil Birkelbach, Neil Domalik, Jean-manuel Gagnon'
-author = u'Phil Birkelbach, Neil Domalik', u'Jean-manuel Gagnon'
+project = u'CAN-FiX Configuration Utility'
+copyright = u'2018, Phil Birkelbach'
+author = u'Phil Birkelbach'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -148,7 +148,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'CFUtil.tex', u'CAN-FIX Utility Manual',
+    (master_doc, 'CFUtil.tex', u'CAN-FiX Utility Manual',
      u'Phil Birkelbach', 'manual'),
 ]
 
@@ -158,7 +158,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'cfutil', u'CAN-FIX Utility Manual',
+    (master_doc, 'cfutil', u'CAN-FiX Utility Manual',
      [author], 1)
 ]
 
@@ -169,7 +169,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'CFUtil', u'CAN-FIX Utility Manual',
+    (master_doc, 'CFUtil', u'CAN-FiX Utility Manual',
      author, 'CFUtil', 'One line description of project.',
      'Miscellaneous'),
 ]
