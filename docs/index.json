@@ -1,0 +1,34 @@
+
+{
+  "name": "Johnny's EFIS Firmware",
+  "vcode": "0x1234",
+  "files": [
+    {
+      "name": "firmware.bin",
+      "type": "binhex4",
+      "offset": "0x00000000",
+      "block type": 0,
+      "subsystem": 0,
+      "blocksize": 64
+    },
+    {
+      "name": "firmware.hex",
+      "type": "intelhex",
+      "offset": 0,
+      "block type": 1,
+      "subsystem": 0,
+      "blocksize": 64
+    },
+    {
+      "name": "",
+      "type": "list",
+      "offset": "0xFFE0",
+      "block type": 1,
+      "subsystem": 0,
+      "blocksize": 64,
+      "data": ["0x00", "0x00", "0x00", "0x00", "0x00", "0x00", "0x00", "0x00",
+               "0x00", "0x00", "0x00", "0x00", "0x00", "0x00", "0x00", "0x00"]
+    }
+
+  ]
+}

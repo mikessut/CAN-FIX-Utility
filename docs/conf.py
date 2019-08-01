@@ -129,20 +129,27 @@ htmlhelp_basename = 'CFUtildoc'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
-    # 'papersize': 'letterpaper',
+    'papersize': 'letterpaper',
 
     # The font size ('10pt', '11pt' or '12pt').
     #
-    # 'pointsize': '10pt',
+    'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
+    'preamble': r"""
+\usepackage{colortbl}
+\definecolor{light-blue}{rgb}{0.5,0.5,1.0}
+\protected\def\sphinxstyletheadfamily {\cellcolor{light-blue}\sffamily}
+""",
 
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
+    'extraclassoptions': 'openany',
+    'maketitle': r'\input{maketitle.tex.txt}'
 }
+latex_additional_files = ['maketitle.tex.txt']
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
