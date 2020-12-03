@@ -19,13 +19,12 @@ concerning those mechanims.  Essentially, each node in the point to point
 communication will be assigned one ID out of a pair of ID's.  One ID is used for
 Host to Node messages and the other is used for Node to Host messages [#F1]_.
 
-
 A firmware download is initiated when the host sends a *Firmware Update Command*
 to the node.  The node would acknowledge this request and then wait to recieve
 the first block of data. Firmware is transmitted to the node as a collection of
 individual blocks.  The actual block size may be important to the receiving
 node.  It is up to the developer to determine an appropriate block size for the
-node in question.  Nodes do not have to
+node in question.
 
 The overall communication to write one block to the node is shown below.
 
@@ -44,6 +43,41 @@ This sequence of frames would result in a single block being sent to the node.
 Once all of the blocks have been sent a *Transmission Complete* frame would be
 sent and the communication is over.  At this point the node is free to begin
 execution of the new firmware.
+
+Initialization
+--------------
+
+There are a couple of ways to get a node into a state where it is listening for
+firmware.  The first is for the node to respond to the CAN-FiX message designed
+for this purpose.  The CAN-FiX *Update Firware* Command assigns the channel
+number and passes the verification code to a node to begin the process.  After
+the node acknowledges this command [#F2]_ it should be gin listening for the
+first data block transfer.
+
+Another prefered way to get a node into a listening state is to have it start up
+in that state and listen for an *Update Firmware* command to be sent to it.  If
+after a second or two no command is received it can resume starting it's already
+installed application firmware.
+
+Any host program should send the *Update Firware* command repeatedly at least
+twice per second to try and initialize a node in this state.  It is preferable that
+the host continue to try until the user cancels the attempt.  This way, the host
+software can be started and the firware update feature selected and started, then the node
+can be powered up and the transfer should begin during this startup phase.
+
+Including the start up feature solves a problem where an errant firmware load
+would "brick" the node.  If we rely soley on the application firmware for this
+feature then we won't have a method to recover from a failed or bug ridden
+firmware load.
+
+Before the application firmware is started, an integrity check of the program
+should be performed.  Usually this would be some kind of checksum.  If the
+integrity check fails the application should not be run.  At this point it may
+make sense for the device to wait in a loop for an *Update Firware* command to
+be sent. Some kind of indication of this state like a red flashing LED or a bad
+status message being sent over the CAN Bus would also be nice to have.  This
+indication obviously depends on what makes the most sense for the particular
+device.
 
 Frame Descriptions
 ------------------
@@ -212,6 +246,10 @@ frame is a single data byte frame and the data byte should be 0xFE.  The
 behaviour that the node takes after getting an Abort from the host depends on
 the individual node and how it is implemented.
 
+To abort the transmission while data is being transferred and before the
+complete block of data has been sent the *Transmission Abort Frame* should be
+preceeded by a *Block End Frame* which is simply a zero length frame.
+
 If the node writes the firmware to it's internal program memory block by block
 then an abort means that it's program is probably flawed or incomplete and it
 makes sense for that node to neglect the new firmware and simply spin in a loop
@@ -228,7 +266,7 @@ care should be taken to verify that the program sent is the program
 that was received.  Typically this is done by calculating a checksum for the
 program and verifying that the program located in program memory passes this
 checksum before it is executed.  Some systems may periodically calculate
-the checksum periodically during execution.
+the checksum during execution.
 
 Checksums for individual data packets were deliberatly left out of this
 protocol.  CAN itself contains a checksum for the individual frames, so it is
@@ -247,3 +285,5 @@ correctly.
 .. [#F1] In this document the term *Host* is used to describe the computer that
   is running the configuration software to download the firmware and *Node* is
   used to describe the actual CAN-FiX node that will be updated.
+
+.. [#F2] See the CAN-FiX documentation for details

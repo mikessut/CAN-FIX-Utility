@@ -103,7 +103,9 @@ class FirmwareBase:
         """Requests a firmware load, waits for 1/2 a second and determines
            if the response is correct and if so returns True returns
            False on timeout"""
+        print("got to __tryFirmwareReq()")
         self.channel = self.__getFreeChannel()
+        print("channel = {}".format(self.channel))
         if self.channel < 0:
             raise FirmwareError("No Free Channel")
         msg = canfix.UpdateFirmware(node=self.destNode, verification=self.device.fwUpdateCode, channel=self.channel)

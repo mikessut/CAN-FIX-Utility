@@ -51,15 +51,24 @@ def initialize(file, args):
 
     config = configparser.RawConfigParser()
     config.read(file)
-    # TODO Deal with command line arguments here
-    # Read CAN connection related data
-    interface = config.get("can", "interface")
-    channel = config.get("can", "channel")
+    # Configure CAN connection related data
+    if args.interface:
+        interface = args.interface
+    else:
+        interface = config.get("can", "interface")
+    if args.channel:
+        channel = args.channel
+    else:
+        channel = config.get("can", "channel")
     try:
-        br = config.get("can", "bitrate")
+        if args.bitrate:
+            br = args.bitrate
+        else:
+            br = config.get("can", "bitrate")
         bitrate = int(br)
     except:
         bitrate = 125000
+
     node = int(config.get("can", "node"))
     #auto_connect = config.getboolean("can", "auto_connect")
 

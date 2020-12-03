@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package 
+#  CAN-FIX Utilities - An Open Source CAN FIX Utility Package
 #  Copyright (c) 2013 Phil Birkelbach
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -19,18 +19,16 @@
 
 from intelhex import IntelHex
 from . import crc
-import canbus
 import time
-from .fwBase import FirmwareBase
-import firmware
+from . import FirmwareBase
 
 class Driver(FirmwareBase):
-    def __init__(self, filename, can):
+    def __init__(self, filename, conn):
         FirmwareBase.__init__(self)
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)
-        self.can = can
-        
+        self.can = conn
+
         cs = crc.crc16()
         for each in range(self.__ih.minaddr(), self.__ih.maxaddr()+1):
             cs.addByte(self.__ih[each])
@@ -41,9 +39,14 @@ class Driver(FirmwareBase):
         self.__blocks = self.__size / self.__blocksize + 1
         self.__currentblock = 0
 
+    def setArg(self, argname, value):
+        if argname == "blocksize":
+            self.__blocksize = value
+            self.__blocks = self.__size / self.__blocksize + 1
+
 
     def __fillBuffer(self, ch, address, data):
-        sframe = canbus.Frame(1760 + ch, [0x01, address & 0xFF, (address & 0xFF00) >> 8, 128])
+        sframe = canbus.Frame(1792 + ch, [0x01, address & 0xFF, (address & 0xFF00) >> 8, 128])
         self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
@@ -66,7 +69,7 @@ class Driver(FirmwareBase):
         return True
 
     def __erasePage(self, ch, address):
-        sframe = canbus.Frame(1760 + ch, [0x02, address & 0xFF, (address & 0xFF00) >> 8, 64])
+        sframe = canbus.Frame(1792 + ch, [0x02, address & 0xFF, (address & 0xFF00) >> 8, 64])
         self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
@@ -81,7 +84,7 @@ class Driver(FirmwareBase):
                 if now > endtime: return False
 
     def __writePage(self, ch, address):
-        sframe = canbus.Frame(1760 + ch, [0x03, address & 0xFF, (address & 0xFF00) >> 8])
+        sframe = canbus.Frame(1792 + ch, [0x03, address & 0xFF, (address & 0xFF00) >> 8])
         self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
@@ -96,7 +99,7 @@ class Driver(FirmwareBase):
                 if now > endtime: return False
 
     def __sendComplete(self, ch):
-        sframe = canbus.Frame(1760 + ch, [0x05, self.__checksum & 0xFF, (self.__checksum & 0xFF00) >> 8, \
+        sframe = canbus.Frame(1792 + ch, [0x05, self.__checksum & 0xFF, (self.__checksum & 0xFF00) >> 8, \
                             self.__size & 0xFF, (self.__size & 0xFF00) >> 8])
         self.can.sendFrame(sframe)
         endtime = time.time() + 0.5
@@ -113,7 +116,7 @@ class Driver(FirmwareBase):
 
     def download(self, node):
         data=[]
-        channel = FirmwareBase.start_download(self, node)
+        channel = FirmwareBase.start_download(self)
         for n in range(self.__blocks * self.__blocksize):
             data.append(self.__ih[n])
         for block in range(self.__blocks):
@@ -128,15 +131,15 @@ class Driver(FirmwareBase):
                     self.sendStatus("Download Stopped")
                     return
                     #raise firmware.FirmwareError("Canceled")
-            
+
             # Erase Page
             #print "Erase Page Address =", address
             self.__erasePage(channel ,address)
-            
+
             # Write Page
             #print "Write Page Address =", address
             self.__writePage(channel ,address)
-            
+
         #self.__progress = 1.0
         #print "Download Complete Checksum", hex(self.__checksum), "Size", self.__size
         self.__sendComplete(channel)

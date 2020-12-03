@@ -63,7 +63,11 @@
     1280,
     1281,
     1282,
-    1283
+    1283,
+    912,
+    913,
+    914,
+    915
   ],
   "configuration": [
     {
@@ -81,1622 +85,2135 @@
       "max": 6
     },
     {
-      "key": 2,
-      "name": "Resistor Input 1 ID",
+      "key": 10,
+      "name": "Analog Input 1 Selection",
       "type": "UINT",
       "input": "listbox",
       "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4"
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263"
       }
     },
     {
-      "key": 3,
-      "name": "Resistor Input 1 Index",
-      "type": "UINT"
-    },
-    {
-      "key": 4,
-      "name": "Resistor Input 1 Raw Input 1",
-      "type": "UINT",
-      "units": "Ohms"
-    },
-    {
-      "key": 5,
-      "name": "Resistor Input 1 Scaled Value 1",
-      "type": "UINT"
-    },
-    {
-      "key": 6,
-      "name": "Resistor Input 1 Raw Input 2",
-      "type": "UINT",
-      "units": "Ohms"
-    },
-    {
-      "key": 7,
-      "name": "Resistor Input 1 Scaled Value 2",
-      "type": "UINT"
-    },
-    {
-      "key": 8,
-      "name": "Resistor Input 1 Raw Input 3",
-      "type": "UINT",
-      "units": "Ohms"
-    },
-    {
-      "key": 9,
-      "name": "Resistor Input 1 Scaled Value 3",
-      "type": "UINT"
-    },
-    {
-      "key": 10,
-      "name": "Resistor Input 1 Raw Input 4",
-      "type": "UINT",
-      "units": "Ohms"
-    },
-    {
       "key": 11,
-      "name": "Resistor Input 1 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 1 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
     },
     {
       "key": 12,
-      "name": "Resistor Input 1 Raw Input 5",
+      "name": "Analog Input 1 Raw Input 1",
       "type": "UINT",
+      "min": 0,
+      "max": 10000,
       "units": "Ohms"
     },
     {
       "key": 13,
-      "name": "Resistor Input 1 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 1 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 14,
-      "name": "Resistor Input 1 Min",
-      "type": "UINT"
+      "name": "Analog Input 1 Raw Input 3",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 15,
-      "name": "Resistor Input 1 Max",
-      "type": "UINT"
+      "name": "Analog Input 1 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 16,
-      "name": "Resistor Input 1 Low Warning",
-      "type": "UINT"
+      "name": "Analog Input 1 Raw Input 5",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 17,
-      "name": "Resistor Input 1 Low Alarm",
-      "type": "UINT"
+      "name": "Analog Input 1 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 18,
-      "name": "Resistor Input 1 High Warning",
-      "type": "UINT"
+      "name": "Analog Input 1 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 19,
-      "name": "Resistor Input 1 High Alarm",
-      "type": "UINT"
+      "name": "Analog Input 1 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 20,
-      "name": "Resistor Input 2 ID",
-      "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4"
-      }
+      "name": "Analog Input 1 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 21,
-      "name": "Resistor Input 2 Index",
-      "type": "UINT"
+      "name": "Analog Input 1 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 22,
-      "name": "Resistor Input 2 Raw Input 1",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 1 Min",
+      "type": "FLOAT"
     },
     {
       "key": 23,
-      "name": "Resistor Input 2 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 1 Max",
+      "type": "FLOAT"
     },
     {
       "key": 24,
-      "name": "Resistor Input 2 Raw Input 2",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 1 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 25,
-      "name": "Resistor Input 2 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 1 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 26,
-      "name": "Resistor Input 2 Raw Input 3",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 1 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 27,
-      "name": "Resistor Input 2 Scaled Value 3",
-      "type": "UINT"
-    },
-    {
-      "key": 28,
-      "name": "Resistor Input 2 Raw Input 4",
-      "type": "UINT",
-      "units": "Ohms"
-    },
-    {
-      "key": 29,
-      "name": "Resistor Input 2 Scaled Value 4",
-      "type": "UINT"
-    },
-    {
-      "key": 30,
-      "name": "Resistor Input 2 Raw Input 5",
-      "type": "UINT",
-      "units": "Ohms"
-    },
-    {
-      "key": 31,
-      "name": "Resistor Input 2 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 1 High Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 32,
-      "name": "Resistor Input 2 Min",
-      "type": "UINT"
+      "name": "Analog Input 2 Selection",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263"
+      }
     },
     {
       "key": 33,
-      "name": "Resistor Input 2 Max",
-      "type": "UINT"
+      "name": "Analog Input 2 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
     },
     {
       "key": 34,
-      "name": "Resistor Input 2 Low Warning",
-      "type": "UINT"
+      "name": "Analog Input 2 Raw Input 1",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 35,
-      "name": "Resistor Input 2 Low Alarm",
-      "type": "UINT"
+      "name": "Analog Input 2 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 36,
-      "name": "Resistor Input 2 High Warning",
-      "type": "UINT"
+      "name": "Analog Input 2 Raw Input 3",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 37,
-      "name": "Resistor Input 2 High Alarm",
-      "type": "UINT"
+      "name": "Analog Input 2 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 38,
-      "name": "Resistor Input 3 ID",
+      "name": "Analog Input 2 Raw Input 5",
       "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4"
-      }
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 39,
-      "name": "Resistor Input 3 Index",
-      "type": "UINT"
+      "name": "Analog Input 2 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 40,
-      "name": "Resistor Input 3 Raw Input 1",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 2 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 41,
-      "name": "Resistor Input 3 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 2 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 42,
-      "name": "Resistor Input 3 Raw Input 2",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 2 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 43,
-      "name": "Resistor Input 3 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 2 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 44,
-      "name": "Resistor Input 3 Raw Input 3",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 2 Min",
+      "type": "FLOAT"
     },
     {
       "key": 45,
-      "name": "Resistor Input 3 Scaled Value 3",
-      "type": "UINT"
+      "name": "Analog Input 2 Max",
+      "type": "FLOAT"
     },
     {
       "key": 46,
-      "name": "Resistor Input 3 Raw Input 4",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 2 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 47,
-      "name": "Resistor Input 3 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 2 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 48,
-      "name": "Resistor Input 3 Raw Input 5",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 2 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 49,
-      "name": "Resistor Input 3 Scaled Value 5",
-      "type": "UINT"
-    },
-    {
-      "key": 50,
-      "name": "Resistor Input 3 Min",
-      "type": "UINT"
-    },
-    {
-      "key": 51,
-      "name": "Resistor Input 3 Max",
-      "type": "UINT"
-    },
-    {
-      "key": 52,
-      "name": "Resistor Input 3 Low Warning",
-      "type": "UINT"
-    },
-    {
-      "key": 53,
-      "name": "Resistor Input 3 Low Alarm",
-      "type": "UINT"
+      "name": "Analog Input 2 High Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 54,
-      "name": "Resistor Input 3 High Warning",
-      "type": "UINT"
-    },
-    {
-      "key": 55,
-      "name": "Resistor Input 3 High Alarm",
-      "type": "UINT"
-    },
-    {
-      "key": 56,
-      "name": "Resistor Input 4 ID",
+      "name": "Analog Input 3 Selection",
       "type": "UINT",
       "input": "listbox",
       "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4"
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263"
       }
     },
     {
+      "key": 55,
+      "name": "Analog Input 3 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
+    },
+    {
+      "key": 56,
+      "name": "Analog Input 3 Raw Input 1",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
+    },
+    {
       "key": 57,
-      "name": "Resistor Input 4 Index",
-      "type": "UINT"
+      "name": "Analog Input 3 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 58,
-      "name": "Resistor Input 4 Raw Input 1",
+      "name": "Analog Input 3 Raw Input 3",
       "type": "UINT",
+      "min": 0,
+      "max": 10000,
       "units": "Ohms"
     },
     {
       "key": 59,
-      "name": "Resistor Input 4 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 3 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 60,
-      "name": "Resistor Input 4 Raw Input 2",
+      "name": "Analog Input 3 Raw Input 5",
       "type": "UINT",
+      "min": 0,
+      "max": 10000,
       "units": "Ohms"
     },
     {
       "key": 61,
-      "name": "Resistor Input 4 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 3 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 62,
-      "name": "Resistor Input 4 Raw Input 3",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 3 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 63,
-      "name": "Resistor Input 4 Scaled Value 3",
-      "type": "UINT"
+      "name": "Analog Input 3 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 64,
-      "name": "Resistor Input 4 Raw Input 4",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 3 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 65,
-      "name": "Resistor Input 4 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 3 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 66,
-      "name": "Resistor Input 4 Raw Input 5",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 3 Min",
+      "type": "FLOAT"
     },
     {
       "key": 67,
-      "name": "Resistor Input 4 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 3 Max",
+      "type": "FLOAT"
     },
     {
       "key": 68,
-      "name": "Resistor Input 4 Min",
-      "type": "UINT"
+      "name": "Analog Input 3 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 69,
-      "name": "Resistor Input 4 Max",
-      "type": "UINT"
+      "name": "Analog Input 3 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 70,
-      "name": "Resistor Input 4 Low Warning",
-      "type": "UINT"
+      "name": "Analog Input 3 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 71,
-      "name": "Resistor Input 4 Low Alarm",
-      "type": "UINT"
-    },
-    {
-      "key": 72,
-      "name": "Resistor Input 4 High Warning",
-      "type": "UINT"
-    },
-    {
-      "key": 73,
-      "name": "Resistor Input 4 High Alarm",
-      "type": "UINT"
-    },
-    {
-      "key": 74,
-      "name": "Resistor Input 5 ID",
-      "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4"
-      }
-    },
-    {
-      "key": 75,
-      "name": "Resistor Input 5 Index",
-      "type": "UINT"
+      "name": "Analog Input 3 High Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 76,
-      "name": "Resistor Input 5 Raw Input 1",
+      "name": "Analog Input 4 Selection",
       "type": "UINT",
-      "units": "Ohms"
+      "input": "listbox",
+      "selections": {
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263"
+      }
     },
     {
       "key": 77,
-      "name": "Resistor Input 5 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 4 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
     },
     {
       "key": 78,
-      "name": "Resistor Input 5 Raw Input 2",
+      "name": "Analog Input 4 Raw Input 1",
       "type": "UINT",
+      "min": 0,
+      "max": 10000,
       "units": "Ohms"
     },
     {
       "key": 79,
-      "name": "Resistor Input 5 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 4 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 80,
-      "name": "Resistor Input 5 Raw Input 3",
+      "name": "Analog Input 4 Raw Input 3",
       "type": "UINT",
+      "min": 0,
+      "max": 10000,
       "units": "Ohms"
     },
     {
       "key": 81,
-      "name": "Resistor Input 5 Scaled Value 3",
-      "type": "UINT"
+      "name": "Analog Input 4 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 82,
-      "name": "Resistor Input 5 Raw Input 4",
+      "name": "Analog Input 4 Raw Input 5",
       "type": "UINT",
+      "min": 0,
+      "max": 10000,
       "units": "Ohms"
     },
     {
       "key": 83,
-      "name": "Resistor Input 5 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 4 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 84,
-      "name": "Resistor Input 5 Raw Input 5",
-      "type": "UINT",
-      "units": "Ohms"
+      "name": "Analog Input 4 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 85,
-      "name": "Resistor Input 5 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 4 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 86,
-      "name": "Resistor Input 5 Min",
-      "type": "UINT"
+      "name": "Analog Input 4 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 87,
-      "name": "Resistor Input 5 Max",
-      "type": "UINT"
+      "name": "Analog Input 4 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 88,
-      "name": "Resistor Input 5 Low Warning",
-      "type": "UINT"
+      "name": "Analog Input 4 Min",
+      "type": "FLOAT"
     },
     {
       "key": 89,
-      "name": "Resistor Input 5 Low Alarm",
-      "type": "UINT"
+      "name": "Analog Input 4 Max",
+      "type": "FLOAT"
     },
     {
       "key": 90,
-      "name": "Resistor Input 5 High Warning",
-      "type": "UINT"
+      "name": "Analog Input 4 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 91,
-      "name": "Resistor Input 5 High Alarm",
-      "type": "UINT"
+      "name": "Analog Input 4 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 92,
-      "name": "Voltage Input 1 ID",
-      "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4",
-        "0x50E0": "Electrical Bus Voltage 1",
-        "0x50E1": "Electrical Bus Voltage 2",
-        "0x5120": "Electrical Bus Current 1",
-        "0x5121": "Electrical Bus Current 2",
-        "0x5160": "Alternator Voltage 1",
-        "0x5161": "Alternator Voltage 2",
-        "0x51A0": "Alternator Current 1",
-        "0x51A1": "Alternator Current 2"
-      }
+      "name": "Analog Input 4 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 93,
-      "name": "Voltage Input 1 Index",
-      "type": "UINT"
-    },
-    {
-      "key": 94,
-      "name": "Voltage Input 1 Raw Input 1",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
-    },
-    {
-      "key": 95,
-      "name": "Voltage Input 1 Scaled Value 1",
-      "type": "UINT"
-    },
-    {
-      "key": 96,
-      "name": "Voltage Input 1 Raw Input 2",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
-    },
-    {
-      "key": 97,
-      "name": "Voltage Input 1 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 4 High Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 98,
-      "name": "Voltage Input 1 Raw Input 3",
+      "name": "Analog Input 5 Selection",
       "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "input": "listbox",
+      "selections": {
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263"
+      }
     },
     {
       "key": 99,
-      "name": "Voltage Input 1 Scaled Value 3",
-      "type": "UINT"
+      "name": "Analog Input 5 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
     },
     {
       "key": 100,
-      "name": "Voltage Input 1 Raw Input 4",
+      "name": "Analog Input 5 Raw Input 1",
       "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 101,
-      "name": "Voltage Input 1 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 5 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 102,
-      "name": "Voltage Input 1 Raw Input 5",
+      "name": "Analog Input 5 Raw Input 3",
       "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 103,
-      "name": "Voltage Input 1 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 5 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 104,
-      "name": "Voltage Input 1 Min",
-      "type": "UINT"
+      "name": "Analog Input 5 Raw Input 5",
+      "type": "UINT",
+      "min": 0,
+      "max": 10000,
+      "units": "Ohms"
     },
     {
       "key": 105,
-      "name": "Voltage Input 1 Max",
-      "type": "UINT"
+      "name": "Analog Input 5 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 106,
-      "name": "Voltage Input 1 Low Warning",
-      "type": "UINT"
+      "name": "Analog Input 5 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 107,
-      "name": "Voltage Input 1 Low Alarm",
-      "type": "UINT"
+      "name": "Analog Input 5 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 108,
-      "name": "Voltage Input 1 High Warning",
-      "type": "UINT"
+      "name": "Analog Input 5 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 109,
-      "name": "Voltage Input 1 High Alarm",
-      "type": "UINT"
+      "name": "Analog Input 5 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 110,
-      "name": "Voltage Input 2 ID",
-      "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4",
-        "0x50E0": "Electrical Bus Voltage 1",
-        "0x50E1": "Electrical Bus Voltage 2",
-        "0x5120": "Electrical Bus Current 1",
-        "0x5121": "Electrical Bus Current 2",
-        "0x5160": "Alternator Voltage 1",
-        "0x5161": "Alternator Voltage 2",
-        "0x51A0": "Alternator Current 1",
-        "0x51A1": "Alternator Current 2"
-      }
+      "name": "Analog Input 5 Min",
+      "type": "FLOAT"
     },
     {
       "key": 111,
-      "name": "Voltage Input 2 Index",
-      "type": "UINT"
+      "name": "Analog Input 5 Max",
+      "type": "FLOAT"
     },
     {
       "key": 112,
-      "name": "Voltage Input 2 Raw Input 1",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 5 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 113,
-      "name": "Voltage Input 2 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 5 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 114,
-      "name": "Voltage Input 2 Raw Input 2",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 5 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 115,
-      "name": "Voltage Input 2 Scaled Value 2",
-      "type": "UINT"
-    },
-    {
-      "key": 116,
-      "name": "Voltage Input 2 Raw Input 3",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
-    },
-    {
-      "key": 117,
-      "name": "Voltage Input 2 Scaled Value 3",
-      "type": "UINT"
-    },
-    {
-      "key": 118,
-      "name": "Voltage Input 2 Raw Input 4",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
-    },
-    {
-      "key": 119,
-      "name": "Voltage Input 2 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 5 High Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 120,
-      "name": "Voltage Input 2 Raw Input 5",
+      "name": "Analog Input 6 Selection",
       "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "input": "listbox",
+      "selections": {
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263",
+        "Electrical Bus Voltage 1": "0x50E0",
+        "Electrical Bus Voltage 2": "0x50E1",
+        "Electrical Bus Current 1": "0x5120",
+        "Electrical Bus Current 2": "0x5121",
+        "Alternator Voltage 1": "0x5160",
+        "Alternator Voltage 2": "0x5161",
+        "Alternator Current 1": "0x51A0",
+        "Alternator Current 2": "0x51A1",
+        "Generic Analog 1": "0x3900",
+        "Generic Analog 2": "0x3901",
+        "Generic Analog 3": "0x3910",
+        "Generic Analog 4": "0x3911",
+        "Generic Analog 5": "0x3920",
+        "Generic Analog 6": "0x3921",
+        "Generic Analog 7": "0x3930",
+        "Generic Analog 8": "0x3931"
+      }
     },
     {
       "key": 121,
-      "name": "Voltage Input 2 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 6 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
     },
     {
       "key": 122,
-      "name": "Voltage Input 2 Min",
-      "type": "UINT"
+      "name": "Analog Input 6 Raw Input 1",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 123,
-      "name": "Voltage Input 2 Max",
-      "type": "UINT"
+      "name": "Analog Input 6 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 124,
-      "name": "Voltage Input 2 Low Warning",
-      "type": "UINT"
+      "name": "Analog Input 6 Raw Input 3",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 125,
-      "name": "Voltage Input 2 Low Alarm",
-      "type": "UINT"
+      "name": "Analog Input 6 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 126,
-      "name": "Voltage Input 2 High Warning",
-      "type": "UINT"
+      "name": "Analog Input 6 Raw Input 5",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 127,
-      "name": "Voltage Input 2 High Alarm",
-      "type": "UINT"
+      "name": "Analog Input 6 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 128,
-      "name": "Voltage Input 3 ID",
-      "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4",
-        "0x50E0": "Electrical Bus Voltage 1",
-        "0x50E1": "Electrical Bus Voltage 2",
-        "0x5120": "Electrical Bus Current 1",
-        "0x5121": "Electrical Bus Current 2",
-        "0x5160": "Alternator Voltage 1",
-        "0x5161": "Alternator Voltage 2",
-        "0x51A0": "Alternator Current 1",
-        "0x51A1": "Alternator Current 2"
-      }
+      "name": "Analog Input 6 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 129,
-      "name": "Voltage Input 3 Index",
-      "type": "UINT"
+      "name": "Analog Input 6 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 130,
-      "name": "Voltage Input 3 Raw Input 1",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 6 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 131,
-      "name": "Voltage Input 3 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 6 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 132,
-      "name": "Voltage Input 3 Raw Input 2",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 6 Min",
+      "type": "FLOAT"
     },
     {
       "key": 133,
-      "name": "Voltage Input 3 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 6 Max",
+      "type": "FLOAT"
     },
     {
       "key": 134,
-      "name": "Voltage Input 3 Raw Input 3",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 6 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 135,
-      "name": "Voltage Input 3 Scaled Value 3",
-      "type": "UINT"
+      "name": "Analog Input 6 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 136,
-      "name": "Voltage Input 3 Raw Input 4",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 6 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 137,
-      "name": "Voltage Input 3 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 6 High Alarm",
+      "type": "FLOAT"
     },
     {
-      "key": 138,
-      "name": "Voltage Input 3 Raw Input 5",
+      "key": 142,
+      "name": "Analog Input 7 Selection",
       "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263",
+        "Electrical Bus Voltage 1": "0x50E0",
+        "Electrical Bus Voltage 2": "0x50E1",
+        "Electrical Bus Current 1": "0x5120",
+        "Electrical Bus Current 2": "0x5121",
+        "Alternator Voltage 1": "0x5160",
+        "Alternator Voltage 2": "0x5161",
+        "Alternator Current 1": "0x51A0",
+        "Alternator Current 2": "0x51A1",
+        "Generic Analog 1": "0x3900",
+        "Generic Analog 2": "0x3901",
+        "Generic Analog 3": "0x3910",
+        "Generic Analog 4": "0x3911",
+        "Generic Analog 5": "0x3920",
+        "Generic Analog 6": "0x3921",
+        "Generic Analog 7": "0x3930",
+        "Generic Analog 8": "0x3931"
+      }
+    },
+    {
+      "key": 143,
+      "name": "Analog Input 7 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
+    },
+    {
+      "key": 144,
+      "name": "Analog Input 7 Raw Input 1",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
       "units": "Volts",
       "multiplier": 0.001
     },
     {
-      "key": 139,
-      "name": "Voltage Input 3 Scaled Value 5",
-      "type": "UINT"
-    },
-    {
-      "key": 140,
-      "name": "Voltage Input 3 Min",
-      "type": "UINT"
-    },
-    {
-      "key": 141,
-      "name": "Voltage Input 3 Max",
-      "type": "UINT"
-    },
-    {
-      "key": 142,
-      "name": "Voltage Input 3 Low Warning",
-      "type": "UINT"
-    },
-    {
-      "key": 143,
-      "name": "Voltage Input 3 Low Alarm",
-      "type": "UINT"
-    },
-    {
-      "key": 144,
-      "name": "Voltage Input 3 High Warning",
-      "type": "UINT"
-    },
-    {
       "key": 145,
-      "name": "Voltage Input 3 High Alarm",
-      "type": "UINT"
+      "name": "Analog Input 7 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 146,
-      "name": "Voltage Input 4 ID",
+      "name": "Analog Input 7 Raw Input 3",
       "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4",
-        "0x50E0": "Electrical Bus Voltage 1",
-        "0x50E1": "Electrical Bus Voltage 2",
-        "0x5120": "Electrical Bus Current 1",
-        "0x5121": "Electrical Bus Current 2",
-        "0x5160": "Alternator Voltage 1",
-        "0x5161": "Alternator Voltage 2",
-        "0x51A0": "Alternator Current 1",
-        "0x51A1": "Alternator Current 2"
-      }
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 147,
-      "name": "Voltage Input 4 Index",
-      "type": "UINT"
+      "name": "Analog Input 7 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 148,
-      "name": "Voltage Input 4 Raw Input 1",
+      "name": "Analog Input 7 Raw Input 5",
       "type": "UINT",
+      "min": 0,
+      "max": 5000,
       "units": "Volts",
       "multiplier": 0.001
     },
     {
       "key": 149,
-      "name": "Voltage Input 4 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 7 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 150,
-      "name": "Voltage Input 4 Raw Input 2",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 7 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 151,
-      "name": "Voltage Input 4 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 7 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 152,
-      "name": "Voltage Input 4 Raw Input 3",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 7 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 153,
-      "name": "Voltage Input 4 Scaled Value 3",
-      "type": "UINT"
+      "name": "Analog Input 7 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 154,
-      "name": "Voltage Input 4 Raw Input 4",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 7 Min",
+      "type": "FLOAT"
     },
     {
       "key": 155,
-      "name": "Voltage Input 4 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 7 Max",
+      "type": "FLOAT"
     },
     {
       "key": 156,
-      "name": "Voltage Input 4 Raw Input 5",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 7 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 157,
-      "name": "Voltage Input 4 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 7 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 158,
-      "name": "Voltage Input 4 Min",
-      "type": "UINT"
+      "name": "Analog Input 7 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 159,
-      "name": "Voltage Input 4 Max",
-      "type": "UINT"
-    },
-    {
-      "key": 160,
-      "name": "Voltage Input 4 Low Warning",
-      "type": "UINT"
-    },
-    {
-      "key": 161,
-      "name": "Voltage Input 4 Low Alarm",
-      "type": "UINT"
-    },
-    {
-      "key": 162,
-      "name": "Voltage Input 4 High Warning",
-      "type": "UINT"
-    },
-    {
-      "key": 163,
-      "name": "Voltage Input 4 High Alarm",
-      "type": "UINT"
+      "name": "Analog Input 7 High Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 164,
-      "name": "Voltage Input 5 ID",
+      "name": "Analog Input 8 Selection",
       "type": "UINT",
       "input": "listbox",
       "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4",
-        "0x50E0": "Electrical Bus Voltage 1",
-        "0x50E1": "Electrical Bus Voltage 2",
-        "0x5120": "Electrical Bus Current 1",
-        "0x5121": "Electrical Bus Current 2",
-        "0x5160": "Alternator Voltage 1",
-        "0x5161": "Alternator Voltage 2",
-        "0x51A0": "Alternator Current 1",
-        "0x51A1": "Alternator Current 2"
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263",
+        "Electrical Bus Voltage 1": "0x50E0",
+        "Electrical Bus Voltage 2": "0x50E1",
+        "Electrical Bus Current 1": "0x5120",
+        "Electrical Bus Current 2": "0x5121",
+        "Alternator Voltage 1": "0x5160",
+        "Alternator Voltage 2": "0x5161",
+        "Alternator Current 1": "0x51A0",
+        "Alternator Current 2": "0x51A1",
+        "Generic Analog 1": "0x3900",
+        "Generic Analog 2": "0x3901",
+        "Generic Analog 3": "0x3910",
+        "Generic Analog 4": "0x3911",
+        "Generic Analog 5": "0x3920",
+        "Generic Analog 6": "0x3921",
+        "Generic Analog 7": "0x3930",
+        "Generic Analog 8": "0x3931"
       }
     },
     {
       "key": 165,
-      "name": "Voltage Input 5 Index",
-      "type": "UINT"
+      "name": "Analog Input 8 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
     },
     {
       "key": 166,
-      "name": "Voltage Input 5 Raw Input 1",
+      "name": "Analog Input 8 Raw Input 1",
       "type": "UINT",
+      "min": 0,
+      "max": 5000,
       "units": "Volts",
       "multiplier": 0.001
     },
     {
       "key": 167,
-      "name": "Voltage Input 5 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 8 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 168,
-      "name": "Voltage Input 5 Raw Input 2",
+      "name": "Analog Input 8 Raw Input 3",
       "type": "UINT",
+      "min": 0,
+      "max": 5000,
       "units": "Volts",
       "multiplier": 0.001
     },
     {
       "key": 169,
-      "name": "Voltage Input 5 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 8 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 170,
-      "name": "Voltage Input 5 Raw Input 3",
+      "name": "Analog Input 8 Raw Input 5",
       "type": "UINT",
+      "min": 0,
+      "max": 5000,
       "units": "Volts",
       "multiplier": 0.001
     },
     {
       "key": 171,
-      "name": "Voltage Input 5 Scaled Value 3",
-      "type": "UINT"
+      "name": "Analog Input 8 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 172,
-      "name": "Voltage Input 5 Raw Input 4",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 8 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 173,
-      "name": "Voltage Input 5 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 8 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 174,
-      "name": "Voltage Input 5 Raw Input 5",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "name": "Analog Input 8 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 175,
-      "name": "Voltage Input 5 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 8 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 176,
-      "name": "Voltage Input 5 Min",
-      "type": "UINT"
+      "name": "Analog Input 8 Min",
+      "type": "FLOAT"
     },
     {
       "key": 177,
-      "name": "Voltage Input 5 Max",
-      "type": "UINT"
+      "name": "Analog Input 8 Max",
+      "type": "FLOAT"
     },
     {
       "key": 178,
-      "name": "Voltage Input 5 Low Warning",
-      "type": "UINT"
+      "name": "Analog Input 8 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 179,
-      "name": "Voltage Input 5 Low Alarm",
-      "type": "UINT"
+      "name": "Analog Input 8 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 180,
-      "name": "Voltage Input 5 High Warning",
-      "type": "UINT"
+      "name": "Analog Input 8 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 181,
-      "name": "Voltage Input 5 High Alarm",
-      "type": "UINT"
-    },
-    {
-      "key": 182,
-      "name": "Voltage Input 6 ID",
-      "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x21E0": "Manifold Pressure",
-        "0x2200": "Oil Pressure",
-        "0x21C0": "Fuel Pressure",
-        "0x2220": "Oil Temperature",
-        "0x2240": "Coolant Temperature",
-        "0x50C0": "Carburetor Temperature",
-        "0x5830": "Cabin Temperature",
-        "0x4060": "Outside Air Temperature",
-        "0x2260": "Fuel Quantity Tank 1",
-        "0x2261": "Fuel Quantity Tank 2",
-        "0x2262": "Fuel Quantity Tank 3",
-        "0x2263": "Fuel Quantity Tank 4",
-        "0x50E0": "Electrical Bus Voltage 1",
-        "0x50E1": "Electrical Bus Voltage 2",
-        "0x5120": "Electrical Bus Current 1",
-        "0x5121": "Electrical Bus Current 2",
-        "0x5160": "Alternator Voltage 1",
-        "0x5161": "Alternator Voltage 2",
-        "0x51A0": "Alternator Current 1",
-        "0x51A1": "Alternator Current 2"
-      }
-    },
-    {
-      "key": 183,
-      "name": "Voltage Input 6 Index",
-      "type": "UINT"
-    },
-    {
-      "key": 184,
-      "name": "Voltage Input 6 Raw Input 1",
-      "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
-    },
-    {
-      "key": 185,
-      "name": "Voltage Input 6 Scaled Value 1",
-      "type": "UINT"
+      "name": "Analog Input 8 High Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 186,
-      "name": "Voltage Input 6 Raw Input 2",
+      "name": "Analog Input 9 Selection",
       "type": "UINT",
-      "units": "Volts",
-      "multiplier": 0.001
+      "input": "listbox",
+      "selections": {
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263",
+        "Electrical Bus Voltage 1": "0x50E0",
+        "Electrical Bus Voltage 2": "0x50E1",
+        "Electrical Bus Current 1": "0x5120",
+        "Electrical Bus Current 2": "0x5121",
+        "Alternator Voltage 1": "0x5160",
+        "Alternator Voltage 2": "0x5161",
+        "Alternator Current 1": "0x51A0",
+        "Alternator Current 2": "0x51A1",
+        "Generic Analog 1": "0x3900",
+        "Generic Analog 2": "0x3901",
+        "Generic Analog 3": "0x3910",
+        "Generic Analog 4": "0x3911",
+        "Generic Analog 5": "0x3920",
+        "Generic Analog 6": "0x3921",
+        "Generic Analog 7": "0x3930",
+        "Generic Analog 8": "0x3931"
+      }
     },
     {
       "key": 187,
-      "name": "Voltage Input 6 Scaled Value 2",
-      "type": "UINT"
+      "name": "Analog Input 9 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
     },
     {
       "key": 188,
-      "name": "Voltage Input 6 Raw Input 3",
+      "name": "Analog Input 9 Raw Input 1",
       "type": "UINT",
+      "min": 0,
+      "max": 5000,
       "units": "Volts",
       "multiplier": 0.001
     },
     {
       "key": 189,
-      "name": "Voltage Input 6 Scaled Value 3",
-      "type": "UINT"
+      "name": "Analog Input 9 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 190,
-      "name": "Voltage Input 6 Raw Input 4",
+      "name": "Analog Input 9 Raw Input 3",
       "type": "UINT",
+      "min": 0,
+      "max": 5000,
       "units": "Volts",
       "multiplier": 0.001
     },
     {
       "key": 191,
-      "name": "Voltage Input 6 Scaled Value 4",
-      "type": "UINT"
+      "name": "Analog Input 9 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "key": 192,
-      "name": "Voltage Input 6 Raw Input 5",
+      "name": "Analog Input 9 Raw Input 5",
       "type": "UINT",
+      "min": 0,
+      "max": 5000,
       "units": "Volts",
       "multiplier": 0.001
     },
     {
       "key": 193,
-      "name": "Voltage Input 6 Scaled Value 5",
-      "type": "UINT"
+      "name": "Analog Input 9 Value A",
+      "type": "FLOAT"
     },
     {
       "key": 194,
-      "name": "Voltage Input 6 Min",
-      "type": "UINT"
+      "name": "Analog Input 9 Value B",
+      "type": "FLOAT"
     },
     {
       "key": 195,
-      "name": "Voltage Input 6 Max",
-      "type": "UINT"
+      "name": "Analog Input 9 Value C",
+      "type": "FLOAT"
     },
     {
       "key": 196,
-      "name": "Voltage Input 6 Low Warning",
-      "type": "UINT"
+      "name": "Analog Input 9 Value D",
+      "type": "FLOAT"
     },
     {
       "key": 197,
-      "name": "Voltage Input 6 Low Alarm",
-      "type": "UINT"
+      "name": "Analog Input 9 Value E",
+      "type": "FLOAT"
     },
     {
       "key": 198,
-      "name": "Voltage Input 6 High Warning",
-      "type": "UINT"
+      "name": "Analog Input 9 Min",
+      "type": "FLOAT"
     },
     {
       "key": 199,
-      "name": "Voltage Input 6 High Alarm",
-      "type": "UINT"
+      "name": "Analog Input 9 Max",
+      "type": "FLOAT"
     },
     {
       "key": 200,
-      "name": "Tach Input 1",
-      "type": "UINT",
-      "input": "listbox",
-      "selections": {
-        "0x2000": "Engine RPM",
-        "0x2020": "Prop RPM"
-      }
+      "name": "Analog Input 9 Low Warning",
+      "type": "FLOAT"
     },
     {
       "key": 201,
-      "name": "Tach Input 1 Calibration",
-      "type": "UINT",
-      "units": "pulses/rev"
+      "name": "Analog Input 9 Low Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 202,
-      "name": "Voltage Input 1 Min",
-      "type": "UINT",
-      "units": "RPM"
+      "name": "Analog Input 9 High Warning",
+      "type": "FLOAT"
     },
     {
       "key": 203,
-      "name": "Voltage Input 1 Max",
-      "type": "UINT",
-      "units": "RPM"
-    },
-    {
-      "key": 204,
-      "name": "Voltage Input 1 Low Warning",
-      "type": "UINT",
-      "units": "RPM"
-    },
-    {
-      "key": 205,
-      "name": "Voltage Input 1 Low Alarm",
-      "type": "UINT",
-      "units": "RPM"
-    },
-    {
-      "key": 206,
-      "name": "Voltage Input 1 High Warning",
-      "type": "UINT",
-      "units": "RPM"
-    },
-    {
-      "key": 207,
-      "name": "Voltage Input 1 High Alarm",
-      "type": "UINT",
-      "units": "RPM"
+      "name": "Analog Input 9 High Alarm",
+      "type": "FLOAT"
     },
     {
       "key": 208,
-      "name": "Voltage Input 1 Low Restriction 1",
-      "type": "UINT",
-      "units": "RPM"
-    },
-    {
-      "key": 209,
-      "name": "Voltage Input 1 High Restriction 1",
-      "type": "UINT",
-      "units": "RPM"
-    },
-    {
-      "key": 210,
-      "name": "Voltage Input 1 Low Restriction 2",
-      "type": "UINT",
-      "units": "RPM"
-    },
-    {
-      "key": 211,
-      "name": "Voltage Input 1 High Restriction 2",
-      "type": "UINT",
-      "units": "RPM"
-    },
-    {
-      "key": 212,
-      "name": "Tach Input 2",
+      "name": "Analog Input 10 Selection",
       "type": "UINT",
       "input": "listbox",
       "selections": {
-        "0x2000": "Engine RPM",
-        "0x2020": "Prop RPM"
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263",
+        "Electrical Bus Voltage 1": "0x50E0",
+        "Electrical Bus Voltage 2": "0x50E1",
+        "Electrical Bus Current 1": "0x5120",
+        "Electrical Bus Current 2": "0x5121",
+        "Alternator Voltage 1": "0x5160",
+        "Alternator Voltage 2": "0x5161",
+        "Alternator Current 1": "0x51A0",
+        "Alternator Current 2": "0x51A1",
+        "Generic Analog 1": "0x3900",
+        "Generic Analog 2": "0x3901",
+        "Generic Analog 3": "0x3910",
+        "Generic Analog 4": "0x3911",
+        "Generic Analog 5": "0x3920",
+        "Generic Analog 6": "0x3921",
+        "Generic Analog 7": "0x3930",
+        "Generic Analog 8": "0x3931"
       }
     },
     {
+      "key": 209,
+      "name": "Analog Input 10 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
+    },
+    {
+      "key": 210,
+      "name": "Analog Input 10 Raw Input 1",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 211,
+      "name": "Analog Input 10 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 212,
+      "name": "Analog Input 10 Raw Input 3",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
       "key": 213,
-      "name": "Tach Input 2 Calibration",
+      "name": "Analog Input 10 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 214,
+      "name": "Analog Input 10 Raw Input 5",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 215,
+      "name": "Analog Input 10 Value A",
+      "type": "FLOAT"
+    },
+    {
+      "key": 216,
+      "name": "Analog Input 10 Value B",
+      "type": "FLOAT"
+    },
+    {
+      "key": 217,
+      "name": "Analog Input 10 Value C",
+      "type": "FLOAT"
+    },
+    {
+      "key": 218,
+      "name": "Analog Input 10 Value D",
+      "type": "FLOAT"
+    },
+    {
+      "key": 219,
+      "name": "Analog Input 10 Value E",
+      "type": "FLOAT"
+    },
+    {
+      "key": 220,
+      "name": "Analog Input 10 Min",
+      "type": "FLOAT"
+    },
+    {
+      "key": 221,
+      "name": "Analog Input 10 Max",
+      "type": "FLOAT"
+    },
+    {
+      "key": 222,
+      "name": "Analog Input 10 Low Warning",
+      "type": "FLOAT"
+    },
+    {
+      "key": 223,
+      "name": "Analog Input 10 Low Alarm",
+      "type": "FLOAT"
+    },
+    {
+      "key": 224,
+      "name": "Analog Input 10 High Warning",
+      "type": "FLOAT"
+    },
+    {
+      "key": 225,
+      "name": "Analog Input 10 High Alarm",
+      "type": "FLOAT"
+    },
+    {
+      "key": 230,
+      "name": "Analog Input 11 Selection",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "None": "0x0000",
+        "Manifold Pressure": "0x21E0",
+        "Oil Pressure": "0x2200",
+        "Fuel Pressure": "0x21C0",
+        "Oil Temperature": "0x2220",
+        "Coolant Temperature": "0x2240",
+        "Carburetor Temperature": "0x50C0",
+        "Cabin Temperature": "0x5830",
+        "Outside Air Temperature": "0x4060",
+        "Fuel Quantity Tank 1": "0x2260",
+        "Fuel Quantity Tank 2": "0x2261",
+        "Fuel Quantity Tank 3": "0x2262",
+        "Fuel Quantity Tank 4": "0x2263",
+        "Electrical Bus Voltage 1": "0x50E0",
+        "Electrical Bus Voltage 2": "0x50E1",
+        "Electrical Bus Current 1": "0x5120",
+        "Electrical Bus Current 2": "0x5121",
+        "Alternator Voltage 1": "0x5160",
+        "Alternator Voltage 2": "0x5161",
+        "Alternator Current 1": "0x51A0",
+        "Alternator Current 2": "0x51A1",
+        "Generic Analog 1": "0x3900",
+        "Generic Analog 2": "0x3901",
+        "Generic Analog 3": "0x3910",
+        "Generic Analog 4": "0x3911",
+        "Generic Analog 5": "0x3920",
+        "Generic Analog 6": "0x3921",
+        "Generic Analog 7": "0x3930",
+        "Generic Analog 8": "0x3931"
+      }
+    },
+    {
+      "key": 231,
+      "name": "Analog Input 11 Function",
+      "type": "SHORT",
+      "input": "listbox",
+      "selections": {
+        "Linear": 0,
+        "5 Step Interpolation": 1,
+        "Exponential": 2,
+        "Steinhart / Hart": 3,
+        "Beta": 4
+      }
+    },
+    {
+      "key": 232,
+      "name": "Analog Input 11 Raw Input 1",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 233,
+      "name": "Analog Input 11 Raw Input 2",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 234,
+      "name": "Analog Input 11 Raw Input 3",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 235,
+      "name": "Analog Input 11 Raw Input 4",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 236,
+      "name": "Analog Input 11 Raw Input 5",
+      "type": "UINT",
+      "min": 0,
+      "max": 5000,
+      "units": "Volts",
+      "multiplier": 0.001
+    },
+    {
+      "key": 237,
+      "name": "Analog Input 11 Value A",
+      "type": "FLOAT"
+    },
+    {
+      "key": 238,
+      "name": "Analog Input 11 Value B",
+      "type": "FLOAT"
+    },
+    {
+      "key": 239,
+      "name": "Analog Input 11 Value C",
+      "type": "FLOAT"
+    },
+    {
+      "key": 240,
+      "name": "Analog Input 11 Value D",
+      "type": "FLOAT"
+    },
+    {
+      "key": 241,
+      "name": "Analog Input 11 Value E",
+      "type": "FLOAT"
+    },
+    {
+      "key": 242,
+      "name": "Analog Input 11 Min",
+      "type": "FLOAT"
+    },
+    {
+      "key": 243,
+      "name": "Analog Input 11 Max",
+      "type": "FLOAT"
+    },
+    {
+      "key": 244,
+      "name": "Analog Input 11 Low Warning",
+      "type": "FLOAT"
+    },
+    {
+      "key": 245,
+      "name": "Analog Input 11 Low Alarm",
+      "type": "FLOAT"
+    },
+    {
+      "key": 246,
+      "name": "Analog Input 11 High Warning",
+      "type": "FLOAT"
+    },
+    {
+      "key": 247,
+      "name": "Analog Input 11 High Alarm",
+      "type": "FLOAT"
+    },
+    {
+      "key": 252,
+      "name": "Tach Input 1 Selection",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "None": 0,
+        "Engine RPM": "0x2000",
+        "Prop RPM": "0x2020"
+      }
+    },
+    {
+      "key": 253,
+      "name": "Tach Input 1 K Factor",
       "type": "UINT",
       "units": "pulses/rev"
     },
     {
-      "key": 214,
-      "name": "Voltage Input 2 Min",
+      "key": 254,
+      "name": "Tach Input 1 Min",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 215,
-      "name": "Voltage Input 2 Max",
+      "key": 255,
+      "name": "Tach Input 1 Max",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 216,
-      "name": "Voltage Input 2 Low Warning",
+      "key": 256,
+      "name": "Tach Input 1 Low Warning",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 217,
-      "name": "Voltage Input 2 Low Alarm",
+      "key": 257,
+      "name": "Tach Input 1 Low Alarm",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 218,
-      "name": "Voltage Input 2 High Warning",
+      "key": 258,
+      "name": "Tach Input 1 High Warning",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 219,
-      "name": "Voltage Input 2 High Alarm",
+      "key": 259,
+      "name": "Tach Input 1 High Alarm",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 220,
-      "name": "Voltage Input 2 Low Restriction 1",
+      "key": 260,
+      "name": "Tach Input 1 Low Restriction 1",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 221,
-      "name": "Voltage Input 2 High Restriction 1",
+      "key": 261,
+      "name": "Tach Input 1 High Restriction 1",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 222,
-      "name": "Voltage Input 2 Low Restriction 2",
+      "key": 262,
+      "name": "Tach Input 1 Low Restriction 2",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 223,
-      "name": "Voltage Input 2 High Restriction 2",
+      "key": 263,
+      "name": "Tach Input 1 High Restriction 2",
       "type": "UINT",
       "units": "RPM"
     },
     {
-      "key": 224,
-      "name": "Flow Input 1",
+      "key": 268,
+      "name": "Tach Input 2 Selection",
       "type": "UINT",
       "input": "listbox",
       "selections": {
-        "0x21A0": "Fuel Flow",
-        "0x21A1": "Fuel Return Flow"
+        "None": 0,
+        "Engine RPM": "0x2000",
+        "Prop RPM": "0x2020"
       }
     },
     {
-      "key": 225,
-      "name": "Fuel Input 1 Calibration",
+      "key": 269,
+      "name": "Tach Input 2 K Factor",
+      "type": "UINT",
+      "units": "pulses/rev"
+    },
+    {
+      "key": 270,
+      "name": "Tach Input 2 Min",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 271,
+      "name": "Tach Input 2 Max",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 272,
+      "name": "Tach Input 2 Low Warning",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 273,
+      "name": "Tach Input 2 Low Alarm",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 274,
+      "name": "Tach Input 2 High Warning",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 275,
+      "name": "Tach Input 2 High Alarm",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 276,
+      "name": "Tach Input 2 Low Restriction 1",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 277,
+      "name": "Tach Input 2 High Restriction 1",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 278,
+      "name": "Tach Input 2 Low Restriction 2",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 279,
+      "name": "Tach Input 2 High Restriction 2",
+      "type": "UINT",
+      "units": "RPM"
+    },
+    {
+      "key": 284,
+      "name": "Flow Input 1 Selection",
+      "type": "UINT",
+      "input": "listbox",
+      "selections": {
+        "None": 0,
+        "Fuel Flow": "0x21A0",
+        "Fuel Return Flow": "0x21A1"
+      }
+    },
+    {
+      "key": 285,
+      "name": "Fuel Input 1 K Factor",
       "type": "UINT",
       "units": "pulses/gal"
     },
     {
-      "key": 226,
-      "name": "Voltage Input 1 Min",
+      "key": 286,
+      "name": "Fuel Input 1 Min",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 227,
-      "name": "Voltage Input 1 Max",
+      "key": 287,
+      "name": "Fuel Input 1 Max",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 228,
-      "name": "Voltage Input 1 Low Warning",
+      "key": 288,
+      "name": "Fuel Input 1 Low Warning",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 229,
-      "name": "Voltage Input 1 Low Alarm",
+      "key": 289,
+      "name": "Fuel Input 1 Low Alarm",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 230,
-      "name": "Voltage Input 1 High Warning",
+      "key": 290,
+      "name": "Fuel Input 1 High Warning",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 231,
-      "name": "Voltage Input 1 High Alarm",
+      "key": 291,
+      "name": "Fuel Input 1 High Alarm",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 232,
-      "name": "Flow Input 2",
+      "key": 296,
+      "name": "Flow Input 2 Selection",
       "type": "UINT",
       "input": "listbox",
       "selections": {
-        "0x21A0": "Fuel Flow",
-        "0x21A1": "Fuel Return Flow"
+        "None": 0,
+        "Fuel Flow": "0x21A0",
+        "Fuel Return Flow": "0x21A1"
       }
     },
     {
-      "key": 233,
-      "name": "Fuel Input 2 Calibration",
+      "key": 297,
+      "name": "Fuel Input 2 K Factor",
       "type": "UINT",
       "units": "pulses/gal"
     },
     {
-      "key": 234,
-      "name": "Voltage Input 2 Min",
+      "key": 298,
+      "name": "Fuel Input 2 Min",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 235,
-      "name": "Voltage Input 2 Max",
+      "key": 299,
+      "name": "Fuel Input 2 Max",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 236,
-      "name": "Voltage Input 2 Low Warning",
+      "key": 300,
+      "name": "Fuel Input 2 Low Warning",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 237,
-      "name": "Voltage Input 2 Low Alarm",
+      "key": 301,
+      "name": "Fuel Input 2 Low Alarm",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 238,
-      "name": "Voltage Input 2 High Warning",
+      "key": 302,
+      "name": "Fuel Input 2 High Warning",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
     },
     {
-      "key": 239,
-      "name": "Voltage Input 2 High Alarm",
+      "key": 303,
+      "name": "Fuel Input 2 High Alarm",
       "type": "UINT",
+      "multiplier": 0.01,
       "units": "gal/hr"
+    },
+    {
+      "key": 309,
+      "name": "CHT Min",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 310,
+      "name": "CHT Max",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 311,
+      "name": "CHT Low Warning",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 312,
+      "name": "CHT Low Alarm",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 313,
+      "name": "CHT High Warning",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 314,
+      "name": "CHT High Alarm",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 318,
+      "name": "EGT Min",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 319,
+      "name": "EGT Max",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 320,
+      "name": "EGT Low Warning",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 321,
+      "name": "EGT Low Alarm",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 322,
+      "name": "EGT High Warning",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 323,
+      "name": "EGT High Alarm",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 328,
+      "name": "CHT Rate of Change Min",
+      "type": "UINT",
+      "units": "degC/min"
+    },
+    {
+      "key": 329,
+      "name": "CHT Rate of Change Max",
+      "type": "UINT",
+      "units": "degC/min"
+    },
+    {
+      "key": 330,
+      "name": "CHT Rate of Change High Warning",
+      "type": "UINT",
+      "units": "degC/min"
+    },
+    {
+      "key": 331,
+      "name": "CHT Rate of Change High Alarm",
+      "type": "UINT",
+      "units": "degC/min"
+    },
+    {
+      "key": 336,
+      "name": "CHT Deviation Min",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 337,
+      "name": "CHT Deviation Max",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 338,
+      "name": "CHT Deviation High Warning",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 339,
+      "name": "CHT Deviation High Alarm",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 344,
+      "name": "EGT Rate of Change Min",
+      "type": "UINT",
+      "units": "degC/min"
+    },
+    {
+      "key": 345,
+      "name": "EGT Rate of Change Max",
+      "type": "UINT",
+      "units": "degC/min"
+    },
+    {
+      "key": 346,
+      "name": "EGT Rate of Change High Warning",
+      "type": "UINT",
+      "units": "degC/min"
+    },
+    {
+      "key": 347,
+      "name": "EGT Rate of Change High Alarm",
+      "type": "UINT",
+      "units": "degC/min"
+    },
+    {
+      "key": 352,
+      "name": "EGT Deviation Min",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 353,
+      "name": "EGT Deviation Max",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 354,
+      "name": "EGT Deviation High Warning",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 355,
+      "name": "EGT Deviation High Alarm",
+      "type": "UINT",
+      "units": "degC"
+    },
+    {
+      "key": 360,
+      "name": "CHT 1 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 361,
+      "name": "CHT 2 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 362,
+      "name": "CHT 3 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 363,
+      "name": "CHT 4 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 364,
+      "name": "CHT 5 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 365,
+      "name": "CHT 6 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 366,
+      "name": "EGT 1 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 367,
+      "name": "EGT 2 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 368,
+      "name": "EGT 3 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 369,
+      "name": "EGT 4 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 370,
+      "name": "EGT 5 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
+    },
+    {
+      "key": 371,
+      "name": "EGT 6 Calibration Offset",
+      "type": "INT",
+      "units": "degC"
     }
   ],
   "status": [
     {
       "parameter": 256,
-      "name": "Resistor Input 1 Raw Input",
+      "name": "Analog Input 1 Raw Value",
       "type": "UINT",
       "units": "Ohms"
     },
     {
       "parameter": 257,
-      "name": "Resistor Input 2 Raw Input",
+      "name": "Analog Input 2 Raw Value",
       "type": "UINT",
       "units": "Ohms"
     },
     {
       "parameter": 258,
-      "name": "Resistor Input 3 Raw Input",
+      "name": "Analog Input 3 Raw Value",
       "type": "UINT",
       "units": "Ohms"
     },
     {
       "parameter": 259,
-      "name": "Resistor Input 4 Raw Input",
+      "name": "Analog Input 4 Raw Value",
       "type": "UINT",
       "units": "Ohms"
     },
     {
       "parameter": 260,
-      "name": "Resistor Input 5 Raw Input",
+      "name": "Analog Input 5 Raw Value",
       "type": "UINT",
       "units": "Ohms"
     },
     {
       "parameter": 261,
-      "name": "Voltage Input 1 Raw Input",
+      "name": "Analog Input 6 Raw Value",
       "type": "UINT",
-      "multiplier": 0.001,
-      "units": "Volts"
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "parameter": 262,
-      "name": "Voltage Input 2 Raw Input",
+      "name": "Analog Input 7 Raw Value",
       "type": "UINT",
-      "multiplier": 0.001,
-      "units": "Volts"
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "parameter": 263,
-      "name": "Voltage Input 3 Raw Input",
+      "name": "Analog Input 8 Raw Value",
       "type": "UINT",
-      "multiplier": 0.001,
-      "units": "Volts"
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "parameter": 264,
-      "name": "Voltage Input 4 Raw Input",
+      "name": "Analog Input 9 Raw Value",
       "type": "UINT",
-      "multiplier": 0.001,
-      "units": "Volts"
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "parameter": 265,
-      "name": "Voltage Input 5 Raw Input",
+      "name": "Analog Input 10 Raw Value",
       "type": "UINT",
-      "multiplier": 0.001,
-      "units": "Volts"
+      "units": "Volts",
+      "multiplier": 0.001
     },
     {
       "parameter": 266,
-      "name": "Voltage Input 6 Raw Input",
+      "name": "Analog Input 11 Raw Value",
       "type": "UINT",
-      "multiplier": 0.001,
-      "units": "Volts"
+      "units": "Volts",
+      "multiplier": 0.001
     }
   ]
 }

@@ -33,6 +33,7 @@ def main():
     #parser.add_argument('--ip-address', help='CANBus Network Adapter IP Address')
     parser.add_argument('--firmware-file', help='Firmware filename')
     parser.add_argument('--firmware-node', type=int, help='Node number to use in firmware download')
+    parser.add_argument('--firmware-driver', help='Driver name to use in firmware download')
     parser.add_argument('--device', help='CANFIX Device Name')
     parser.add_argument('--device-id', type=int, help='CANFIX Device Identifier')
     parser.add_argument('--list-devices', action='store_true', help='List all known devices and their device IDs')

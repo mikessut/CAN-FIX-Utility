@@ -24,15 +24,27 @@ import argparse
 #from . import common as fw
 from .common import *
 
-def Firmware(driver, filename):
+def Firmware(driver, filename, conn):
     if driver == "AT328":
-        from . import AT328
-        return AT328.Driver(filename)
+        from . import AVR8
+        d = AVR8.Driver(filename, conn)
+        d.setArg("blocksize", 128)
+        return d
+    elif driver == "AT2561":
+        from . import AVR8
+        d = AVR8.Driver(filename, conn)
+        d.setArg("blocksize", 256)
+        return d
     elif driver == "DUMMY":
         from . import DUMMY
-        return DUMMY.Driver(filename)
+        return DUMMY.Driver(filename, conn)
     else:
         raise FirmwareError("No such device")
+
+def GetDriverList():
+    return {"AT328":"ATmega328",
+            "AT2561":"Atmega2561",
+            "DUMMY":"Test Driver"}
 
 # def config():
 #     parser = argparse.ArgumentParser(description='CANFIX Firmware Downloader 1.0')

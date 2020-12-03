@@ -9,18 +9,18 @@ a particular file to a node.
 Overall Description
 -------------------
 
-The firmware file is simply an archive of at least two files.  The archive
-should be a compressed tarball file.  The compression algorithm should be
-Gzip.  The file can easily be made with the following command.
+The firmware file is simply a compressed archive.  The archive should be a gzip
+compressed tarball file.  The file can easily be made with the following
+command.
 
 
-``tar zcvf firmware.tar.gz dirname``
+``tar zcvf firmware.tar.gz index.json file1 file2``
 
-This archive should contain at least two files.  The first is a file named
-*index.json* which is a JSON file that contains all of the information as to
-which files are contained in the archive and how they are to be loaded.  At
-least one file should be included that represents the firmware data to be
-downloaded into the node.
+This archive should contain at least one file.  A file named *index.json* which
+is a JSON file that contains all of the information any other  files that may be
+contained in the archive and how they are to be loaded.  At least one file
+should be included that represents the firmware data to be downloaded into the
+node.
 
 A typical *index.json* might look like this.
 
