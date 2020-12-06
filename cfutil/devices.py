@@ -42,7 +42,7 @@ class Device:
         self.configuration = []
 
     def __str__(self):
-        return "{} type={}, model={}, version={}".format(self.name, self.deviceType, self.modelNumber, self.version)
+        return "{} type=0x{:02X}, model={:06X}, version={}".format(self.name, self.deviceType, self.modelNumber, self.version)
 
 devices = []
 

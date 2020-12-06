@@ -8,6 +8,9 @@
   "node_errors":
     [
       {
+        "description":"Firmware Checksum Failure"
+      },
+      {
         "description":"Temperature Out of Range"
       },
       {

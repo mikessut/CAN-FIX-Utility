@@ -20,14 +20,16 @@
 from intelhex import IntelHex
 from . import crc
 import time
+import can
 from . import FirmwareBase
+from cfutil import connection
+
 
 class Driver(FirmwareBase):
-    def __init__(self, filename, conn):
-        FirmwareBase.__init__(self)
+    def __init__(self, device, filename, conn):
+        FirmwareBase.__init__(self, device, filename, conn)
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)
-        self.can = conn
 
         cs = crc.crc16()
         for each in range(self.__ih.minaddr(), self.__ih.maxaddr()+1):
@@ -35,114 +37,154 @@ class Driver(FirmwareBase):
         self.__size = self.__ih.maxaddr()+1
         self.__checksum = cs.getResult()
         self.__progress = 0.0
-        self.__blocksize = 128
-        self.__blocks = self.__size / self.__blocksize + 1
+        self.blocksize = 128
         self.__currentblock = 0
 
     def setArg(self, argname, value):
         if argname == "blocksize":
-            self.__blocksize = value
-            self.__blocks = self.__size / self.__blocksize + 1
+            self.blocksize = value
+
+    # .blocksize property
+    def setBlocksize(self, value):
+        self.__blocksize = value
+        self.__blocks = self.__size // self.__blocksize
+        if self.__size % self.__blocksize != 0:
+            self.__blocks = self.__blocks+1
+        #print("Block count = {}".format(self.__blocks))
+
+    def getBlocksize(self):
+        return self.__blocksize
+
+    blocksize = property(getBlocksize, setBlocksize)
 
 
     def __fillBuffer(self, ch, address, data):
-        sframe = canbus.Frame(1792 + ch, [0x01, address & 0xFF, (address & 0xFF00) >> 8, 128])
-        self.can.sendFrame(sframe)
+        sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
+                             data=[0x01, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24, 0, 1])
+        self.can.send(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
             try:
-                rframe = self.can.recvFrame()
-            except canbus.DeviceTimeout:
+                rframe = self.can.recv(1)
+            except connection.Timeout:
                 pass
             else:
-                if rframe.id == sframe.id+1 and \
+                if rframe.arbitration_id == sframe.arbitration_id+1 and \
                     rframe.data == sframe.data: break
-                now = time.time()
-                if now > endtime:
-                    return False
-        for n in range(self.__blocksize / 8):
-            #print data[address + (8*n):address + (8*n) + 8]
-            sframe.data = data[address + (8*n):address + (8*n) + 8]
-            self.can.sendFrame(sframe)
+            now = time.time()
+            if now > endtime:
+                raise connection.Timeout
+        length = len(data)
+        for n in range(length//8):
+            # print("[{:02}: ".format(n), end='')
+            # for each in data[(8*n):(8*n) + 8]:
+            #     print("{:02X} ".format(each), end='')
+            # print("]")
+            sframe.data = data[(8*n):(8*n) + 8]
+            sframe.dlc=8
+            self.can.send(sframe)
             #time.sleep(0.3)
             # TODO Need to deal with the abort from the uC somewhere
         return True
 
     def __erasePage(self, ch, address):
-        sframe = canbus.Frame(1792 + ch, [0x02, address & 0xFF, (address & 0xFF00) >> 8, 64])
-        self.can.sendFrame(sframe)
+        sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
+                             data=[0x02, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24])
+        self.can.send(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
             try:
-                rframe = self.can.recvFrame()
-            except canbus.DeviceTimeout:
+                rframe = self.can.recv(0.1)
+            except connection.Timeout:
                 pass
             else:
-                if rframe.id == sframe.id+1 and \
+                if rframe.arbitration_id == sframe.arbitration_id+1 and \
                     rframe.data == sframe.data: break
-                now = time.time()
-                if now > endtime: return False
+            now = time.time()
+            if now > endtime:
+                raise connection.Timeout
+        return True
 
     def __writePage(self, ch, address):
-        sframe = canbus.Frame(1792 + ch, [0x03, address & 0xFF, (address & 0xFF00) >> 8])
-        self.can.sendFrame(sframe)
+        sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
+                             data=[0x03, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24])
+        self.can.send(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
             try:
-                rframe = self.can.recvFrame()
-            except canbus.DeviceTimeout:
+                rframe = self.can.recv(1)
+            except connection.Timeout:
                 pass
             else:
-                if rframe.id == sframe.id+1 and \
+                if rframe.arbitration_id == sframe.arbitration_id+1 and \
                     rframe.data == sframe.data: break
-                now = time.time()
-                if now > endtime: return False
+            now = time.time()
+            if now > endtime:
+                raise connection.Timeout
 
     def __sendComplete(self, ch):
-        sframe = canbus.Frame(1792 + ch, [0x05, self.__checksum & 0xFF, (self.__checksum & 0xFF00) >> 8, \
-                            self.__size & 0xFF, (self.__size & 0xFF00) >> 8])
-        self.can.sendFrame(sframe)
+        sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
+                             data=[0x05, self.__checksum & 0xFF, (self.__checksum & 0xFF00) >> 8, \
+                                   self.__size & 0xFF, (self.__size & 0xFF00) >> 8])
+        self.can.send(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
             try:
-                rframe = self.can.recvFrame()
-            except canbus.DeviceTimeout:
+                rframe = self.can.recv(1)
+            except connection.Timeout:
                 pass
             else:
-                if rframe.id == sframe.id+1 and \
+                if rframe.arbitration_id == sframe.arbitration_id+1 and \
                     rframe.data == sframe.data: break
-                now = time.time()
-                if now > endtime: return False
+            now = time.time()
+            if now > endtime:
+                raise connection.Timeout
 
-    def download(self, node):
+    # TODO Need to make sure this fails properly when something goes wrong and
+    #      it might be nice to have some retires on blocks that fail.  Might
+    #      make this more robust.
+    # TODO We are not sending partial frames.  This probably isn't a big deal
+    #      but it's not exactly like the specification.  Maybe change the spec,
+    #      that might simplify the bootloader
+    def download(self):
         data=[]
-        channel = FirmwareBase.start_download(self)
+        FirmwareBase.start_download(self)
         for n in range(self.__blocks * self.__blocksize):
             data.append(self.__ih[n])
+
         for block in range(self.__blocks):
-            address = block * 128
-            #print "Buffer Fill at %d" % (address)
-            self.sendStatus("Writing Block %d of %d" % (block, self.__blocks))
-            self.sendProgress(float(block) / float(self.__blocks))
-            self.__currentblock = block
-            while(self.__fillBuffer(channel, address, data)==False):
-                if self.kill:
-                    self.sendProgress(0.0)
-                    self.sendStatus("Download Stopped")
-                    return
-                    #raise firmware.FirmwareError("Canceled")
+            try:
+                address = block * self.__blocksize
+                self.sendStatus("Writing Block %d of %d" % (block+1, self.__blocks))
+                self.sendProgress(float(block) / float(self.__blocks))
+                self.__currentblock = block
+                while(self.__fillBuffer(self.channel, address, data[address:address+self.blocksize])==False):
+                    if self.kill:
+                        self.sendProgress(0.0)
+                        self.sendStatus("Download Stopped")
+                        return
+                        #raise firmware.FirmwareError("Canceled")
 
-            # Erase Page
-            #print "Erase Page Address =", address
-            self.__erasePage(channel ,address)
+                # Erase Page
+                #print( "Erase Page Address = {}".format(address))
+                self.__erasePage(self.channel ,address)
 
-            # Write Page
-            #print "Write Page Address =", address
-            self.__writePage(channel ,address)
+                # Write Page
+                #print("Write Page Address = {}".format(address))
+                self.__writePage(self.channel ,address)
+            except connection.Timeout:
+                self.sendProgress(0.0)
+                self.sendStatus("FAIL: Timeout Writing Data")
+                return
 
         #self.__progress = 1.0
-        #print "Download Complete Checksum", hex(self.__checksum), "Size", self.__size
-        self.__sendComplete(channel)
-        self.sendStatus("Download Complete Checksum 0x%X, Size %d" % (self.__checksum, self.__size))
-        self.sendProgress(1.0)
+        #print("Download Complete Checksum".format(hex(self.__checksum), "Size", self.__size))
+        try:
+            self.__sendComplete(self.channel)
+            self.sendStatus("Download Complete Checksum 0x%X, Size %d" % (self.__checksum, self.__size))
+            self.sendProgress(1.0)
+        except connection.Timeout:
+            self.sendProgress(0.0)
+            self.sendStatus("FAIL: Timeout While Finalizing Download")
+
         #FirmwareBase.end_download()

@@ -29,15 +29,17 @@ class FirmwareError(Exception):
 
 class FirmwareBase:
     """Base Class for all firmware download drivers"""
-    def __init__(self):
+    def __init__(self, device, filename, conn):
+        self.can = conn
+        self.device = device # Object from EDS file
+        self.filename = filename
+
         # kill when set to True should stop downloads
         self.kill = False
-        self.can = None
 
         # This is our node number
         self.srcNode = None
         self.destNode = None
-        self.device = None # Object from EDS file
         self.__statusCallback = None
         self.__progressCallback = None
         self.__stopCallback = None
@@ -84,7 +86,7 @@ class FirmwareBase:
            free channel"""
         endtime = time.time() + 0.5
         channels = [0]*16
-        while True: # Channel wait loop
+        while True: # Wait loop
             try:
                 rframe = self.can.recv(0.1)
                 msg = canfix.parseMessage(rframe)
@@ -103,17 +105,15 @@ class FirmwareBase:
         """Requests a firmware load, waits for 1/2 a second and determines
            if the response is correct and if so returns True returns
            False on timeout"""
-        print("got to __tryFirmwareReq()")
         self.channel = self.__getFreeChannel()
-        print("channel = {}".format(self.channel))
         if self.channel < 0:
             raise FirmwareError("No Free Channel")
         msg = canfix.UpdateFirmware(node=self.destNode, verification=self.device.fwUpdateCode, channel=self.channel)
         msg.sendNode = self.srcNode
         msg.msgType = canfix.MSG_REQUEST
         self.can.send(msg.msg)
-        endtime = time.time() + 0.5
-        while True: # Channel wait loop
+        endtime = time.time() + 0.1
+        while True: # Wait loop
             if self.kill: raise FirmwareError("Canceled")
             try:
                 rframe = self.can.recv(0.1)
@@ -121,6 +121,7 @@ class FirmwareBase:
                 pass
             else:
                 msg = canfix.parseMessage(rframe)
+                #print(msg)
                 if isinstance(msg, canfix.UpdateFirmware):
                     if msg.destNode == self.srcNode:
                         if msg.status == canfix.MSG_SUCCESS:
@@ -143,4 +144,4 @@ class FirmwareBase:
             attempt += 1
             if self.__tryFirmwareReq(): break
         # This should be definied in the child and be specific for each driver
-        self.download()
+        #self.download()

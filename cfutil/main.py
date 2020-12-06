@@ -21,6 +21,8 @@ import logging
 import can
 import logging.config
 import cfutil.config as config
+def auto_int(x):
+    return int(x, 0)
 
 def main():
     parser = argparse.ArgumentParser(description='CAN-FIX Configuration Utility Program')
@@ -33,9 +35,11 @@ def main():
     #parser.add_argument('--ip-address', help='CANBus Network Adapter IP Address')
     parser.add_argument('--firmware-file', help='Firmware filename')
     parser.add_argument('--firmware-node', type=int, help='Node number to use in firmware download')
-    parser.add_argument('--firmware-driver', help='Driver name to use in firmware download')
+#    parser.add_argument('--firmware-code', help='Firmware Verification Code')
     parser.add_argument('--device', help='CANFIX Device Name')
-    parser.add_argument('--device-id', type=int, help='CANFIX Device Identifier')
+    parser.add_argument('--device-type', type=auto_int, help='CANFIX Target Device Type')
+    parser.add_argument('--device-model', type=auto_int, help='CANFIX Target Device Model')
+    parser.add_argument('--device-version', type=auto_int, help='CANFIX Target Device Model')
     parser.add_argument('--list-devices', action='store_true', help='List all known devices and their device IDs')
     parser.add_argument('--listen', action='store_true', help='Listen on the CANBus network and print to STDOUT')
     parser.add_argument('--frame-count', type=int, default=0, help='Number of frames to print before exiting')

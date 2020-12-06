@@ -4,7 +4,7 @@
   "model": "0x000001",
   "version": "0x01",
   "firmware_code": "0xF22",
-  "firmware_driver": "ATMEL8",
+  "firmware_driver": "AT2561",
   "parameters": [
     540,
     541,

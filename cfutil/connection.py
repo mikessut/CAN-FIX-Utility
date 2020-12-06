@@ -66,9 +66,13 @@ class Connection:
     def send(self, msg):
         self.__sendFunction(msg)
 
-    def recv(self, block=True, timeout=None):
+    def recv(self, timeout=None):
         try:
-            return self.recvQueue.get(block, timeout=timeout)
+            if timeout == None:
+                return self.recvQueue.get(block=True)
+            else:
+                return self.recvQueue.get(block=True, timeout=timeout)
+
         except queue.Empty:
             raise Timeout()
 
