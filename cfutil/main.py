@@ -21,6 +21,8 @@ import logging
 import can
 import logging.config
 import cfutil.config as config
+
+# Check for integers that could include hex values
 def auto_int(x):
     return int(x, 0)
 
@@ -32,11 +34,14 @@ def main():
     parser.add_argument('--interface', choices=l, help='CANBus Connection Interface Name')
     parser.add_argument('--channel', help='CANBus Channel or Device file')
     parser.add_argument('--bitrate', default=125, type=int, help='CANBus Bitrate')
+    parser.add_argument('--node', default=0xFF, type=auto_int, help='Node Number')
     #parser.add_argument('--ip-address', help='CANBus Network Adapter IP Address')
-    parser.add_argument('--firmware-file', help='Firmware filename')
-    parser.add_argument('--firmware-node', type=int, help='Node number to use in firmware download')
-#    parser.add_argument('--firmware-code', help='Firmware Verification Code')
-    parser.add_argument('--device', help='CANFIX Device Name')
+    parser.add_argument('--firmware-file', help='Firmware Filename')
+    parser.add_argument('--firmware-code', type=auto_int, help='Firmware Verification Code')
+    parser.add_argument('--firmware-driver', help='Firmware Driver to Use')
+    parser.add_argument('--target-node', type=auto_int, help='Destination Node Number')
+
+#    parser.add_argument('--device', help='CANFIX Device Name')
     parser.add_argument('--device-type', type=auto_int, help='CANFIX Target Device Type')
     parser.add_argument('--device-model', type=auto_int, help='CANFIX Target Device Model')
     parser.add_argument('--device-version', type=auto_int, help='CANFIX Target Device Model')

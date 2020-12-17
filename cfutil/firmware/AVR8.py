@@ -26,8 +26,8 @@ from cfutil import connection
 
 
 class Driver(FirmwareBase):
-    def __init__(self, device, filename, conn):
-        FirmwareBase.__init__(self, device, filename, conn)
+    def __init__(self, filename, node, vcode, conn):
+        FirmwareBase.__init__(self, filename, node, vcode, conn)
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)
 
@@ -57,8 +57,26 @@ class Driver(FirmwareBase):
 
     blocksize = property(getBlocksize, setBlocksize)
 
+    def __waitBufferResponse(self, channel, offset):
+        endtime = time.time() + 0.5
+        while True:
+            try:
+                rframe = self.can.recv(0.5)
+            except connection.Timeout:
+                pass
+            else:
+                if rframe.arbitration_id == 0x700 + channel + 1:
+                    if (rframe.data[0] + (rframe.data[1]<<8)) == offset:
+                        break
+                    else:
+                        raise connection.BadOffset
+            now = time.time()
+            if now > endtime:
+                raise connection.Timeout
+        return True
 
     def __fillBuffer(self, ch, address, data):
+        length = len(data)
         sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
                              data=[0x01, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24, 0, 1])
         self.can.send(sframe)
@@ -74,7 +92,6 @@ class Driver(FirmwareBase):
             now = time.time()
             if now > endtime:
                 raise connection.Timeout
-        length = len(data)
         for n in range(length//8):
             # print("[{:02}: ".format(n), end='')
             # for each in data[(8*n):(8*n) + 8]:
@@ -83,6 +100,7 @@ class Driver(FirmwareBase):
             sframe.data = data[(8*n):(8*n) + 8]
             sframe.dlc=8
             self.can.send(sframe)
+            self.__waitBufferResponse(ch, (n+1)*8)
             #time.sleep(0.3)
             # TODO Need to deal with the abort from the uC somewhere
         return True
@@ -175,6 +193,10 @@ class Driver(FirmwareBase):
             except connection.Timeout:
                 self.sendProgress(0.0)
                 self.sendStatus("FAIL: Timeout Writing Data")
+                return
+            except connection.BadOffset:
+                self.sendProgress(0.0)
+                self.sendStatus("FAIL: Bad Block Offset Received")
                 return
 
         #self.__progress = 1.0

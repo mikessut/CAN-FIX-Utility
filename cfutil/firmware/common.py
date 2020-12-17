@@ -29,17 +29,17 @@ class FirmwareError(Exception):
 
 class FirmwareBase:
     """Base Class for all firmware download drivers"""
-    def __init__(self, device, filename, conn):
-        self.can = conn
-        self.device = device # Object from EDS file
+    def __init__(self, filename, node, vcode, conn):
         self.filename = filename
+        self.destNode = node
+        self.firmwareCode = vcode
+        self.can = conn
 
         # kill when set to True should stop downloads
         self.kill = False
 
         # This is our node number
-        self.srcNode = None
-        self.destNode = None
+        self.srcNode = 0xFF #0xFF is the default for configuration software
         self.__statusCallback = None
         self.__progressCallback = None
         self.__stopCallback = None
@@ -108,7 +108,7 @@ class FirmwareBase:
         self.channel = self.__getFreeChannel()
         if self.channel < 0:
             raise FirmwareError("No Free Channel")
-        msg = canfix.UpdateFirmware(node=self.destNode, verification=self.device.fwUpdateCode, channel=self.channel)
+        msg = canfix.UpdateFirmware(node=self.destNode, verification=self.firmwareCode, channel=self.channel)
         msg.sendNode = self.srcNode
         msg.msgType = canfix.MSG_REQUEST
         self.can.send(msg.msg)

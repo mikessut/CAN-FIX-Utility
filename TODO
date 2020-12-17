@@ -3,8 +3,6 @@ sent when the node is expanded to get all the information.  This would only
 work on nodes with a proper EDS file as there is no mechanism to poll a device
 for the enabled status of a parameter.
 
-Node Configuration Dialog and features
-
 Enable / Disable parameters
 
 Write to file from traffic tab
@@ -32,3 +30,5 @@ Firmware updating has some problems:
   Test Firmware download on real hardware.
 
   Firmware download for 'unknown' devices
+
+Global configuration for our node number

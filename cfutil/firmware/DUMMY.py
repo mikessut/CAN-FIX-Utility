@@ -25,8 +25,8 @@ from .common import FirmwareBase
 import time
 
 class Driver(FirmwareBase):
-    def __init__(self, device, filename, conn):
-        FirmwareBase.__init__(self)
+    def __init__(self, filename, node, vcode, conn):
+        FirmwareBase.__init__(self, filename, node, vcode, conn)
 
         self.__ih = IntelHex()
         self.__ih.loadhex(filename)

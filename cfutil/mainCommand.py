@@ -62,14 +62,42 @@ def listen(conn, msg_count, raw):
 def fwstatus(status):
     print(status)
 
-def load_firmware(conn, filename, node, device=None):
+def load_firmware(conn, filename, args):
     import cfutil.firmware as firmware
+    driver = None
+    vcode = None
+    if args.firmware_driver:
+        driver = args.firmware_driver
 
-    # If the driver type is not given then we'll try to figure it out
-    if device == None:
+    if args.target_node:
+        node = args.target_node
+    else:
+        print("ERROR: Target Node must be given")
+        return
+
+    if args.device_type or args.device_model or args.device_version:
+        if not args.device_type:
+            print("ERROR: Device type must be given")
+        if not args.device_model:
+            print("ERROR: Device model number must be given")
+        if not args.device_version:
+            print("ERROR: Device firmware version must be given")
+        if args.device_type and args.device_model and args.device_version:
+            device = devices.findDevice(args.device_type, args.device_model, args.device_version)
+            if device:
+                print("Found {}".format(device.name))
+                print("Using Firmware Driver", device.fwDriver)
+                driver = device.fwDriver
+                vcode = device.fwUpdateCode
+            else:
+                print("ERROR: Unknown Device Given")
+                return
+
+    # If the device definition wasn't given on the command line then we'll
+    # look on the network for it.
+    if driver is None:
         # Send node Identification message to node
-        # TODO: We need to have our node set.
-        m = can.Message(arbitration_id=0x6E0, data=[0, node])
+        m = can.Message(arbitration_id=0x6E0, is_extended_id=False, data=[0, node])
         conn.send(m)
         while True:
             try:
@@ -81,17 +109,21 @@ def load_firmware(conn, filename, node, device=None):
                     if device:
                         print("Found", device.name, "At Node", node)
                         print("Using Firmware Driver", device.fwDriver)
+                        driver = device.fwDriver
+                        vcode = device.fwUpdateCode
                     else:
-                        print("Unknown Device at that node")
+                        print("ERROR: Unknown Device at that node")
                         return
-            except canbus.exceptions.DeviceTimeout:
+            except connection.Timeout:
+                print("ERROR: No device found at node 0x{:02X}", )
                 break
             except KeyboardInterrupt:
                 return
+
     try:
-        fw = firmware.Firmware(device, filename, conn)
-        fw.srcNode = 0x07
+        fw = firmware.Firmware(driver, filename, node, vcode, conn)
         fw.setStatusCallback(fwstatus)
+        fw.srcNode = args.node
         fw.destNode = node
         fw.download()
     except KeyboardInterrupt:
@@ -105,35 +137,25 @@ def run(args):
         if args.list_devices == True:
             list_devices()
             cmdrun = True
-        if args.firmware_file or args.firmware_node:
+        if args.firmware_file:
             cmdrun = True
             if not connection.canbus.connected:
                 raise(Exception("ERROR: No valid CAN Bus connection"))
-            if args.firmware_file == None:
-                args.firmware_file = input("Enter Firmware Filename:")
-            if args.firmware_node == None:
-                args.firmware_node = int(input("Enter Node Number:"))
+            if args.target_node == None:
+                # TODO: it might be nice if the argument parser did this for us?
+                raise(Exception("ERROR: Target Node Number Requried"))
 
-            if args.device_type == None and args.device_model == None and args.device_version == None:
-                load_firmware(conn, args.firmware_file, args.firmware_node)
-            else:
-                if args.device_type == None or args.device_model == None or args.device_version == None:
-                    print("ERROR: You must give device type, model and version")
-                    raise(Exception("Arguments Missing"))
-                d = devices.findDevice(args.device_type, args.device_model, args.device_version)
-                if d == None:
-                    print("ERROR: Device Not Found in Database")
-                    raise(Exception("Device Not Found in Database"))
-                load_firmware(conn, args.firmware_file, args.firmware_node, d)
+            load_firmware(conn, args.firmware_file, args)
+
         if args.listen == True:
             listen(conn, args.frame_count, args.raw)
             cmdrun = True
     except Exception as e:
         print(e)
-#        raise(e)
-    finally:
-        connection.canbus.free_connection(conn)
-        return cmdrun
+        raise(e)
+    # finally:
+    #     connection.canbus.free_connection(conn)
+    #     return cmdrun
 
 if __name__ == "__main__":
     run(None)

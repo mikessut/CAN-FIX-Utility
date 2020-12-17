@@ -56,6 +56,9 @@ class NotConnected(Exception):
 class Timeout(Exception):
     pass
 
+class BadOffset(Exception):
+    pass
+
 
 class Connection:
     """Represent a generic connection to a CANBus network"""
