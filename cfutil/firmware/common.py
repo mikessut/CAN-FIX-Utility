@@ -94,6 +94,8 @@ class FirmwareBase:
                     self.channels[msg.channel] = 1
             except connection.Timeout:
                 pass
+            except Exception as e:
+                print(e)
             finally:
                 now = time.time()
                 if now > endtime: break

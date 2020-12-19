@@ -65,7 +65,7 @@ class Driver(FirmwareBase):
             except connection.Timeout:
                 pass
             else:
-                if rframe.arbitration_id == 0x700 + channel + 1:
+                if rframe.arbitration_id == 0x7E0 + channel + 1:
                     if (rframe.data[0] + (rframe.data[1]<<8)) == offset:
                         break
                     else:
@@ -77,7 +77,7 @@ class Driver(FirmwareBase):
 
     def __fillBuffer(self, ch, address, data):
         length = len(data)
-        sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
+        sframe = can.Message(arbitration_id = 0x7E0 + ch, is_extended_id =False,
                              data=[0x01, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24, 0, 1])
         self.can.send(sframe)
         endtime = time.time() + 0.5
@@ -106,7 +106,7 @@ class Driver(FirmwareBase):
         return True
 
     def __erasePage(self, ch, address):
-        sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
+        sframe = can.Message(arbitration_id = 0x7E0 + ch, is_extended_id =False,
                              data=[0x02, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24])
         self.can.send(sframe)
         endtime = time.time() + 0.5
@@ -124,7 +124,7 @@ class Driver(FirmwareBase):
         return True
 
     def __writePage(self, ch, address):
-        sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
+        sframe = can.Message(arbitration_id = 0x7E0 + ch, is_extended_id =False,
                              data=[0x03, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24])
         self.can.send(sframe)
         endtime = time.time() + 0.5
@@ -141,9 +141,10 @@ class Driver(FirmwareBase):
                 raise connection.Timeout
 
     def __sendComplete(self, ch):
-        sframe = can.Message(arbitration_id = 0x700 + ch, is_extended_id =False,
+        sframe = can.Message(arbitration_id = 0x7E0 + ch, is_extended_id =False,
                              data=[0x05, self.__checksum & 0xFF, (self.__checksum & 0xFF00) >> 8, \
-                                   self.__size & 0xFF, (self.__size & 0xFF00) >> 8])
+                                   self.__size & 0xFF, (self.__size & 0xFF00) >> 8, \
+                                   (self.__size & 0xFF0000) >> 16, (self.__size & 0xFF000000) >> 24])
         self.can.send(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
