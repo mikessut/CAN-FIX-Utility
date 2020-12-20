@@ -90,7 +90,7 @@ class FirmwareBase:
             try:
                 rframe = self.can.recv(0.1)
                 if rframe is not None:
-                    print("***ch detect", rframe.error_state_indicator)
+                    #print("***ch detect", rframe.error_state_indicator)
                     msg = canfix.parseMessage(rframe)
                     if isinstance(msg, canfix.TwoWayConnection):
                         self.channels[msg.channel] = 1
@@ -110,7 +110,7 @@ class FirmwareBase:
         self.channel = self.__getFreeChannel()
         if self.channel < 0:
             raise FirmwareError("No Free Channel")
-        print("Channel found:", self.channel)
+        #print("Channel found:", self.channel)
         msg = canfix.UpdateFirmware(node=self.destNode, verification=self.firmwareCode, channel=self.channel)
         msg.sendNode = self.srcNode
         msg.msgType = canfix.MSG_REQUEST
@@ -122,7 +122,7 @@ class FirmwareBase:
             
             rframe = self.can.recv()
             msg = canfix.parseMessage(rframe)
-            print("****", rframe, rframe.is_error_frame)
+            #print("****", rframe, rframe.is_error_frame)
             if isinstance(msg, canfix.UpdateFirmware):
                 if msg.destNode == self.srcNode:
                     if msg.status == canfix.MSG_SUCCESS:

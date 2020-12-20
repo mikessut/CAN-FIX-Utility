@@ -4,6 +4,9 @@ import can
 from canfix.globals import TWOWAY_CONN_CHANS
 import struct
 import time
+import argparse
+import tqdm
+
 
 SECTORS = {5:  (0x8020000, 0x8040000),
            6:  (0x8040000, 0x8060000),
@@ -52,16 +55,28 @@ class STM32Firmware(FirmwareBase):
     # send code specifying done with erasing
     self.__send_recv([0xff], 0x2)
 
-    for start_addr, stop_addr in self._ih.segments():
-      #for start_addr, stop_addr in [(0x8008000, 0x8008006), (0x8008010, 0x8008018)]:
+    for ns, (start_addr, stop_addr) in enumerate(self._ih.segments()):
+      print(f"Segment {ns+1} of {len(self._ih.segments())}")
       self.__send_recv(struct.pack('II', start_addr, stop_addr - start_addr), 0x3)
       
       # Send data
-      for n in range(start_addr, stop_addr-8, 8):
+      for n in tqdm.tqdm(list(range(start_addr, stop_addr-8, 8))):
         self.__send_recv(bytearray([self._ih[xx] for xx in range(n,n+8)]), 0x4)
       # last msg has a different return code
       self.__send_recv(bytearray([self._ih[xx] for xx in range(n,n+8)]), 0x5)
 
-    # Send add 0, 0 to state we're done.
+    # Send addr 0, 0 to state we're done.
     self.__send_recv(struct.pack('II', 0, 0), 0x6)
     
+
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(epilog="Run within the first 10 seconds of AHRS powerup.")
+  parser.add_argument('fn', help=".hex filename")
+  parser.add_argument('-c', '--can', default='can0')
+  parser.add_argument('--ahrs-node-id', default=0x12, type=int)
+  args = parser.parse_args()
+
+  c = can.interface.Bus(args.can, bustype='socketcan')
+
+  f = STM32Firmware(args.fn, args.ahrs_node_id, 1, c)
+  f.update_fw()
