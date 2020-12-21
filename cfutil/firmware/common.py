@@ -89,9 +89,11 @@ class FirmwareBase:
         while True: # Wait loop
             try:
                 rframe = self.can.recv(0.1)
-                msg = canfix.parseMessage(rframe)
-                if isinstance(msg, canfix.TwoWayConnection):
-                    self.channels[msg.channel] = 1
+                if rframe is not None:
+                    #print("***ch detect", rframe.error_state_indicator)
+                    msg = canfix.parseMessage(rframe)
+                    if isinstance(msg, canfix.TwoWayConnection):
+                        self.channels[msg.channel] = 1
             except connection.Timeout:
                 pass
             finally:
@@ -108,30 +110,29 @@ class FirmwareBase:
         self.channel = self.__getFreeChannel()
         if self.channel < 0:
             raise FirmwareError("No Free Channel")
+        #print("Channel found:", self.channel)
         msg = canfix.UpdateFirmware(node=self.destNode, verification=self.firmwareCode, channel=self.channel)
         msg.sendNode = self.srcNode
         msg.msgType = canfix.MSG_REQUEST
         self.can.send(msg.msg)
         endtime = time.time() + 0.1
         while True: # Wait loop
-            if self.kill: raise FirmwareError("Canceled")
-            try:
-                rframe = self.can.recv(0.1)
-            except connection.Timeout:
-                pass
-            else:
-                msg = canfix.parseMessage(rframe)
-                #print(msg)
-                if isinstance(msg, canfix.UpdateFirmware):
-                    if msg.destNode == self.srcNode:
-                        if msg.status == canfix.MSG_SUCCESS:
-                            return True
-                        else:
-                            log.warn("Firmware Update received with error code {}".format(msg.errorCode))
-                            raise FirmwareError("Error {} Received".format(msg.errorCode))
-            finally:
-                now = time.time()
-                if now > endtime: return False
+            if self.kill: 
+                raise FirmwareError("Canceled")
+            
+            rframe = self.can.recv()
+            msg = canfix.parseMessage(rframe)
+            #print("****", rframe, rframe.is_error_frame)
+            if isinstance(msg, canfix.UpdateFirmware):
+                if msg.destNode == self.srcNode:
+                    if msg.status == canfix.MSG_SUCCESS:
+                        return True
+                    else:
+                        log.warn("Firmware Update received with error code {}".format(msg.errorCode))
+                        raise FirmwareError("Error {} Received".format(msg.errorCode))
+
+            now = time.time()
+            if now > endtime: return False
         return True
 
     def start_download(self):
