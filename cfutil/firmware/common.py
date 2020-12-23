@@ -119,19 +119,23 @@ class FirmwareBase:
         self.can.send(msg.msg)
         endtime = time.time() + 0.1
         while True: # Wait loop
-            if self.kill: 
+            if self.kill:
                 raise FirmwareError("Canceled")
-            
-            rframe = self.can.recv()
-            msg = canfix.parseMessage(rframe)
-            #print("****", rframe, rframe.is_error_frame)
-            if isinstance(msg, canfix.UpdateFirmware):
-                if msg.destNode == self.srcNode:
-                    if msg.status == canfix.MSG_SUCCESS:
-                        return True
-                    else:
-                        log.warn("Firmware Update received with error code {}".format(msg.errorCode))
-                        raise FirmwareError("Error {} Received".format(msg.errorCode))
+            try:
+                rframe = self.can.recv(0.1)
+            except connection.Timeout:
+                rframe = None
+
+            if rframe != None:
+                msg = canfix.parseMessage(rframe, silent=True)
+                #print("****", rframe, rframe.is_error_frame)
+                if isinstance(msg, canfix.UpdateFirmware):
+                    if msg.destNode == self.srcNode:
+                        if msg.status == canfix.MSG_SUCCESS:
+                            return True
+                        else:
+                            log.warn("Firmware Update received with error code {}".format(msg.errorCode))
+                            raise FirmwareError("Error {} Received".format(msg.errorCode))
 
             now = time.time()
             if now > endtime: return False
