@@ -1,3 +1,7 @@
+"""
+STM32 device type is 0xB4
+"""
+
 from . import FirmwareBase
 from intelhex import IntelHex
 import can
@@ -18,7 +22,7 @@ SECTORS = {5:  (0x8020000, 0x8040000),
           }
 
 
-class STM32Firmware(FirmwareBase):
+class Driver(FirmwareBase):
 
   def __init__(self, filename, node, vcode, conn):
     super().__init__(filename, node, vcode, conn)
@@ -45,7 +49,7 @@ class STM32Firmware(FirmwareBase):
       if len(s) > 0:
         yield sect
 
-  def update_fw(self):
+  def download(self):
     self.start_download()  # This will set self.channel
         
     # Erase necessary sectors

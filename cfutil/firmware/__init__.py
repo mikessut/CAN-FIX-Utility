@@ -35,6 +35,10 @@ def Firmware(driver, filename, node, vcode, conn):
         d = AVR8.Driver(filename, node, vcode, conn)
         d.setArg("blocksize", 256)
         return d
+    elif driver == "STM32":
+        from . import STM32
+        d = STM32.Driver(filename, node, vcode, conn)
+        return d
     elif driver == "DUMMY":
         from . import DUMMY
         return DUMMY.Driver(filename, node, vcode, conn)
