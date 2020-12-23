@@ -77,8 +77,9 @@ class Driver(FirmwareBase):
 
     def __fillBuffer(self, ch, address, data):
         length = len(data)
+        print("Address 0x{:08X} {}".format(address, address))
         sframe = can.Message(arbitration_id = 0x7E0 + ch, is_extended_id =False,
-                             data=[0x01, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24, 0, 1])
+                             data=[0x01, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000) >> 16, (address & 0xFF000000) >> 24, 0, 1])
         self.can.send(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
@@ -107,7 +108,7 @@ class Driver(FirmwareBase):
 
     def __erasePage(self, ch, address):
         sframe = can.Message(arbitration_id = 0x7E0 + ch, is_extended_id =False,
-                             data=[0x02, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24])
+                             data=[0x02, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000) >> 16, (address & 0xFF000000) >> 24])
         self.can.send(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
@@ -125,7 +126,7 @@ class Driver(FirmwareBase):
 
     def __writePage(self, ch, address):
         sframe = can.Message(arbitration_id = 0x7E0 + ch, is_extended_id =False,
-                             data=[0x03, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000 >> 16), (address & 0xFF000000) >> 24])
+                             data=[0x03, address & 0xFF, (address & 0xFF00) >> 8, (address & 0xFF0000) >> 16, (address & 0xFF000000) >> 24])
         self.can.send(sframe)
         endtime = time.time() + 0.5
         while True: # Channel wait loop
